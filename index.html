@@ -4,329 +4,999 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash NDA Generator | SBLC Business Lawyers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'claude-bg': '#FFFCF5',
-                        'claude-card': '#FFFFFF',
-                        'claude-border': '#E8E4DB',
-                        'claude-text': '#2D2B28',
-                        'claude-muted': '#8C8780',
-                        'claude-orange': '#D97757',
-                        'claude-orange-hover': '#C5684A',
-                        'claude-cream': '#FAF7F2',
-                        'claude-warm': '#F5F1EA',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { background-color: #FFFCF5; color: #2D2B28; }
-        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-        @media (max-width: 640px) { .checkbox-grid { grid-template-columns: 1fr; } }
-        .loading { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .generated-nda { font-family: 'Times New Roman', serif; line-height: 1.8; color: #2D2B28; }
-        .generated-nda h1 { font-size: 1.5rem; font-weight: bold; margin-top: 1.5em; margin-bottom: 0.5em; text-align: center; }
-        .generated-nda h2 { font-size: 1.1rem; font-weight: bold; margin-top: 1.2em; margin-bottom: 0.5em; }
-        .generated-nda p { margin-bottom: 0.8em; text-align: justify; }
-        input, select { 
-            background-color: #FFFFFF !important; 
-            border: 1px solid #E8E4DB !important; 
-            color: #2D2B28 !important; 
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0C0E12;
+            --bg-elevated: #14161C;
+            --bg-card: #1A1D25;
+            --bg-card-hover: #1E2230;
+            --bg-input: #12141A;
+            --border: #2A2D38;
+            --border-focus: #C8A45C;
+            --text: #E8E6E1;
+            --text-secondary: #8A8B94;
+            --text-muted: #5C5D66;
+            --accent: #C8A45C;
+            --accent-hover: #D4B36A;
+            --accent-dim: rgba(200,164,92,0.12);
+            --accent-glow: rgba(200,164,92,0.25);
+            --success: #4ADE80;
+            --warning: #FBBF24;
+            --error: #F87171;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
         }
-        input::placeholder { color: #8C8780 !important; }
-        input:focus, select:focus { 
-            border-color: #D97757 !important; 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.15);
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
-        .fill-tab.active { background-color: #D97757 !important; color: white !important; }
-        .autocomplete-dropdown { 
-            position: absolute; top: 100%; left: 0; right: 0; 
-            background: white; border: 1px solid #E8E4DB; border-radius: 0.5rem; 
-            max-height: 240px; overflow-y: auto; z-index: 50; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+
+        /* Subtle grain texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
         }
-        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #F5F1EA; }
-        .autocomplete-item:hover { background-color: #FAF7F2; }
-        .autocomplete-item:last-child { border-bottom: none; }
-        .section-title { font-weight: 600; color: #2D2B28; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #E8E4DB; }
+
+        /* ═══════ HEADER ═══════ */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(12,14,18,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .header-brand h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.25rem;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        .header-brand p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .header-logo img { height: 22px; opacity: 0.7; transition: opacity 0.2s; }
+        .header-logo img:hover { opacity: 1; }
+
+        /* ═══════ MAIN ═══════ */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════ STEPPER ═══════ */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 36px;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: default;
+            white-space: nowrap;
+        }
+        .step-item.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(200,164,92,0.25);
+        }
+        .step-item.done {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(200,164,92,0.25);
+        }
+        .step-item.inactive {
+            color: var(--text-muted);
+            border: 1px solid transparent;
+        }
+        .step-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .step-item.active .step-num { background: var(--accent); color: var(--bg); }
+        .step-item.done .step-num { background: var(--accent); color: var(--bg); }
+        .step-item.inactive .step-num { background: var(--border); color: var(--text-muted); }
+        .step-connector {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+        @media (max-width: 640px) {
+            .step-item span:not(.step-num) { display: none; }
+            .step-item { padding: 10px 14px; }
+            .step-connector { width: 20px; }
+        }
+
+        /* ═══════ CARDS ═══════ */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: #3A3D48; }
+        .card-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.05rem;
+            color: var(--text);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title .badge {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 4px 10px;
+            border-radius: 100px;
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        /* ═══════ GRID ═══════ */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .three-col { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 500px) { .three-col { grid-template-columns: 1fr; } }
+
+        /* ═══════ FORMS ═══════ */
+        label.field-label {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        select { cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8B94' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .field-group { margin-bottom: 16px; }
+        .field-group:last-child { margin-bottom: 0; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+
+        /* ═══════ AUTOFILL TABS ═══════ */
+        .autofill-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .autofill-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .autofill-tab {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .autofill-tab:hover { background: var(--bg-card); color: var(--text); }
+        .autofill-tab.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-color: rgba(200,164,92,0.2);
+        }
+        .autofill-tab svg { width: 14px; height: 14px; }
+        .autofill-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .autofill-row {
+            display: flex;
+            gap: 8px;
+        }
+        .autofill-row input { flex: 1; }
+        .autofill-row .btn-fill {
+            padding: 10px 16px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .autofill-row .btn-fill:hover { background: var(--accent-hover); }
+
+        /* ═══════ AUTOCOMPLETE ═══════ */
+        .autocomplete-wrap { position: relative; }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+            display: none;
+        }
+        .autocomplete-dropdown.show { display: block; }
+        .ac-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .ac-item:last-child { border-bottom: none; }
+        .ac-item:hover { background: var(--bg-card-hover); }
+        .ac-name { font-weight: 600; color: var(--text); font-size: 0.88rem; }
+        .ac-meta {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .ac-tag {
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .ac-tag-id { background: rgba(200,164,92,0.1); color: var(--accent); }
+        .ac-tag-jur { background: rgba(138,139,148,0.15); color: var(--text-secondary); }
+        .ac-tag-status { font-family: 'DM Sans', sans-serif; font-weight: 500; color: var(--text-muted); font-size: 0.72rem; }
+        .ac-address { font-size: 0.75rem; margin-top: 4px; color: var(--success); }
+        .ac-address.missing { color: var(--warning); }
+        .ac-source { font-size: 0.68rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+        .ac-loading {
+            padding: 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+        .ac-loading .spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ═══════ UPLOAD ZONE ═══════ */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+        .upload-zone .icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .upload-zone .label { font-size: 0.82rem; color: var(--text-secondary); }
+        .upload-zone .hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* ═══════ STATUS ═══════ */
+        .parse-status {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+        .parse-status.visible { display: flex; }
+        .parse-status.success { color: var(--success); }
+        .parse-status.error { color: var(--error); }
+        .parse-status.warning { color: var(--warning); }
+        .parse-status.loading { color: var(--text-muted); }
+
+        /* ═══════ CHECKBOX GRID ═══════ */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        @media (max-width: 640px) { .checkbox-grid { grid-template-columns: repeat(2, 1fr); } }
+        .cb-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .cb-item:hover { border-color: var(--accent); background: var(--accent-dim); }
+        .cb-item input[type="checkbox"] {
+            width: 16px; height: 16px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        /* ═══════ TEMPLATE SELECT ═══════ */
+        .template-bar {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .template-bar .icon { font-size: 1.1rem; }
+        .template-bar select { flex: 1; background: var(--bg-card); }
+        .template-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* ═══════ BUTTONS ═══════ */
+        .btn-primary {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--accent), #B8943F);
+            color: var(--bg);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s;
+            letter-spacing: -0.01em;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-primary svg { width: 20px; height: 20px; }
+
+        .btn-secondary {
+            padding: 12px 20px;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.2s;
+            padding: 0;
+        }
+        .btn-back:hover { color: var(--accent); }
+        .btn-back svg { width: 18px; height: 18px; }
+
+        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        @media (max-width: 500px) { .action-row { grid-template-columns: 1fr; } }
+
+        /* ═══════ SAVE BUTTON ═══════ */
+        .save-btn {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .save-btn:hover { color: var(--accent); }
+        .saved-notice {
+            display: none;
+            padding: 8px 12px;
+            background: rgba(74,222,128,0.08);
+            border: 1px solid rgba(74,222,128,0.2);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--success);
+            margin-bottom: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .saved-notice.show { display: flex; }
+        .saved-notice .clear-btn {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* ═══════ LOADING ═══════ */
+        .loading-box {
+            display: none;
+            text-align: center;
+            padding: 48px 24px;
+        }
+        .loading-box.show { display: block; }
+        .loading-spinner {
+            width: 48px; height: 48px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        .loading-box .title { font-weight: 600; color: var(--text); font-size: 0.95rem; }
+        .loading-box .subtitle { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+
+        /* ═══════ RESULT ═══════ */
+        .result-box { display: none; }
+        .result-box.show { display: block; }
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .result-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.05rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-title .check { color: var(--success); }
+        .result-actions { display: flex; gap: 8px; }
+        .nda-output {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            max-height: 520px;
+            overflow-y: auto;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.85;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        .nda-output h1 { font-size: 1.35rem; font-weight: bold; margin: 1.5em 0 0.5em; text-align: center; font-family: 'DM Serif Display', serif; }
+        .nda-output h2 { font-size: 1.05rem; font-weight: bold; margin: 1.2em 0 0.5em; font-family: 'DM Serif Display', serif; }
+        .nda-output p { margin-bottom: 0.8em; text-align: justify; }
+        .nda-output::-webkit-scrollbar { width: 6px; }
+        .nda-output::-webkit-scrollbar-track { background: transparent; }
+        .nda-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* ═══════ CTA FOOTER ═══════ */
+        .cta-box {
+            display: none;
+            margin-top: 28px;
+        }
+        .cta-box.show { display: block; }
+        .cta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 600px) { .cta-row { grid-template-columns: 1fr; } }
+        .cta-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .cta-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .cta-item-accent {
+            background: linear-gradient(135deg, var(--accent), #B8943F);
+            border-color: transparent;
+        }
+        .cta-item-accent:hover { border-color: transparent; box-shadow: 0 8px 24px var(--accent-glow); }
+        .cta-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .cta-item .cta-icon { background: var(--bg-elevated); }
+        .cta-item-accent .cta-icon { background: rgba(255,255,255,0.2); }
+        .cta-text .cta-name { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+        .cta-text .cta-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 1px; }
+        .cta-item-accent .cta-text .cta-name { color: var(--bg); }
+        .cta-item-accent .cta-text .cta-desc { color: rgba(12,14,18,0.65); }
+        .cta-price { font-weight: 700; font-size: 0.95rem; margin-left: auto; white-space: nowrap; }
+        .cta-item .cta-price { color: var(--accent); }
+        .cta-item-accent .cta-price { color: var(--bg); }
+        .cta-label {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* ═══════ INFO BANNER ═══════ */
+        .info-banner {
+            background: var(--accent-dim);
+            border: 1px solid rgba(200,164,92,0.18);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+        .info-banner strong { font-weight: 600; }
+
+        /* ═══════ DONE BOX ═══════ */
+        .done-box {
+            text-align: center;
+            padding: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-top: 20px;
+        }
+        .done-box .emoji { font-size: 1.5rem; margin-bottom: 8px; }
+        .done-box .msg { font-weight: 600; color: var(--text); font-size: 0.92rem; }
+
+        /* ═══════ FOOTER ═══════ */
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        footer p, footer a { font-size: 0.78rem; color: var(--text-muted); }
+        footer a { text-decoration: none; transition: color 0.2s; }
+        footer a:hover { color: var(--accent); }
+        .footer-links { display: flex; gap: 16px; }
+
+        /* ═══════ ADDRESS SELECT ═══════ */
+        .address-selection {
+            display: none;
+            margin-top: 8px;
+        }
+        .address-selection.show { display: block; }
+
+        /* ═══════ HIDDEN ═══════ */
+        .hidden { display: none !important; }
+
+        /* ═══════ SECTION SPACER ═══════ */
+        .section-gap { margin-top: 20px; }
+        .section-gap-lg { margin-top: 28px; }
+
+        /* Scrollbar for autocomplete */
+        .autocomplete-dropdown::-webkit-scrollbar { width: 5px; }
+        .autocomplete-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .autocomplete-dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header -->
-    <header class="bg-white border-b border-claude-border sticky top-0 z-10">
-        <div class="max-w-5xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                    <h1 class="text-xl font-bold text-claude-text">Flash NDA Generator</h1>
-                    <p class="text-sm text-claude-muted">Generate enforceable NDAs in 90 seconds</p>
-                </div>
-                <a href="https://sblc.com.ua" target="_blank">
-                    <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC" class="h-6">
-                </a>
+<body>
+    <!-- ═══════ HEADER ═══════ -->
+    <header>
+        <div class="header-inner">
+            <div class="header-brand">
+                <h1>Flash NDA Generator</h1>
+                <p>Generate enforceable NDAs in 90 seconds</p>
             </div>
+            <a href="https://sblc.com.ua" target="_blank" class="header-logo">
+                <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC Law Firm">
+            </a>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-8">
-        <!-- Progress Steps -->
-        <div class="flex items-center justify-center mb-8 flex-wrap gap-2">
-            <div class="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
-                <div id="step1-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-orange text-white rounded-full text-sm font-medium">
-                    <span class="w-6 h-6 bg-white text-claude-orange rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                    <span class="hidden sm:inline">Flash NDA</span>
-                </div>
-                <svg class="w-5 h-5 text-claude-border" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <div id="step2-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-warm text-claude-muted rounded-full text-sm font-medium border border-claude-border">
-                    <span class="w-6 h-6 bg-claude-border text-claude-muted rounded-full flex items-center justify-center text-xs font-bold">+</span>
-                    <span class="hidden sm:inline">Enhanced</span>
-                </div>
-                <div id="step3-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-warm text-claude-muted rounded-full text-sm font-medium border border-claude-border">
-                    <span class="w-6 h-6 bg-claude-border text-claude-muted rounded-full flex items-center justify-center text-xs font-bold">+</span>
-                    <span class="hidden sm:inline">Summary</span>
-                </div>
+    <main>
+        <!-- ═══════ STEPPER ═══════ -->
+        <div class="stepper">
+            <div id="step1-badge" class="step-item active">
+                <span class="step-num" id="step1-num">1</span>
+                <span>Flash NDA</span>
+            </div>
+            <div class="step-connector"></div>
+            <div id="step2-badge" class="step-item inactive">
+                <span class="step-num" id="step2-num">+</span>
+                <span>Enhanced</span>
+            </div>
+            <div class="step-connector"></div>
+            <div id="step3-badge" class="step-item inactive">
+                <span class="step-num" id="step3-num">+</span>
+                <span>Summary</span>
             </div>
         </div>
 
-        <!-- STEP 1: Flash NDA -->
+        <!-- ═══════════════════════════════════ -->
+        <!-- STEP 1: Flash NDA                  -->
+        <!-- ═══════════════════════════════════ -->
         <div id="step1" class="space-y-6">
-            <div class="grid lg:grid-cols-2 gap-6">
-                
-                <!-- Party A (Your Details) -->
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-claude-border">
-                        <h3 class="font-semibold text-claude-text">Party A (You)</h3>
-                        <button onclick="savePartyData('A')" class="text-xs text-claude-muted hover:text-claude-orange flex items-center gap-1">
-                            <span id="savePartyAIcon">💾</span> <span id="savePartyAText">Save</span>
+            <div class="two-col">
+                <!-- ─── Party A ─── -->
+                <div class="card">
+                    <div class="card-title">
+                        Party A — You
+                        <button class="save-btn" onclick="savePartyData('A')">
+                            <span id="savePartyAIcon">💾</span>
+                            <span id="savePartyAText">Save</span>
                         </button>
                     </div>
-                    <div id="savedPartyANotice" class="hidden mb-4 p-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700 flex items-center justify-between">
-                        <span>✓ Loaded from saved</span>
-                        <button onclick="clearPartyData('A')" class="text-red-500 hover:text-red-700">Clear</button>
+                    <div id="savedPartyANotice" class="saved-notice">
+                        <span>✓ Loaded from saved data</span>
+                        <button class="clear-btn" onclick="clearPartyData('A')">Clear</button>
                     </div>
-                    
-                    <!-- Quick Fill Options for Party A -->
-                    <div class="mb-5 p-4 bg-claude-cream rounded-xl border border-claude-border">
-                        <div class="flex gap-2 mb-3 flex-wrap">
-                            <button onclick="showFillOption('A', 'name')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-orange text-white active">🔍 Name</button>
-                            <button onclick="showFillOption('A', 'url')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🔗 Website</button>
-                            <button onclick="showFillOption('A', 'email')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📧 Email</button>
-                            <button onclick="showFillOption('A', 'card')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📇 Card</button>
-                            <button onclick="showFillOption('A', 'history')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🕐 History</button>
+
+                    <!-- Autofill box -->
+                    <div class="autofill-box">
+                        <div class="autofill-tabs">
+                            <button class="autofill-tab fill-tab-A active" onclick="showFillOption('A','name',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                Name
+                            </button>
+                            <button class="autofill-tab fill-tab-A" onclick="showFillOption('A','url',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                                Website
+                            </button>
+                            <button class="autofill-tab fill-tab-A" onclick="showFillOption('A','email',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>
+                                Email
+                            </button>
+                            <button class="autofill-tab fill-tab-A" onclick="showFillOption('A','card',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4m-4-3h2"/><circle cx="16" cy="12" r="2"/></svg>
+                                Card
+                            </button>
+                            <button class="autofill-tab fill-tab-A" onclick="showFillOption('A','history',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                History
+                            </button>
                         </div>
-                        
                         <div id="fillOption-A-name" class="fill-option-A">
-                            <div class="relative">
-                                <input type="text" id="partyANameSearch" placeholder="Start typing company name..." oninput="searchCompanyByName('A')" class="w-full px-4 py-2 rounded-lg text-sm">
-                                <div id="partyAAutocomplete" class="autocomplete-dropdown hidden"></div>
+                            <div class="autocomplete-wrap">
+                                <input type="text" id="partyANameSearch" placeholder="Start typing company name…" oninput="searchCompanyByName('A')">
+                                <div id="partyAAutocomplete" class="autocomplete-dropdown"></div>
                             </div>
-                            <p class="text-xs text-claude-muted mt-1">Search UK, EU, US company registries</p>
+                            <div class="autofill-hint">Search UK, EU & 140+ country registries</div>
                         </div>
-                        
                         <div id="fillOption-A-url" class="fill-option-A hidden">
-                            <div class="flex gap-2">
-                                <input type="url" id="partyAUrl" placeholder="https://company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
-                                <button onclick="parseWebsite('A')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            <div class="autofill-row">
+                                <input type="url" id="partyAUrl" placeholder="https://company.com">
+                                <button class="btn-fill" onclick="parseWebsite('A')">Autofill</button>
                             </div>
                         </div>
-                        
                         <div id="fillOption-A-email" class="fill-option-A hidden">
-                            <div class="flex gap-2">
-                                <input type="email" id="partyAEmailInput" placeholder="contact@company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
-                                <button onclick="parseFromEmail('A')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            <div class="autofill-row">
+                                <input type="email" id="partyAEmailInput" placeholder="contact@company.com">
+                                <button class="btn-fill" onclick="parseFromEmail('A')">Autofill</button>
                             </div>
-                            <p class="text-xs text-claude-muted mt-1">We'll parse the company website from the email domain</p>
+                            <div class="autofill-hint">We'll parse the company website from the email domain</div>
                         </div>
-                        
                         <div id="fillOption-A-card" class="fill-option-A hidden">
-                            <label class="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-claude-border rounded-lg cursor-pointer hover:border-claude-orange transition-colors">
-                                <span class="text-claude-muted text-sm">📇 Click to upload business card</span>
-                                <span class="text-xs text-claude-muted mt-1">JPG, PNG</span>
+                            <label class="upload-zone">
+                                <div class="icon">📇</div>
+                                <div class="label">Click to upload business card</div>
+                                <div class="hint">JPG, PNG — AI will extract details</div>
                                 <input type="file" id="partyACardInput" accept="image/*" class="hidden" onchange="parseBusinessCard(event, 'A')">
                             </label>
                         </div>
-                        
                         <div id="fillOption-A-history" class="fill-option-A hidden">
-                            <select id="partyAHistoryDropdown" onchange="loadFromHistory('A')" class="w-full px-4 py-2 rounded-lg text-sm">
-                                <option value="">-- Select from recent --</option>
+                            <select id="partyAHistoryDropdown" onchange="loadFromHistory('A')">
+                                <option value="">— Select from recent —</option>
                             </select>
-                            <p id="noHistoryMsgA" class="hidden text-xs text-claude-muted mt-2">No history yet</p>
+                            <p id="noHistoryMsgA" class="hidden autofill-hint">No history yet</p>
                         </div>
-                        
-                        <p id="parseStatusA" class="text-xs text-claude-muted mt-2 hidden"></p>
-                        
-                        <div id="addressSelectionA" class="hidden mt-3">
-                            <label class="block text-sm text-claude-muted mb-1">Select address:</label>
-                            <select id="addressDropdownA" onchange="handleAddressSelection('A')" class="w-full px-4 py-2 rounded-lg text-sm"></select>
-                            <input type="text" id="customAddressInputA" placeholder="Enter custom address" class="hidden w-full px-4 py-2 rounded-lg text-sm mt-2">
+                        <div id="parseStatusA" class="parse-status"></div>
+                        <div id="addressSelectionA" class="address-selection">
+                            <label class="field-label">Select address:</label>
+                            <select id="addressDropdownA" onchange="handleAddressSelection('A')"></select>
+                            <input type="text" id="customAddressInputA" placeholder="Enter custom address" class="hidden" style="margin-top:8px">
                         </div>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="field-group">
+                        <label class="field-label">Company / Person Name *</label>
+                        <input type="text" id="partyAName" placeholder="Acme Corp LLC">
+                    </div>
+                    <div class="field-row field-group">
                         <div>
-                            <label class="block text-sm text-claude-muted mb-1">Company / Person Name *</label>
-                            <input type="text" id="partyAName" placeholder="Acme Corp LLC" class="w-full px-4 py-3 rounded-lg text-sm">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Type</label>
-                                <select id="partyAType" class="w-full px-4 py-3 rounded-lg text-sm">
-                                    <option value="company">Company</option>
-                                    <option value="individual">Individual</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Company Number</label>
-                                <input type="text" id="partyACompanyNumber" placeholder="12345678" class="w-full px-4 py-3 rounded-lg text-sm">
-                            </div>
+                            <label class="field-label">Type</label>
+                            <select id="partyAType">
+                                <option value="company">Company</option>
+                                <option value="individual">Individual</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-claude-muted mb-1">Registered Address *</label>
-                            <input type="text" id="partyAAddress" placeholder="123 Main St, City, Country" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <label class="field-label">Company Number</label>
+                            <input type="text" id="partyACompanyNumber" placeholder="12345678">
                         </div>
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Email</label>
-                            <input type="email" id="partyAEmail" placeholder="legal@company.com" class="w-full px-4 py-3 rounded-lg text-sm">
-                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Registered Address *</label>
+                        <input type="text" id="partyAAddress" placeholder="123 Main St, City, Country">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Email</label>
+                        <input type="email" id="partyAEmail" placeholder="legal@company.com">
                     </div>
                 </div>
 
-                <!-- Party B (Counterparty) -->
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-claude-border">
-                        <h3 class="font-semibold text-claude-text">Party B (Counterparty)</h3>
-                        <button onclick="savePartyData('B')" class="text-xs text-claude-muted hover:text-claude-orange flex items-center gap-1">
-                            <span id="savePartyBIcon">💾</span> <span id="savePartyBText">Save</span>
+                <!-- ─── Party B ─── -->
+                <div class="card">
+                    <div class="card-title">
+                        Party B — Counterparty
+                        <button class="save-btn" onclick="savePartyData('B')">
+                            <span id="savePartyBIcon">💾</span>
+                            <span id="savePartyBText">Save</span>
                         </button>
                     </div>
-                    <div id="savedPartyBNotice" class="hidden mb-4 p-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700 flex items-center justify-between">
-                        <span>✓ Loaded from saved</span>
-                        <button onclick="clearPartyData('B')" class="text-red-500 hover:text-red-700">Clear</button>
+                    <div id="savedPartyBNotice" class="saved-notice">
+                        <span>✓ Loaded from saved data</span>
+                        <button class="clear-btn" onclick="clearPartyData('B')">Clear</button>
                     </div>
-                    
-                    <!-- Quick Fill Options for Party B -->
-                    <div class="mb-5 p-4 bg-claude-cream rounded-xl border border-claude-border">
-                        <div class="flex gap-2 mb-3 flex-wrap">
-                            <button onclick="showFillOption('B', 'name')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-orange text-white active">🔍 Name</button>
-                            <button onclick="showFillOption('B', 'url')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🔗 Website</button>
-                            <button onclick="showFillOption('B', 'email')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📧 Email</button>
-                            <button onclick="showFillOption('B', 'card')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📇 Card</button>
-                            <button onclick="showFillOption('B', 'history')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🕐 History</button>
+
+                    <div class="autofill-box">
+                        <div class="autofill-tabs">
+                            <button class="autofill-tab fill-tab-B active" onclick="showFillOption('B','name',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                Name
+                            </button>
+                            <button class="autofill-tab fill-tab-B" onclick="showFillOption('B','url',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                                Website
+                            </button>
+                            <button class="autofill-tab fill-tab-B" onclick="showFillOption('B','email',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7"/></svg>
+                                Email
+                            </button>
+                            <button class="autofill-tab fill-tab-B" onclick="showFillOption('B','card',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4m-4-3h2"/><circle cx="16" cy="12" r="2"/></svg>
+                                Card
+                            </button>
+                            <button class="autofill-tab fill-tab-B" onclick="showFillOption('B','history',this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                History
+                            </button>
                         </div>
-                        
                         <div id="fillOption-B-name" class="fill-option-B">
-                            <div class="relative">
-                                <input type="text" id="partyBNameSearch" placeholder="Start typing company name..." oninput="searchCompanyByName('B')" class="w-full px-4 py-2 rounded-lg text-sm">
-                                <div id="partyBAutocomplete" class="autocomplete-dropdown hidden"></div>
+                            <div class="autocomplete-wrap">
+                                <input type="text" id="partyBNameSearch" placeholder="Start typing company name…" oninput="searchCompanyByName('B')">
+                                <div id="partyBAutocomplete" class="autocomplete-dropdown"></div>
                             </div>
-                            <p class="text-xs text-claude-muted mt-1">Search UK, EU, US company registries</p>
+                            <div class="autofill-hint">Search UK, EU & 140+ country registries</div>
                         </div>
-                        
                         <div id="fillOption-B-url" class="fill-option-B hidden">
-                            <div class="flex gap-2">
-                                <input type="url" id="partyBUrl" placeholder="https://company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
-                                <button onclick="parseWebsite('B')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            <div class="autofill-row">
+                                <input type="url" id="partyBUrl" placeholder="https://company.com">
+                                <button class="btn-fill" onclick="parseWebsite('B')">Autofill</button>
                             </div>
                         </div>
-                        
                         <div id="fillOption-B-email" class="fill-option-B hidden">
-                            <div class="flex gap-2">
-                                <input type="email" id="partyBEmailInput" placeholder="contact@company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
-                                <button onclick="parseFromEmail('B')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            <div class="autofill-row">
+                                <input type="email" id="partyBEmailInput" placeholder="contact@company.com">
+                                <button class="btn-fill" onclick="parseFromEmail('B')">Autofill</button>
                             </div>
-                            <p class="text-xs text-claude-muted mt-1">We'll parse the company website from the email domain</p>
+                            <div class="autofill-hint">We'll parse the company website from the email domain</div>
                         </div>
-                        
                         <div id="fillOption-B-card" class="fill-option-B hidden">
-                            <label class="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-claude-border rounded-lg cursor-pointer hover:border-claude-orange transition-colors">
-                                <span class="text-claude-muted text-sm">📇 Click to upload business card</span>
-                                <span class="text-xs text-claude-muted mt-1">JPG, PNG</span>
+                            <label class="upload-zone">
+                                <div class="icon">📇</div>
+                                <div class="label">Click to upload business card</div>
+                                <div class="hint">JPG, PNG — AI will extract details</div>
                                 <input type="file" id="partyBCardInput" accept="image/*" class="hidden" onchange="parseBusinessCard(event, 'B')">
                             </label>
                         </div>
-                        
                         <div id="fillOption-B-history" class="fill-option-B hidden">
-                            <select id="partyBHistoryDropdown" onchange="loadFromHistory('B')" class="w-full px-4 py-2 rounded-lg text-sm">
-                                <option value="">-- Select from recent --</option>
+                            <select id="partyBHistoryDropdown" onchange="loadFromHistory('B')">
+                                <option value="">— Select from recent —</option>
                             </select>
-                            <p id="noHistoryMsgB" class="hidden text-xs text-claude-muted mt-2">No history yet</p>
+                            <p id="noHistoryMsgB" class="hidden autofill-hint">No history yet</p>
                         </div>
-                        
-                        <p id="parseStatusB" class="text-xs text-claude-muted mt-2 hidden"></p>
-                        
-                        <div id="addressSelectionB" class="hidden mt-3">
-                            <label class="block text-sm text-claude-muted mb-1">Select address:</label>
-                            <select id="addressDropdownB" onchange="handleAddressSelection('B')" class="w-full px-4 py-2 rounded-lg text-sm"></select>
-                            <input type="text" id="customAddressInputB" placeholder="Enter custom address" class="hidden w-full px-4 py-2 rounded-lg text-sm mt-2">
+                        <div id="parseStatusB" class="parse-status"></div>
+                        <div id="addressSelectionB" class="address-selection">
+                            <label class="field-label">Select address:</label>
+                            <select id="addressDropdownB" onchange="handleAddressSelection('B')"></select>
+                            <input type="text" id="customAddressInputB" placeholder="Enter custom address" class="hidden" style="margin-top:8px">
                         </div>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="field-group">
+                        <label class="field-label">Company / Person Name *</label>
+                        <input type="text" id="partyBName" placeholder="Partner Corp Ltd">
+                    </div>
+                    <div class="field-row field-group">
                         <div>
-                            <label class="block text-sm text-claude-muted mb-1">Company / Person Name *</label>
-                            <input type="text" id="partyBName" placeholder="XYZ Ltd" class="w-full px-4 py-3 rounded-lg text-sm">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Type</label>
-                                <select id="partyBType" class="w-full px-4 py-3 rounded-lg text-sm">
-                                    <option value="company">Company</option>
-                                    <option value="individual">Individual</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Company Number</label>
-                                <input type="text" id="partyBCompanyNumber" placeholder="12345678" class="w-full px-4 py-3 rounded-lg text-sm">
-                            </div>
+                            <label class="field-label">Type</label>
+                            <select id="partyBType">
+                                <option value="company">Company</option>
+                                <option value="individual">Individual</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-claude-muted mb-1">Registered Address *</label>
-                            <input type="text" id="partyBAddress" placeholder="456 Oak Ave, City, Country" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <label class="field-label">Company Number</label>
+                            <input type="text" id="partyBCompanyNumber" placeholder="12345678">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Registered Address *</label>
+                        <input type="text" id="partyBAddress" placeholder="456 High St, London, UK">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Email</label>
+                        <input type="email" id="partyBEmail" placeholder="info@partner.com">
+                    </div>
+                    <div class="field-row field-group">
+                        <div>
+                            <label class="field-label">Role</label>
+                            <select id="partyBRole">
+                                <option value="contractor">Contractor</option>
+                                <option value="consultant">Consultant</option>
+                                <option value="advisor">Advisor</option>
+                                <option value="partner">Partner</option>
+                                <option value="investor">Investor</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-sm text-claude-muted mb-1">Email</label>
-                            <input type="email" id="partyBEmail" placeholder="contact@xyz.com" class="w-full px-4 py-3 rounded-lg text-sm">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Role</label>
-                                <select id="partyBRole" class="w-full px-4 py-3 rounded-lg text-sm">
-                                    <option value="contractor">Contractor</option>
-                                    <option value="consultant">Consultant</option>
-                                    <option value="advisor">Advisor</option>
-                                    <option value="partner">Partner</option>
-                                    <option value="investor">Investor</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Bind employees?</label>
-                                <select id="bindOthers" class="w-full px-4 py-3 rounded-lg text-sm">
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
+                            <label class="field-label">Bind employees?</label>
+                            <select id="bindOthers">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NDA Terms -->
-            <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                <h3 class="section-title">NDA Terms</h3>
-                
-                <!-- Quick Templates -->
-                <div class="mb-6 p-4 bg-claude-cream rounded-xl border border-claude-border">
-                    <label class="block text-sm text-claude-muted mb-2">📋 Quick Templates</label>
-                    <select id="ndaTemplate" onchange="applyTemplate()" class="w-full px-4 py-2 rounded-lg text-sm">
-                        <option value="">-- Select a template --</option>
+            <!-- ─── NDA Terms ─── -->
+            <div class="card section-gap">
+                <div class="card-title">
+                    NDA Terms
+                    <span class="badge">Core Settings</span>
+                </div>
+
+                <div class="template-bar">
+                    <span class="template-label">Quick Template</span>
+                    <select id="ndaTemplate" onchange="applyTemplate()">
+                        <option value="">— Choose a scenario —</option>
                         <option value="contractor">🔧 Contractor / Freelancer</option>
                         <option value="investor">💰 Investor / Due Diligence</option>
                         <option value="partner">🤝 Business Partner</option>
@@ -335,324 +1005,294 @@
                     </select>
                 </div>
 
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm text-claude-muted mb-1">Purpose</label>
-                        <select id="purpose" class="w-full px-4 py-3 rounded-lg text-sm">
+                <div class="three-col">
+                    <div class="field-group">
+                        <label class="field-label">Purpose</label>
+                        <select id="purpose">
                             <option value="Discussing potential business cooperation">Business cooperation</option>
                             <option value="Evaluating service engagement">Service engagement</option>
                             <option value="Exploring partnership">Partnership</option>
                             <option value="Conducting due diligence">Due diligence</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm text-claude-muted mb-1">NDA Type</label>
-                        <select id="ndaType" class="w-full px-4 py-3 rounded-lg text-sm">
+                    <div class="field-group">
+                        <label class="field-label">NDA Type</label>
+                        <select id="ndaType">
                             <option value="One-way">One-way (you disclose)</option>
                             <option value="Mutual">Mutual (both disclose)</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm text-claude-muted mb-1">Period</label>
-                        <select id="confPeriod" class="w-full px-4 py-3 rounded-lg text-sm">
+                    <div class="field-group">
+                        <label class="field-label">Confidentiality Period</label>
+                        <select id="confPeriod">
                             <option value="1">1 year</option>
                             <option value="2">2 years</option>
                             <option value="3" selected>3 years</option>
                             <option value="5">5 years</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-sm text-claude-muted mb-1">Governing Law</label>
-                        <select id="governingLawSelect" onchange="handleGoverningLawChange()" class="w-full px-4 py-3 rounded-lg text-sm">
-                            <option value="">-- Select --</option>
+                    <div class="field-group">
+                        <label class="field-label">Governing Law</label>
+                        <select id="governingLawSelect" onchange="handleGoverningLawChange()">
+                            <option value="">— Select —</option>
                             <option value="__partyA__" id="govLawPartyA" class="hidden">📍 Party A jurisdiction</option>
                             <option value="__partyB__" id="govLawPartyB" class="hidden">📍 Party B jurisdiction</option>
-                            <option value="__custom__">✏️ Enter custom...</option>
+                            <option value="__custom__">✏️ Enter custom…</option>
                         </select>
-                        <input type="text" id="governingLaw" placeholder="e.g. England and Wales" class="hidden w-full px-4 py-3 rounded-lg text-sm mt-2">
+                        <input type="text" id="governingLaw" placeholder="e.g. England and Wales" class="hidden" style="margin-top:8px">
                     </div>
-                    <div>
-                        <label class="block text-sm text-claude-muted mb-1">Agreement Date</label>
-                        <input type="date" id="agreementDate" class="w-full px-4 py-3 rounded-lg text-sm">
+                    <div class="field-group">
+                        <label class="field-label">Agreement Date</label>
+                        <input type="date" id="agreementDate">
                     </div>
                 </div>
-                
-                <div class="mt-4">
-                    <label class="block text-sm text-claude-muted mb-2">Confidential Information Includes</label>
+
+                <div class="section-gap">
+                    <label class="field-label" style="margin-bottom:10px">Confidential Information Includes</label>
                     <div class="checkbox-grid">
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" checked class="confInfo rounded" value="Technical data"><span>Technical data</span></label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Product data"><span>Product data</span></label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" checked class="confInfo rounded" value="Business data"><span>Business data</span></label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Customer data"><span>Customer data</span></label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Financial data"><span>Financial data</span></label>
-                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Commercial data"><span>Commercial data</span></label>
+                        <label class="cb-item"><input type="checkbox" checked class="confInfo" value="Technical data"><span>Technical data</span></label>
+                        <label class="cb-item"><input type="checkbox" class="confInfo" value="Product data"><span>Product data</span></label>
+                        <label class="cb-item"><input type="checkbox" checked class="confInfo" value="Business data"><span>Business data</span></label>
+                        <label class="cb-item"><input type="checkbox" class="confInfo" value="Customer data"><span>Customer data</span></label>
+                        <label class="cb-item"><input type="checkbox" class="confInfo" value="Financial data"><span>Financial data</span></label>
+                        <label class="cb-item"><input type="checkbox" class="confInfo" value="Commercial data"><span>Commercial data</span></label>
                     </div>
                 </div>
             </div>
 
             <!-- Generate Button -->
-            <button onclick="generateNDA()" id="generateBtn1" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-all flex items-center justify-center gap-2 shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                Generate Flash NDA
-            </button>
+            <div class="section-gap">
+                <button class="btn-primary" onclick="generateNDA()" id="generateBtn1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Generate Flash NDA
+                </button>
+            </div>
 
-            <!-- Loading State -->
-            <div id="loadingState1" class="hidden">
-                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
-                    <div class="loading">
-                        <svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
+            <!-- Loading -->
+            <div id="loadingState1" class="loading-box card">
+                <div class="loading-spinner"></div>
+                <div class="title">Generating your Flash NDA…</div>
+                <div class="subtitle">This usually takes 10–20 seconds</div>
+            </div>
+
+            <!-- Result -->
+            <div id="result1" class="result-box card">
+                <div class="result-header">
+                    <div class="result-title">
+                        <span class="check">✓</span> Flash NDA Generated
                     </div>
-                    <p class="text-claude-text font-medium">Generating your Flash NDA...</p>
-                    <p class="text-claude-muted text-sm mt-1">This usually takes 10-20 seconds</p>
+                    <div class="result-actions">
+                        <button class="btn-sm" onclick="copyText(generatedNDAText)">Copy</button>
+                        <button class="btn-sm" onclick="downloadPDF('ndaContent1','NDA.pdf')">PDF ↓</button>
+                    </div>
+                </div>
+                <div id="ndaContent1" class="nda-output"></div>
+                <div class="action-row">
+                    <button class="btn-secondary" onclick="goToStep2()" style="justify-content:center">+ Enhanced Protections</button>
+                    <button class="btn-secondary" onclick="goToStep3()" style="justify-content:center">+ Summary for Counterparty</button>
                 </div>
             </div>
 
-            <!-- Generated NDA Result -->
-            <div id="result1" class="hidden">
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
-                        <h3 class="font-semibold text-claude-text flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Flash NDA Generated
-                        </h3>
-                        <div class="flex gap-2">
-                            <button onclick="copyText(generatedNDAText)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border transition-colors">Copy</button>
-                            <button onclick="downloadPDF('ndaContent1', 'NDA.pdf')" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border transition-colors">PDF</button>
+            <!-- CTA -->
+            <div id="footerCTA" class="cta-box">
+                <div class="cta-label">Want more?</div>
+                <div class="cta-row">
+                    <a href="https://sblc.com.ua/buy-nda" target="_blank" class="cta-item">
+                        <div class="cta-icon">📄</div>
+                        <div class="cta-text">
+                            <div class="cta-name">Editable Word Doc</div>
+                            <div class="cta-desc">Professional formatting</div>
                         </div>
-                    </div>
-                    <div id="ndaContent1" class="generated-nda bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
-                </div>
-                <div class="mt-6 grid sm:grid-cols-2 gap-4">
-                    <button onclick="goToStep2()" class="py-3 px-6 bg-white rounded-xl hover:bg-claude-cream border border-claude-border flex items-center justify-center gap-2 transition-colors">+ Enhanced Protections</button>
-                    <button onclick="goToStep3()" class="py-3 px-6 bg-white rounded-xl hover:bg-claude-cream border border-claude-border flex items-center justify-center gap-2 transition-colors">+ Summary for Counterparty</button>
-                </div>
-            </div>
-
-            <!-- Footer CTA -->
-            <div id="footerCTA" class="hidden mt-8">
-                <div class="bg-white border border-claude-border rounded-2xl p-5 shadow-sm">
-                    <p class="text-sm text-claude-muted text-center mb-4">Want more?</p>
-                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                        <a href="https://sblc.com.ua/buy-nda" target="_blank" class="flex items-center gap-3 px-5 py-3 bg-claude-cream border border-claude-border rounded-xl hover:border-claude-orange transition-all w-full sm:w-auto">
-                            <div class="w-10 h-10 bg-claude-warm rounded-lg flex items-center justify-center text-xl">📄</div>
-                            <div class="flex-1">
-                                <div class="font-medium text-sm text-claude-text">Editable Word Doc</div>
-                                <div class="text-xs text-claude-muted">Professional formatting</div>
-                            </div>
-                            <div class="text-claude-orange font-semibold">$10</div>
-                        </a>
-                        <a href="https://sblc.com.ua/legal-review" target="_blank" class="flex items-center gap-3 px-5 py-3 bg-claude-orange text-white rounded-xl hover:bg-claude-orange-hover transition-all w-full sm:w-auto">
-                            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-xl">⚖️</div>
-                            <div class="flex-1">
-                                <div class="font-medium text-sm">Legal Audit</div>
-                                <div class="text-xs text-white/80">Personal lawyer review</div>
-                            </div>
-                            <div class="font-semibold">$100</div>
-                        </a>
-                    </div>
+                        <div class="cta-price">$10</div>
+                    </a>
+                    <a href="https://sblc.com.ua/legal-review" target="_blank" class="cta-item cta-item-accent">
+                        <div class="cta-icon">⚖️</div>
+                        <div class="cta-text">
+                            <div class="cta-name">Legal Audit</div>
+                            <div class="cta-desc">Personal lawyer review</div>
+                        </div>
+                        <div class="cta-price">$100</div>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- STEP 2: Enhanced Protections -->
-        <div id="step2" class="hidden space-y-6">
-            <button onclick="backToStep1()" class="flex items-center gap-2 text-claude-muted hover:text-claude-orange transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        <!-- ═══════════════════════════════════ -->
+        <!-- STEP 2: Enhanced Protections       -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="step2" class="hidden">
+            <button class="btn-back" onclick="backToStep1()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
                 Back to Flash NDA
             </button>
-            
-            <div class="bg-claude-cream border border-claude-border rounded-2xl p-4">
-                <p class="text-claude-text"><span class="font-medium">Step 2:</span> Add additional protections to your Flash NDA.</p>
+
+            <div class="info-banner" style="margin-top:20px">
+                <strong>Step 2:</strong> Add additional protections to your Flash NDA.
             </div>
 
-            <div class="grid lg:grid-cols-2 gap-6">
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <h3 class="section-title">Materials & Knowledge</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Retain general skills?</label>
-                            <select id="residualKnowledge" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Return materials within</label>
-                            <select id="returnDays" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="7">7 days</option>
-                                <option value="14" selected>14 days</option>
-                                <option value="30">30 days</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Written destruction certificate?</label>
-                            <select id="writtenCert" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-title">Materials & Knowledge</div>
+                    <div class="field-group">
+                        <label class="field-label">Retain general skills?</label>
+                        <select id="residualKnowledge"><option value="Yes">Yes</option><option value="No">No</option></select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Return materials within</label>
+                        <select id="returnDays"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option></select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Written destruction certificate?</label>
+                        <select id="writtenCert"><option value="Yes">Yes</option><option value="No">No</option></select>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <h3 class="section-title">Non-Solicitation</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Prohibit soliciting</label>
-                            <select id="prohibitSoliciting" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Employees">Employees</option>
-                                <option value="Employees + Contractors">Employees + Contractors</option>
-                                <option value="All + Clients">All + Clients</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Duration</label>
-                            <select id="solicitDuration" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="12" selected>12 months</option>
-                                <option value="18">18 months</option>
-                                <option value="24">24 months</option>
-                            </select>
-                        </div>
+                <div class="card">
+                    <div class="card-title">Non-Solicitation</div>
+                    <div class="field-group">
+                        <label class="field-label">Prohibit soliciting</label>
+                        <select id="prohibitSoliciting">
+                            <option value="Employees">Employees</option>
+                            <option value="Employees + Contractors">Employees + Contractors</option>
+                            <option value="All + Clients">All + Clients</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Duration</label>
+                        <select id="solicitDuration"><option value="12" selected>12 months</option><option value="18">18 months</option><option value="24">24 months</option></select>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <h3 class="section-title">Disclosures</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Allow professional advisors?</label>
-                            <select id="allowAdvisors" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Notify before legal disclosure?</label>
-                            <select id="notifyCompelled" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
+                <div class="card">
+                    <div class="card-title">Legal Provisions</div>
+                    <div class="field-group">
+                        <label class="field-label">Allow advisor disclosures?</label>
+                        <select id="allowAdvisors"><option value="Yes">Yes</option><option value="No">No</option></select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Notify before legal disclosure?</label>
+                        <select id="notifyCompelled"><option value="Yes">Yes</option><option value="No">No</option></select>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <h3 class="section-title">Disputes</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm text-claude-muted mb-1">Resolution method</label>
-                            <select id="disputeMethod" onchange="toggleArbFields()" class="w-full px-4 py-3 rounded-lg text-sm">
-                                <option value="Litigation">Litigation</option>
-                                <option value="Arbitration" selected>Arbitration</option>
-                            </select>
+                <div class="card">
+                    <div class="card-title">Dispute Resolution</div>
+                    <div class="field-group">
+                        <label class="field-label">Method</label>
+                        <select id="disputeMethod" onchange="toggleArbFields()"><option value="Litigation">Litigation</option><option value="Arbitration">Arbitration</option></select>
+                    </div>
+                    <div id="arbFields" class="hidden">
+                        <div class="field-group">
+                            <label class="field-label">Rules</label>
+                            <select id="arbRules"><option value="ICC">ICC</option><option value="LCIA">LCIA</option><option value="AAA">AAA</option><option value="UNCITRAL">UNCITRAL</option></select>
                         </div>
-                        <div id="arbFields">
-                            <div class="mb-4">
-                                <label class="block text-sm text-claude-muted mb-1">Arbitration Rules</label>
-                                <select id="arbRules" class="w-full px-4 py-3 rounded-lg text-sm">
-                                    <option value="ICC">ICC</option>
-                                    <option value="LCIA">LCIA</option>
-                                    <option value="AAA">AAA</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-claude-muted mb-1">Location</label>
-                                <input type="text" id="arbLocation" placeholder="London, UK" class="w-full px-4 py-3 rounded-lg text-sm">
-                            </div>
+                        <div class="field-group">
+                            <label class="field-label">Location</label>
+                            <input type="text" id="arbLocation" placeholder="City, Country">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button onclick="generateEnhancedNDA()" id="generateBtn2" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-all flex items-center justify-center gap-2 shadow-sm">
-                Generate Enhanced NDA
-            </button>
-
-            <div id="loadingState2" class="hidden">
-                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
-                    <div class="loading"><svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path></svg></div>
-                    <p class="text-claude-text font-medium">Adding enhanced protections...</p>
-                </div>
+            <div class="section-gap">
+                <button class="btn-primary" onclick="generateEnhancedNDA()" id="generateBtn2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Generate Enhanced NDA
+                </button>
             </div>
 
-            <div id="result2" class="hidden">
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
-                        <h3 class="font-semibold text-claude-text flex items-center gap-2"><span class="text-green-500">✓</span> Enhanced NDA Generated</h3>
-                        <div class="flex gap-2">
-                            <button onclick="copyText(generatedNDAText2)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">Copy</button>
-                            <button onclick="downloadPDF('ndaContent2', 'NDA_Enhanced.pdf')" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">PDF</button>
-                        </div>
+            <div id="loadingState2" class="loading-box card">
+                <div class="loading-spinner"></div>
+                <div class="title">Enhancing your NDA…</div>
+                <div class="subtitle">Adding protections</div>
+            </div>
+
+            <div id="result2" class="result-box card">
+                <div class="result-header">
+                    <div class="result-title">
+                        <span class="check">✓</span> Enhanced NDA Ready
                     </div>
-                    <div id="ndaContent2" class="generated-nda bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
+                    <div class="result-actions">
+                        <button class="btn-sm" onclick="copyText(generatedNDAText2)">Copy</button>
+                        <button class="btn-sm" onclick="downloadPDF('ndaContent2','NDA_Enhanced.pdf')">PDF ↓</button>
+                    </div>
                 </div>
-                <div class="mt-6 grid sm:grid-cols-2 gap-4">
-                    <button onclick="backToStep1()" class="py-3 bg-white rounded-xl border border-claude-border hover:bg-claude-cream transition-colors">← Back to NDA</button>
-                    <button onclick="goToStep3()" class="py-3 bg-claude-orange text-white rounded-xl hover:bg-claude-orange-hover transition-colors">+ Create Summary</button>
+                <div id="ndaContent2" class="nda-output"></div>
+                <div class="action-row">
+                    <button class="btn-secondary" onclick="backToStep1()" style="justify-content:center">← Back to NDA</button>
+                    <button class="btn-primary" onclick="goToStep3()" style="font-size:0.88rem;padding:12px 20px">+ Create Summary</button>
                 </div>
             </div>
         </div>
 
-        <!-- STEP 3: Summary -->
-        <div id="step3" class="hidden space-y-6">
-            <button onclick="backToResults()" class="flex items-center gap-2 text-claude-muted hover:text-claude-orange transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        <!-- ═══════════════════════════════════ -->
+        <!-- STEP 3: Summary                    -->
+        <!-- ═══════════════════════════════════ -->
+        <div id="step3" class="hidden">
+            <button class="btn-back" onclick="backToResults()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
                 Back
             </button>
-            
-            <div class="bg-claude-cream border border-claude-border rounded-2xl p-4">
-                <p class="text-claude-text"><span class="font-medium">Step 3:</span> Generate a friendly summary to share with the counterparty.</p>
+
+            <div class="info-banner" style="margin-top:20px">
+                <strong>Step 3:</strong> Generate a friendly summary to share with the counterparty.
             </div>
 
-            <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                <p class="text-claude-muted mb-4">This will explain the <span id="summarySource" class="text-claude-text font-medium">Flash NDA</span> in simple terms for the other party.</p>
-                <button onclick="generateSummary()" id="generateBtn3" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-colors">
+            <div class="card">
+                <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.88rem">
+                    This will explain the <strong id="summarySource" style="color:var(--text)">Flash NDA</strong> in simple terms for the other party.
+                </p>
+                <button class="btn-primary" onclick="generateSummary()" id="generateBtn3" style="font-size:0.88rem">
                     Generate Plain-English Summary
                 </button>
             </div>
 
-            <div id="loadingState3" class="hidden">
-                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
-                    <div class="loading"><svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>
-                    <p class="text-claude-text font-medium">Creating summary...</p>
-                </div>
+            <div id="loadingState3" class="loading-box card">
+                <div class="loading-spinner"></div>
+                <div class="title">Creating summary…</div>
             </div>
 
-            <div id="result3" class="hidden">
-                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
-                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
-                        <h3 class="font-semibold text-claude-text flex items-center gap-2"><span class="text-green-500">✓</span> Summary Ready</h3>
-                        <button onclick="copyText(generatedSummaryText)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">Copy</button>
+            <div id="result3" class="result-box card" style="margin-top:20px">
+                <div class="result-header">
+                    <div class="result-title">
+                        <span class="check">✓</span> Summary Ready
                     </div>
-                    <div id="summaryContent" class="bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
+                    <div class="result-actions">
+                        <button class="btn-sm" onclick="copyText(generatedSummaryText)">Copy</button>
+                    </div>
                 </div>
-                <div class="mt-6 p-4 bg-white border border-claude-border rounded-2xl text-center shadow-sm">
-                    <p class="text-claude-text font-medium">🎉 All done! Your NDA package is ready.</p>
-                    <button onclick="backToStep1()" class="mt-3 px-6 py-2 bg-claude-orange text-white rounded-lg hover:bg-claude-orange-hover transition-colors">← Back to NDA</button>
-                </div>
+                <div id="summaryContent" class="nda-output"></div>
+            </div>
+
+            <div id="doneBox" class="done-box hidden">
+                <div class="emoji">🎉</div>
+                <div class="msg">All done! Your NDA package is ready.</div>
+                <button class="btn-secondary" onclick="backToStep1()" style="margin-top:16px">← Start Over</button>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-claude-border mt-12 bg-white">
-        <div class="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-4">
-            <p class="text-sm text-claude-muted">© 2025 SBLC Law Firm. All rights reserved.</p>
-            <div class="flex items-center gap-4">
-                <a href="mailto:hello@sblc.com.ua" class="text-sm text-claude-muted hover:text-claude-orange transition-colors">hello@sblc.com.ua</a>
-                <a href="https://sblc.com.ua" target="_blank" class="text-sm text-claude-muted hover:text-claude-orange transition-colors">sblc.com.ua</a>
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer>
+        <div class="footer-inner">
+            <p>© 2025 SBLC Law Firm. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="mailto:info@sblc.cc">info@sblc.cc</a>
+                <a href="https://sblc.com.ua" target="_blank">sblc.com.ua</a>
             </div>
         </div>
     </footer>
 
+    <!-- ═══════════════════════════════════ -->
+    <!-- JAVASCRIPT                         -->
+    <!-- ═══════════════════════════════════ -->
     <script>
         let generatedNDAText = '';
         let generatedNDAText2 = '';
         let generatedSummaryText = '';
         let searchTimeout = null;
 
-        // Save/Load Party Data
+        // ─── Save/Load Party Data ───
         function savePartyData(party) {
             const data = {
                 name: document.getElementById(`party${party}Name`).value,
@@ -662,12 +1302,10 @@
                 email: document.getElementById(`party${party}Email`).value
             };
             localStorage.setItem(`nda_party_${party}`, JSON.stringify(data));
-            document.getElementById(`saveParty${party}Icon`).textContent = '✓';
-            document.getElementById(`saveParty${party}Text`).textContent = 'Saved!';
-            setTimeout(() => {
-                document.getElementById(`saveParty${party}Icon`).textContent = '💾';
-                document.getElementById(`saveParty${party}Text`).textContent = 'Save';
-            }, 2000);
+            const icon = document.getElementById(`saveParty${party}Icon`);
+            const text = document.getElementById(`saveParty${party}Text`);
+            icon.textContent = '✓'; text.textContent = 'Saved!';
+            setTimeout(() => { icon.textContent = '💾'; text.textContent = 'Save'; }, 2000);
         }
 
         function loadPartyData(party) {
@@ -679,7 +1317,7 @@
                 if (data.companyNumber) document.getElementById(`party${party}CompanyNumber`).value = data.companyNumber;
                 if (data.address) document.getElementById(`party${party}Address`).value = data.address;
                 if (data.email) document.getElementById(`party${party}Email`).value = data.email;
-                document.getElementById(`savedParty${party}Notice`).classList.remove('hidden');
+                document.getElementById(`savedParty${party}Notice`).classList.add('show');
                 updateGoverningLawOptions();
             }
         }
@@ -691,10 +1329,10 @@
             document.getElementById(`party${party}CompanyNumber`).value = '';
             document.getElementById(`party${party}Address`).value = '';
             document.getElementById(`party${party}Email`).value = '';
-            document.getElementById(`savedParty${party}Notice`).classList.add('hidden');
+            document.getElementById(`savedParty${party}Notice`).classList.remove('show');
         }
 
-        // Templates
+        // ─── Templates ───
         function applyTemplate() {
             const template = document.getElementById('ndaTemplate').value;
             if (!template) return;
@@ -716,64 +1354,61 @@
             }
         }
 
-        // Fill Options
-        function showFillOption(party, option) {
+        // ─── Fill Options ───
+        function showFillOption(party, option, btn) {
             document.querySelectorAll(`.fill-option-${party}`).forEach(el => el.classList.add('hidden'));
             document.getElementById(`fillOption-${party}-${option}`).classList.remove('hidden');
-            document.querySelectorAll(`.fill-tab-${party}`).forEach(btn => {
-                btn.classList.remove('bg-claude-orange', 'text-white', 'active');
-                btn.classList.add('bg-claude-border', 'text-claude-muted');
-            });
-            event.target.classList.remove('bg-claude-border', 'text-claude-muted');
-            event.target.classList.add('bg-claude-orange', 'text-white', 'active');
+            document.querySelectorAll(`.fill-tab-${party}`).forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
             if (option === 'history') loadHistoryDropdown(party);
         }
 
-        // Company Name Search
+        // ─── Company Search ───
         async function searchCompanyByName(party) {
             const input = document.getElementById(`party${party}NameSearch`);
             const dropdown = document.getElementById(`party${party}Autocomplete`);
             const query = input.value.trim();
-            
-            if (query.length < 3) { dropdown.classList.add('hidden'); return; }
-            
+
+            if (query.length < 3) { dropdown.classList.remove('show'); return; }
+
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
+                dropdown.innerHTML = '<div class="ac-loading"><span class="spinner"></span>Searching registries…</div>';
+                dropdown.classList.add('show');
+
                 try {
-                    dropdown.innerHTML = '<div class="p-3 text-claude-muted text-sm">🔍 Searching registries...</div>';
-                    dropdown.classList.remove('hidden');
-                    
                     const res = await fetch('/.netlify/functions/search-company', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ query, sources: ['uk', 'opencorporates'] })
                     });
-                    
                     const data = await res.json();
-                    
+
                     if (data.results && data.results.length > 0) {
                         dropdown.innerHTML = data.results.slice(0, 10).map((r, idx) => `
-                            <div class="autocomplete-item" onclick="selectCompanyFromSearch('${party}', ${idx})">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="flex-1">
-                                        <div class="font-medium text-claude-text">${escapeHtml(r.name)}</div>
-                                        <div class="text-xs text-claude-muted mt-1">
-                                            ${r.companyNumber ? `<span class="bg-claude-warm px-1.5 py-0.5 rounded font-mono">${r.companyNumber}</span> ` : ''}
-                                            <span class="font-medium">${r.jurisdiction || ''}</span>
-                                            ${r.status ? `<span class="text-claude-border mx-1">•</span><span>${r.status}</span>` : ''}
+                            <div class="ac-item" onclick="selectCompanyFromSearch('${party}', ${idx})">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                                    <div style="flex:1;min-width:0">
+                                        <div class="ac-name">${escapeHtml(r.name)}</div>
+                                        <div class="ac-meta">
+                                            ${r.companyNumber ? `<span class="ac-tag ac-tag-id">${r.companyNumber}</span>` : ''}
+                                            ${r.jurisdiction ? `<span class="ac-tag ac-tag-jur">${r.jurisdiction}</span>` : ''}
+                                            ${r.status ? `<span class="ac-tag-status">${r.status}</span>` : ''}
                                         </div>
-                                        ${r.address ? `<div class="text-xs text-green-600 mt-1">📍 ${escapeHtml(r.address.length > 80 ? r.address.substring(0, 80) + '...' : r.address)}</div>` : '<div class="text-xs text-yellow-600 mt-1">⚠️ Address will be fetched</div>'}
+                                        ${r.address
+                                            ? `<div class="ac-address">📍 ${escapeHtml(r.address.length > 80 ? r.address.substring(0,80)+'…' : r.address)}</div>`
+                                            : '<div class="ac-address missing">⚠ Address will be fetched</div>'}
                                     </div>
-                                    <div class="text-xs text-claude-muted whitespace-nowrap">${r.source}</div>
+                                    <span class="ac-source">${r.source}</span>
                                 </div>
                             </div>
                         `).join('');
                         window.lastSearchResults = data.results;
                     } else {
-                        dropdown.innerHTML = '<div class="p-3 text-claude-muted text-sm">No companies found. Try a different name.</div>';
+                        dropdown.innerHTML = '<div class="ac-loading">No companies found. Try a different name.</div>';
                     }
                 } catch (e) {
-                    dropdown.innerHTML = '<div class="p-3 text-red-500 text-sm">Search error. Please try again.</div>';
+                    dropdown.innerHTML = '<div class="ac-loading" style="color:var(--error)">Search error. Please try again.</div>';
                 }
             }, 400);
         }
@@ -781,30 +1416,25 @@
         function selectCompanyFromSearch(party, idx) {
             const r = window.lastSearchResults[idx];
             if (!r) return;
-            
-            // Fill basic info immediately
+
             document.getElementById(`party${party}Name`).value = r.name || '';
             document.getElementById(`party${party}CompanyNumber`).value = r.companyNumber || '';
             document.getElementById(`party${party}Type`).value = 'company';
-            
-            document.getElementById(`party${party}Autocomplete`).classList.add('hidden');
+            document.getElementById(`party${party}Autocomplete`).classList.remove('show');
             document.getElementById(`party${party}NameSearch`).value = '';
-            
-            // If we have address, fill it
+
             if (r.address) {
                 document.getElementById(`party${party}Address`).value = r.address;
                 updateGoverningLawOptions();
-                showStatus(party, `✓ Loaded: ${r.name}`, 'green');
+                showStatus(party, `✓ Loaded: ${r.name}`, 'success');
             } else if (r.url) {
-                // No address - try to fetch full details
-                showStatus(party, `🔍 Fetching full details for ${r.name}...`, 'gray');
+                showStatus(party, `Fetching details for ${r.name}…`, 'loading');
                 fetchCompanyDetails(party, r.url, r.name);
             } else {
-                showStatus(party, `✓ Loaded: ${r.name} (no address found)`, 'yellow');
+                showStatus(party, `✓ Loaded: ${r.name} (no address found)`, 'warning');
             }
         }
-        
-        // Fetch full company details from OpenCorporates/Companies House
+
         async function fetchCompanyDetails(party, url, companyName) {
             try {
                 const res = await fetch('/.netlify/functions/search-company', {
@@ -812,121 +1442,107 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fetchDetails: true, companyUrl: url })
                 });
-                
                 const data = await res.json();
-                
+
                 if (data.address) {
                     document.getElementById(`party${party}Address`).value = data.address;
                     updateGoverningLawOptions();
-                    showStatus(party, `✓ Loaded: ${companyName} with address`, 'green');
+                    showStatus(party, `✓ Loaded: ${companyName} with address`, 'success');
                 } else {
-                    showStatus(party, `✓ Loaded: ${companyName} (address not available in registry)`, 'yellow');
+                    showStatus(party, `✓ Loaded: ${companyName} (address not in registry)`, 'warning');
                 }
-                
-                // Update other fields if available
                 if (data.companyNumber && !document.getElementById(`party${party}CompanyNumber`).value) {
                     document.getElementById(`party${party}CompanyNumber`).value = data.companyNumber;
                 }
             } catch (e) {
-                showStatus(party, `✓ Loaded: ${companyName} (could not fetch address)`, 'yellow');
+                showStatus(party, `✓ Loaded: ${companyName} (could not fetch address)`, 'warning');
             }
         }
 
-        // Website Parsing
+        // ─── Website Parsing ───
         async function parseWebsite(party) {
             const urlInput = document.getElementById(`party${party}Url`);
             let url = urlInput.value.trim();
-            if (!url) { alert('Please enter a website URL'); return; }
+            if (!url) return;
             if (!url.startsWith('http')) url = 'https://' + url;
-            
-            showStatus(party, '🔍 Fetching company info...', 'gray');
-            
+
+            showStatus(party, 'Parsing website…', 'loading');
             try {
                 const res = await fetch('/.netlify/functions/parse-company', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url })
                 });
-                
                 const data = await res.json();
-                
-                // Handle rate limit
-                if (res.status === 429) {
-                    showStatus(party, '⏳ Rate limit reached. Please wait 30 seconds and try again.', 'yellow');
-                    return;
-                }
-                
                 if (!res.ok) throw new Error(data.error);
-                
+
                 let filled = [];
                 if (data.name) { document.getElementById(`party${party}Name`).value = data.name; filled.push('name'); }
+                if (data.addresses && data.addresses.length === 1) {
+                    document.getElementById(`party${party}Address`).value = data.addresses[0]; filled.push('address');
+                } else if (data.addresses && data.addresses.length > 1) {
+                    showAddressDropdown(party, data.addresses); filled.push('addresses');
+                }
                 if (data.email) { document.getElementById(`party${party}Email`).value = data.email; filled.push('email'); }
-                
-                if (data.addresses && data.addresses.length > 0) {
-                    filled.push(data.addresses.length + ' address(es)');
-                    showAddressDropdown(party, data.addresses);
-                    document.getElementById(`party${party}Address`).value = data.addresses[0];
-                }
-                
-                if (data.name && /LLC|Inc|Ltd|Corp|GmbH|S\.A\.|Limited|LLP/i.test(data.name)) {
-                    document.getElementById(`party${party}Type`).value = 'company';
-                }
-                
                 updateGoverningLawOptions();
-                showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠️ No info found', filled.length ? 'green' : 'yellow');
+                showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠ Could not extract info', filled.length ? 'success' : 'warning');
             } catch (e) {
-                showStatus(party, `✗ ${e.message}`, 'red');
+                showStatus(party, `✗ ${e.message}`, 'error');
             }
         }
 
-        // Email Parsing
-        function parseFromEmail(party) {
-            const email = document.getElementById(`party${party}EmailInput`).value.trim();
-            if (!email || !email.includes('@')) { alert('Please enter a valid email'); return; }
+        // ─── Email Parsing ───
+        async function parseFromEmail(party) {
+            const emailInput = document.getElementById(`party${party}EmailInput`);
+            const email = emailInput.value.trim();
+            if (!email || !email.includes('@')) return;
+
             const domain = email.split('@')[1];
+            document.getElementById(`party${party}Email`).value = email;
+
+            const freeProviders = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','mail.com','protonmail.com'];
+            if (freeProviders.includes(domain.toLowerCase())) {
+                showStatus(party, '⚠ Free email provider — cannot parse company info', 'warning');
+                return;
+            }
+
             document.getElementById(`party${party}Url`).value = 'https://' + domain;
-            showFillOption(party, 'url');
-            parseWebsite(party);
+            await parseWebsite(party);
         }
 
-        // Business Card Parsing
+        // ─── Business Card Parsing ───
         async function parseBusinessCard(event, party) {
             const file = event.target.files[0];
             if (!file) return;
-            
-            showStatus(party, '🔍 Analyzing business card...', 'gray');
-            
-            try {
-                const base64 = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                
-                const res = await fetch('/.netlify/functions/parse-card', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: base64, mimeType: file.type })
-                });
-                
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
-                
-                let filled = [];
-                if (data.name) { document.getElementById(`party${party}Name`).value = data.name; filled.push('name'); }
-                if (data.company) { document.getElementById(`party${party}Name`).value = data.company; filled.push('company'); }
-                if (data.address) { document.getElementById(`party${party}Address`).value = data.address; filled.push('address'); }
-                if (data.email) { document.getElementById(`party${party}Email`).value = data.email; filled.push('email'); }
-                
-                showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠️ Could not extract info', filled.length ? 'green' : 'yellow');
-            } catch (e) {
-                showStatus(party, `✗ ${e.message}`, 'red');
-            }
+
+            showStatus(party, 'Processing business card…', 'loading');
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64 = e.target.result.split(',')[1];
+                try {
+                    const res = await fetch('/.netlify/functions/parse-card', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: base64, mimeType: file.type })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error);
+
+                    let filled = [];
+                    if (data.name) { document.getElementById(`party${party}Name`).value = data.name; filled.push('name'); }
+                    if (data.company) { document.getElementById(`party${party}Name`).value = data.company; filled.push('company'); }
+                    if (data.address) { document.getElementById(`party${party}Address`).value = data.address; filled.push('address'); }
+                    if (data.email) { document.getElementById(`party${party}Email`).value = data.email; filled.push('email'); }
+                    showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠ Could not extract info', filled.length ? 'success' : 'warning');
+                } catch (e) {
+                    showStatus(party, `✗ ${e.message}`, 'error');
+                }
+            };
+            reader.readAsDataURL(file);
             event.target.value = '';
         }
 
-        // History
+        // ─── History ───
         function saveToHistory(party, name, address, email, type, companyNumber) {
             if (!name) return;
             let history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
@@ -941,11 +1557,10 @@
             const dropdown = document.getElementById(`party${party}HistoryDropdown`);
             const noMsg = document.getElementById(`noHistoryMsg${party}`);
             const history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
-            
-            dropdown.innerHTML = '<option value="">-- Select from recent --</option>';
+
+            dropdown.innerHTML = '<option value="">— Select from recent —</option>';
             if (history.length === 0) { noMsg.classList.remove('hidden'); return; }
             noMsg.classList.add('hidden');
-            
             history.forEach((h, idx) => {
                 const opt = document.createElement('option');
                 opt.value = idx;
@@ -960,39 +1575,35 @@
             const history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
             const h = history[idx];
             if (!h) return;
-            
             if (h.name) document.getElementById(`party${party}Name`).value = h.name;
             if (h.address) document.getElementById(`party${party}Address`).value = h.address;
             if (h.email) document.getElementById(`party${party}Email`).value = h.email;
             if (h.type) document.getElementById(`party${party}Type`).value = h.type;
             if (h.companyNumber) document.getElementById(`party${party}CompanyNumber`).value = h.companyNumber;
-            
             updateGoverningLawOptions();
-            showStatus(party, '✓ Loaded from history', 'green');
+            showStatus(party, '✓ Loaded from history', 'success');
         }
 
-        // Helper Functions
-        function showStatus(party, msg, color) {
+        // ─── Helpers ───
+        function showStatus(party, msg, type) {
             const el = document.getElementById(`parseStatus${party}`);
             el.textContent = msg;
-            el.className = `text-xs mt-2 ${color === 'green' ? 'text-green-600' : color === 'red' ? 'text-red-500' : color === 'yellow' ? 'text-yellow-600' : 'text-claude-muted'}`;
-            el.classList.remove('hidden');
+            el.className = `parse-status visible ${type}`;
         }
 
         function showAddressDropdown(party, addresses) {
-            const selection = document.getElementById(`addressSelection${party}`);
+            const sel = document.getElementById(`addressSelection${party}`);
             const dropdown = document.getElementById(`addressDropdown${party}`);
-            dropdown.innerHTML = addresses.map(addr => 
-                `<option value="${escapeHtml(addr)}">${addr.length > 60 ? addr.substring(0, 60) + '...' : addr}</option>`
-            ).join('') + '<option value="__custom__">✏️ Enter custom...</option>';
-            selection.classList.remove('hidden');
+            dropdown.innerHTML = addresses.map(addr =>
+                `<option value="${escapeHtml(addr)}">${addr.length > 60 ? addr.substring(0,60)+'…' : addr}</option>`
+            ).join('') + '<option value="__custom__">✏️ Enter custom…</option>';
+            sel.classList.add('show');
         }
 
         function handleAddressSelection(party) {
             const dropdown = document.getElementById(`addressDropdown${party}`);
             const customInput = document.getElementById(`customAddressInput${party}`);
             const addressField = document.getElementById(`party${party}Address`);
-            
             if (dropdown.value === '__custom__') {
                 customInput.classList.remove('hidden');
                 customInput.focus();
@@ -1009,16 +1620,16 @@
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Governing Law
+        // ─── Governing Law ───
         function extractJurisdiction(address) {
             if (!address) return null;
             const parts = address.split(',').map(p => p.trim());
             if (parts.length === 0) return null;
             const lastPart = parts[parts.length - 1];
             const secondLast = parts.length > 1 ? parts[parts.length - 2] : '';
-            
+
             if (lastPart.match(/USA|United States|U\.S\.A\.|US$/i)) {
-                const states = ['Delaware', 'California', 'New York', 'Texas', 'Florida', 'Nevada', 'Wyoming'];
+                const states = ['Delaware','California','New York','Texas','Florida','Nevada','Wyoming'];
                 for (const state of states) {
                     if (secondLast.toLowerCase().includes(state.toLowerCase())) return state + ', USA';
                 }
@@ -1031,6 +1642,10 @@
             if (lastPart.match(/Estonia/i)) return 'Estonia';
             if (lastPart.match(/Poland|Polska/i)) return 'Poland';
             if (lastPart.match(/Czech|Czechia/i)) return 'Czech Republic';
+            if (lastPart.match(/UAE|United Arab Emirates/i)) return 'UAE (DIFC)';
+            if (lastPart.match(/Lithuania|Lietuva/i)) return 'Lithuania';
+            if (lastPart.match(/Spain|España/i)) return 'Spain';
+            if (lastPart.match(/Hungary|Magyarország/i)) return 'Hungary';
             return lastPart || null;
         }
 
@@ -1039,13 +1654,11 @@
             const addrB = document.getElementById('partyBAddress').value;
             const optA = document.getElementById('govLawPartyA');
             const optB = document.getElementById('govLawPartyB');
-            
             const jurA = extractJurisdiction(addrA);
             const jurB = extractJurisdiction(addrB);
-            
+
             if (jurA) { optA.textContent = '📍 Party A: ' + jurA; optA.dataset.value = jurA; optA.classList.remove('hidden'); }
             else { optA.classList.add('hidden'); }
-            
             if (jurB) { optB.textContent = '📍 Party B: ' + jurB; optB.dataset.value = jurB; optB.classList.remove('hidden'); }
             else { optB.classList.add('hidden'); }
         }
@@ -1053,7 +1666,6 @@
         function handleGoverningLawChange() {
             const select = document.getElementById('governingLawSelect');
             const input = document.getElementById('governingLaw');
-            
             if (select.value === '__custom__') { input.classList.remove('hidden'); input.focus(); }
             else if (select.value === '__partyA__') { input.classList.add('hidden'); input.value = document.getElementById('govLawPartyA').dataset.value || ''; }
             else if (select.value === '__partyB__') { input.classList.add('hidden'); input.value = document.getElementById('govLawPartyB').dataset.value || ''; }
@@ -1068,7 +1680,7 @@
             return input.value;
         }
 
-        // Navigation
+        // ─── Navigation ───
         function goToStep2() {
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
@@ -1090,7 +1702,7 @@
             document.getElementById('step1').classList.remove('hidden');
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
-            if (generatedNDAText) document.getElementById('result1').classList.remove('hidden');
+            if (generatedNDAText) document.getElementById('result1').classList.add('show');
             updateBadge(1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1098,37 +1710,26 @@
         function backToResults() { backToStep1(); }
 
         function updateBadge(step) {
-            const b1 = document.getElementById('step1-badge');
-            const b2 = document.getElementById('step2-badge');
-            const b3 = document.getElementById('step3-badge');
-            
-            if (generatedNDAText) {
-                b1.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
-                b1.querySelector('span:first-child').textContent = '✓';
-            }
-            
-            if (step === 2 || generatedNDAText2) {
-                b2.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
-                if (generatedNDAText2) b2.querySelector('span:first-child').textContent = '✓';
-            } else {
-                b2.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-warm text-claude-muted border border-claude-border';
-                b2.querySelector('span:first-child').textContent = '+';
-            }
-            
-            if (step === 3 || generatedSummaryText) {
-                b3.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
-                if (generatedSummaryText) b3.querySelector('span:first-child').textContent = '✓';
-            } else {
-                b3.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-warm text-claude-muted border border-claude-border';
-                b3.querySelector('span:first-child').textContent = '+';
-            }
+            const items = [
+                { el: document.getElementById('step1-badge'), num: document.getElementById('step1-num'), done: !!generatedNDAText },
+                { el: document.getElementById('step2-badge'), num: document.getElementById('step2-num'), done: !!generatedNDAText2 },
+                { el: document.getElementById('step3-badge'), num: document.getElementById('step3-num'), done: !!generatedSummaryText }
+            ];
+            items.forEach((item, i) => {
+                const isActive = (i + 1) === step;
+                const isDone = item.done;
+                item.el.className = 'step-item ' + (isDone ? 'done' : isActive ? 'active' : 'inactive');
+                if (isDone) item.num.textContent = '✓';
+                else if (i === 0) item.num.textContent = '1';
+                else item.num.textContent = '+';
+            });
         }
 
         function toggleArbFields() {
             document.getElementById('arbFields').classList.toggle('hidden', document.getElementById('disputeMethod').value !== 'Arbitration');
         }
 
-        // NDA Generation
+        // ─── NDA Generation ───
         function buildPrompt1() {
             const pA = {
                 name: document.getElementById('partyAName').value || '[Party A Name]',
@@ -1145,12 +1746,11 @@
                 email: document.getElementById('partyBEmail').value,
                 role: document.getElementById('partyBRole').value
             };
-            
             const confInfo = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ') || 'business information';
             let formattedDate = '[Date]';
             const dateVal = document.getElementById('agreementDate').value;
             if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            
+
             return `Create a comprehensive, professional Non-Disclosure Agreement.
 
 PARTY A (Disclosing Party):
@@ -1178,7 +1778,10 @@ Requirements:
 - Professional legal language, plain English
 - Standard exclusions (public info, prior knowledge, legal disclosure)
 - Return/destruction of materials clause
-- Include signature blocks at the end`;
+- Damage compensation, severability, e-signature provisions
+- Enforceability check for the governing law jurisdiction
+- Include signature blocks with name, title, date lines
+- Use markdown formatting`;
         }
 
         function buildPrompt2() {
@@ -1202,8 +1805,8 @@ Output complete enhanced NDA with signature blocks.`;
         async function generateNDA() {
             const prompt = buildPrompt1();
             document.getElementById('generateBtn1').disabled = true;
-            document.getElementById('loadingState1').classList.remove('hidden');
-            document.getElementById('result1').classList.add('hidden');
+            document.getElementById('loadingState1').classList.add('show');
+            document.getElementById('result1').classList.remove('show');
 
             try {
                 const res = await fetch('/.netlify/functions/generate-nda', {
@@ -1213,18 +1816,18 @@ Output complete enhanced NDA with signature blocks.`;
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
-                
+
                 generatedNDAText = data.result;
                 document.getElementById('ndaContent1').innerHTML = formatNDA(data.result);
-                document.getElementById('result1').classList.remove('hidden');
-                document.getElementById('footerCTA').classList.remove('hidden');
+                document.getElementById('result1').classList.add('show');
+                document.getElementById('footerCTA').classList.add('show');
                 updateBadge(1);
-                
+
                 saveToHistory('A', document.getElementById('partyAName').value, document.getElementById('partyAAddress').value, document.getElementById('partyAEmail').value, document.getElementById('partyAType').value, document.getElementById('partyACompanyNumber').value);
                 saveToHistory('B', document.getElementById('partyBName').value, document.getElementById('partyBAddress').value, document.getElementById('partyBEmail').value, document.getElementById('partyBType').value, document.getElementById('partyBCompanyNumber').value);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
-                document.getElementById('loadingState1').classList.add('hidden');
+                document.getElementById('loadingState1').classList.remove('show');
                 document.getElementById('generateBtn1').disabled = false;
             }
         }
@@ -1232,8 +1835,8 @@ Output complete enhanced NDA with signature blocks.`;
         async function generateEnhancedNDA() {
             const prompt = buildPrompt2();
             document.getElementById('generateBtn2').disabled = true;
-            document.getElementById('loadingState2').classList.remove('hidden');
-            document.getElementById('result2').classList.add('hidden');
+            document.getElementById('loadingState2').classList.add('show');
+            document.getElementById('result2').classList.remove('show');
 
             try {
                 const res = await fetch('/.netlify/functions/generate-nda', {
@@ -1243,14 +1846,14 @@ Output complete enhanced NDA with signature blocks.`;
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
-                
+
                 generatedNDAText2 = data.result;
                 document.getElementById('ndaContent2').innerHTML = formatNDA(data.result);
-                document.getElementById('result2').classList.remove('hidden');
+                document.getElementById('result2').classList.add('show');
                 updateBadge(2);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
-                document.getElementById('loadingState2').classList.add('hidden');
+                document.getElementById('loadingState2').classList.remove('show');
                 document.getElementById('generateBtn2').disabled = false;
             }
         }
@@ -1264,8 +1867,8 @@ ${nda}
 Explain in friendly terms: what it is, what they agree to, what's confidential, duration, their rights. End with: "This summary is for convenience only. The NDA is the binding document."`;
 
             document.getElementById('generateBtn3').disabled = true;
-            document.getElementById('loadingState3').classList.remove('hidden');
-            document.getElementById('result3').classList.add('hidden');
+            document.getElementById('loadingState3').classList.add('show');
+            document.getElementById('result3').classList.remove('show');
 
             try {
                 const res = await fetch('/.netlify/functions/generate-nda', {
@@ -1275,14 +1878,15 @@ Explain in friendly terms: what it is, what they agree to, what's confidential, 
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
-                
+
                 generatedSummaryText = data.result;
                 document.getElementById('summaryContent').innerHTML = formatNDA(data.result);
-                document.getElementById('result3').classList.remove('hidden');
+                document.getElementById('result3').classList.add('show');
+                document.getElementById('doneBox').classList.remove('hidden');
                 updateBadge(3);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
-                document.getElementById('loadingState3').classList.add('hidden');
+                document.getElementById('loadingState3').classList.remove('show');
                 document.getElementById('generateBtn3').disabled = false;
             }
         }
@@ -1293,8 +1897,9 @@ Explain in friendly terms: what it is, what they agree to, what's confidential, 
         }
 
         function copyText(text) {
-            navigator.clipboard.writeText(text);
-            alert('Copied to clipboard!');
+            navigator.clipboard.writeText(text).then(() => {
+                // Brief visual feedback could be added
+            });
         }
 
         function downloadPDF(elementId, filename) {
@@ -1307,18 +1912,21 @@ Explain in friendly terms: what it is, what they agree to, what's confidential, 
             }).from(document.getElementById(elementId)).save();
         }
 
-        // Init
+        // ─── Init ───
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('agreementDate').value = new Date().toISOString().split('T')[0];
             loadPartyData('A');
             loadPartyData('B');
             document.getElementById('partyAAddress').addEventListener('input', updateGoverningLawOptions);
             document.getElementById('partyBAddress').addEventListener('input', updateGoverningLawOptions);
-            
+
+            // Close autocomplete on outside click
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.relative')) {
-                    document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.add('hidden'));
-                }
+                ['A', 'B'].forEach(party => {
+                    const wrap = document.getElementById(`fillOption-${party}-name`);
+                    const dropdown = document.getElementById(`party${party}Autocomplete`);
+                    if (wrap && !wrap.contains(e.target)) dropdown.classList.remove('show');
+                });
             });
         });
     </script>
