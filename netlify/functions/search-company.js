@@ -150,66 +150,99 @@ async function searchCompaniesHouse(query) {
 
 // ═══════ Estonia e-Business Register (ariregister) ═══════
 async function searchEstoniaRegister(query) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+  // Try both Estonian and English API endpoints
+  const endpoints = [
+    `https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`,
+    `https://ariregister.rik.ee/eng/api/autocomplete?q=${encodeURIComponent(query)}`,
+  ];
 
-  try {
-    // Free public autocomplete API — no authentication required
-    const eeRes = await fetch(
-      `https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`,
-      {
+  for (const url of endpoints) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const eeRes = await fetch(url, {
         headers: {
-          "User-Agent": "NDA-Generator/1.0",
-          "Accept": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "application/json, text/plain, */*",
+          "Accept-Language": "en-US,en;q=0.9,et;q=0.8",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Referer": "https://ariregister.rik.ee/",
+          "Origin": "https://ariregister.rik.ee",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
         },
         signal: controller.signal,
-      }
-    );
-    clearTimeout(timeout);
+      });
+      clearTimeout(timeout);
 
-    if (!eeRes.ok) return [];
-    const eeData = await eeRes.json();
-
-    // The API returns an array of company objects
-    if (!Array.isArray(eeData) || eeData.length === 0) return [];
-
-    return eeData.map(company => {
-      // Build address from legal_address and zip_code
-      let address = company.legal_address || null;
-      if (address && company.zip_code) {
-        address = `${address}, ${company.zip_code}`;
-      }
-      // Append ", Estonia" if address exists and doesn't already mention it
-      if (address && !address.toLowerCase().includes('estonia') && !address.toLowerCase().includes('eesti')) {
-        address = `${address}, Estonia`;
+      if (!eeRes.ok) {
+        console.log(`Estonia API returned ${eeRes.status} for ${url}`);
+        continue; // Try next endpoint
       }
 
-      // Map status to English
-      const statusMap = {
-        'R': 'Registered',
-        'Registrisse kantud': 'Registered',
-        'K': 'Deleted',
-        'Kustutatud': 'Deleted',
-        'L': 'In liquidation',
-        'Likvideerimisel': 'In liquidation',
-      };
+      // Check content-type to avoid parsing HTML (Cloudflare challenge)
+      const contentType = eeRes.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        console.log('Estonia API returned HTML (likely Cloudflare challenge), skipping');
+        continue; // Try next endpoint
+      }
 
-      return {
-        source: 'Estonia e-Business Register',
-        name: company.name || company.nimi,
-        jurisdiction: 'EE',
-        address: address,
-        status: statusMap[company.status] || company.status || 'Active',
-        companyNumber: String(company.reg_code || company.ariregistri_kood || ''),
-        incorporationDate: null,
-        companyType: null,
-        url: company.url || `https://ariregister.rik.ee/eng/company/${company.reg_code}`,
-      };
-    }).filter(r => r.name && r.companyNumber);
-  } catch (e) {
-    clearTimeout(timeout);
-    throw e;
+      const responseText = await eeRes.text();
+
+      // Safety check: ensure response is actually JSON
+      if (!responseText.trim().startsWith('[') && !responseText.trim().startsWith('{')) {
+        console.log('Estonia API returned non-JSON response, skipping');
+        continue; // Try next endpoint
+      }
+
+      const eeData = JSON.parse(responseText);
+
+      // The API returns an array of company objects
+      if (!Array.isArray(eeData) || eeData.length === 0) return [];
+
+      return eeData.map(company => {
+        // Build address from legal_address and zip_code
+        let address = company.legal_address || null;
+        if (address && company.zip_code) {
+          address = `${address}, ${company.zip_code}`;
+        }
+        // Append ", Estonia" if address exists and doesn't already mention it
+        if (address && !address.toLowerCase().includes('estonia') && !address.toLowerCase().includes('eesti')) {
+          address = `${address}, Estonia`;
+        }
+
+        // Map status to English
+        const statusMap = {
+          'R': 'Registered',
+          'Registrisse kantud': 'Registered',
+          'K': 'Deleted',
+          'Kustutatud': 'Deleted',
+          'L': 'In liquidation',
+          'Likvideerimisel': 'In liquidation',
+        };
+
+        return {
+          source: 'Estonia e-Business Register',
+          name: company.name || company.nimi,
+          jurisdiction: 'EE',
+          address: address,
+          status: statusMap[company.status] || company.status || 'Active',
+          companyNumber: String(company.reg_code || company.ariregistri_kood || ''),
+          incorporationDate: null,
+          companyType: null,
+          url: company.url || `https://ariregister.rik.ee/eng/company/${company.reg_code}`,
+        };
+      }).filter(r => r.name && r.companyNumber);
+    } catch (e) {
+      clearTimeout(timeout);
+      console.log(`Estonia API error for ${url}: ${e.message}`);
+      continue; // Try next endpoint
+    }
   }
+
+  // All endpoints failed
+  throw new Error('Estonia register unavailable');
 }
 
 // ═══════ OpenCorporates (140+ countries) ═══════
