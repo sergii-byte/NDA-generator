@@ -52,7 +52,7 @@
             z-index: 100;
         }
         .header-inner {
-            max-width: 820px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 16px 24px;
             display: flex;
@@ -78,7 +78,7 @@
 
         /* ─── Main ─── */
         main {
-            max-width: 820px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 28px 24px 60px;
         }
@@ -140,6 +140,36 @@
             box-shadow: var(--shadow-sm);
         }
         .card + .card { margin-top: 16px; }
+        /* ─── Side-by-side Party Cards ─── */
+        .parties-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        .parties-row .card { margin-top: 0; }
+        .parties-row .card .form-row {
+            grid-template-columns: 1fr;
+        }
+        .parties-row .fill-tabs {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .parties-row .fill-tab {
+            font-size: 0.7rem;
+            padding: 5px 6px;
+            gap: 3px;
+        }
+        .parties-row .fill-tab svg { width: 12px; height: 12px; }
+        @media (max-width: 860px) {
+            .parties-row { grid-template-columns: 1fr; }
+            .parties-row .card .form-row { grid-template-columns: 1fr 1fr; }
+            .parties-row .fill-tab { font-size: 0.75rem; padding: 6px 10px; gap: 5px; }
+            .parties-row .fill-tab svg { width: 14px; height: 14px; }
+        }
+        @media (max-width: 640px) {
+            .parties-row .card .form-row { grid-template-columns: 1fr; }
+        }
         .card-title {
             font-family: 'Instrument Serif', Georgia, serif;
             font-size: 1.15rem;
@@ -545,7 +575,7 @@
             margin-top: 48px;
         }
         .footer-inner {
-            max-width: 820px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 18px 24px;
             display: flex;
@@ -599,7 +629,7 @@
             <div class="logo-area">
                 <a href="https://sblc.com.ua" target="_blank">
                     <h1>Flash NDA Generator</h1>
-                    <p>Generate enforceable NDAs in 90 seconds</p>
+                    <p>Generate enforceable NDAs in 30 seconds</p>
                 </a>
             </div>
             <a href="https://sblc.com.ua" target="_blank">
@@ -629,6 +659,7 @@
 
         <!-- ═══════ STEP 1: Flash NDA ═══════ -->
         <div id="step1" class="space-y">
+            <div class="parties-row">
             <!-- Party A -->
             <div class="card">
                 <div class="card-title">
@@ -841,6 +872,7 @@
                     </div>
                 </div>
             </div>
+            </div><!-- end parties-row -->
 
             <!-- NDA Terms -->
             <div class="card">
@@ -848,7 +880,18 @@
 
                 <div class="form-group">
                     <label>Purpose of Disclosure</label>
-                    <textarea id="purpose" placeholder="e.g., To evaluate a potential business collaboration between the Parties regarding software development services..."></textarea>
+                    <select id="purposeSelect" onchange="toggleCustomPurpose()">
+                        <option value="To evaluate and pursue a potential business collaboration between the Parties.">Business collaboration</option>
+                        <option value="To evaluate a potential investment opportunity between the Parties.">Investment evaluation</option>
+                        <option value="To discuss and negotiate the terms of a potential software development engagement between the Parties.">Software development engagement</option>
+                        <option value="To evaluate and negotiate a potential technology licensing arrangement between the Parties.">Technology licensing</option>
+                        <option value="To explore a potential merger, acquisition, or strategic partnership between the Parties.">M&A / Strategic partnership</option>
+                        <option value="To discuss and evaluate a potential joint venture between the Parties.">Joint venture</option>
+                        <option value="To evaluate the provision of consulting or advisory services between the Parties.">Consulting / Advisory services</option>
+                        <option value="To evaluate and negotiate a potential vendor or supplier engagement between the Parties.">Vendor / Supplier engagement</option>
+                        <option value="custom">Custom (write your own)...</option>
+                    </select>
+                    <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
                 </div>
 
                 <div class="form-row">
@@ -1133,8 +1176,8 @@
                     <h4>🎉 Your NDA package is complete</h4>
                     <p>Need a polished Word document or want a lawyer to review your NDA?</p>
                     <div class="cta-links">
-                        <a href="mailto:info@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                        <a href="mailto:info@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                        <a href="mailto:hello@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
+                        <a href="mailto:hello@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
                     </div>
                 </div>
 
@@ -1150,8 +1193,8 @@
                 <h4>Want a polished Word document?</h4>
                 <p>Get a professionally formatted .docx ready for signing, or have a lawyer review your NDA.</p>
                 <div class="cta-links">
-                    <a href="mailto:info@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                    <a href="mailto:info@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                    <a href="mailto:hello@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
+                    <a href="mailto:hello@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
                 </div>
             </div>
         </div>
@@ -1161,7 +1204,7 @@
         <div class="footer-inner">
             <p>© 2025 SBLC Law Firm. All rights reserved.</p>
             <div style="display:flex;gap:16px;">
-                <a href="mailto:info@sblc.com.ua">info@sblc.com.ua</a>
+                <a href="mailto:hello@sblc.com.ua">hello@sblc.com.ua</a>
                 <a href="https://sblc.com.ua" target="_blank">sblc.com.ua</a>
             </div>
         </div>
@@ -1231,6 +1274,25 @@
         }
 
         // ═══════ Fill Mode Tabs ═══════
+        function toggleCustomPurpose() {
+            const sel = document.getElementById('purposeSelect');
+            const custom = document.getElementById('purposeCustom');
+            if (sel.value === 'custom') {
+                custom.classList.remove('hidden');
+                custom.focus();
+            } else {
+                custom.classList.add('hidden');
+            }
+        }
+
+        function getPurpose() {
+            const sel = document.getElementById('purposeSelect');
+            if (sel.value === 'custom') {
+                return document.getElementById('purposeCustom').value || 'To evaluate and pursue a potential business relationship between the Parties.';
+            }
+            return sel.value;
+        }
+
         function setFillMode(party, mode, btn) {
             document.querySelectorAll(`#fillTabs${party} .fill-tab`).forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
@@ -1239,6 +1301,36 @@
         }
 
         // ═══════ Company Search ═══════
+        // ═══════ Client-side Estonia Register fallback ═══════
+        async function searchEstoniaClient(query) {
+            try {
+                const res = await fetch(`https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return [];
+                const ct = res.headers.get('content-type') || '';
+                if (ct.includes('text/html')) return []; // Cloudflare challenge
+                const data = await res.json();
+                if (!Array.isArray(data)) return [];
+                return data.map(c => {
+                    let addr = c.legal_address || null;
+                    if (addr && c.zip_code) addr = `${addr}, ${c.zip_code}`;
+                    if (addr && !addr.toLowerCase().includes('estonia')) addr = `${addr}, Estonia`;
+                    const statusMap = { 'R': 'Registered', 'Registrisse kantud': 'Registered', 'K': 'Deleted', 'Kustutatud': 'Deleted', 'L': 'In liquidation', 'Likvideerimisel': 'In liquidation' };
+                    return {
+                        source: 'Estonia e-Business Register',
+                        name: c.name || c.nimi,
+                        jurisdiction: 'EE',
+                        address: addr,
+                        status: statusMap[c.status] || c.status || 'Active',
+                        companyNumber: String(c.reg_code || ''),
+                        companyType: null,
+                        url: c.url || `https://ariregister.rik.ee/eng/company/${c.reg_code}`,
+                    };
+                }).filter(r => r.name && r.companyNumber);
+            } catch (e) { return []; }
+        }
+
         function searchCompany(party, query) {
             const dropdown = document.getElementById(`dropdown${party}`);
             clearTimeout(searchTimeout);
@@ -1249,14 +1341,29 @@
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    const res = await fetch('/.netlify/functions/search-company', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ query })
-                    });
-                    const data = await res.json();
-                    if (data.results && data.results.length > 0) {
-                        dropdown.innerHTML = data.results.map(r => `
+                    // Run server search and client-side Estonia search in parallel
+                    const [serverRes, eeClientResults] = await Promise.all([
+                        fetch('/.netlify/functions/search-company', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query })
+                        }).then(r => r.json()),
+                        searchEstoniaClient(query),
+                    ]);
+
+                    let results = serverRes.results || [];
+
+                    // Merge client-side Estonian results if server didn't return any Estonian ones
+                    const hasServerEE = results.some(r => r.source === 'Estonia e-Business Register');
+                    if (!hasServerEE && eeClientResults.length > 0) {
+                        // Deduplicate by company number
+                        const existingNums = new Set(results.map(r => r.companyNumber));
+                        const newEE = eeClientResults.filter(r => !existingNums.has(r.companyNumber));
+                        results = [...results, ...newEE];
+                    }
+
+                    if (results.length > 0) {
+                        dropdown.innerHTML = results.slice(0, 12).map(r => `
                             <div class="autocomplete-item" onclick='selectCompany("${party}", ${JSON.stringify(r).replace(/'/g, "&#39;")})'>
                                 <div class="ac-name">${escapeHtml(r.name)}</div>
                                 <div class="ac-meta">
@@ -1272,8 +1379,12 @@
                     } else {
                         dropdown.innerHTML = '<div class="ac-loading">No results found</div>';
                     }
-                    if (data.warning) {
-                        dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(data.warning)}</div>`;
+                    // Show warnings except Estonia (handled by client fallback)
+                    if (serverRes.warning) {
+                        const warning = serverRes.warning.replace(/;?\s*Estonia register unavailable\s*;?/g, '').trim();
+                        if (warning) {
+                            dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(warning)}</div>`;
+                        }
                     }
                 } catch (e) {
                     dropdown.innerHTML = '<div class="ac-loading">Search error. Try again.</div>';
@@ -1602,7 +1713,7 @@ PARTY B (Receiving Party):
 - Role: ${pB.role}
 - Bind employees/contractors: ${document.getElementById('bindOthers').value}
 
-PURPOSE: ${document.getElementById('purpose').value || 'To evaluate and pursue a potential business relationship between the Parties.'}
+PURPOSE: ${getPurpose()}
 CONFIDENTIAL INFORMATION INCLUDES: ${confInfo}
 NDA TYPE: ${document.getElementById('ndaType').value}
 CONFIDENTIALITY PERIOD: ${document.getElementById('confPeriod').value} years
