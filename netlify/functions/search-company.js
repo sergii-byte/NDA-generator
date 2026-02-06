@@ -36,14 +36,49 @@ exports.handler = async (event, context) => {
 
     let warnings = [];
 
-    // Run all searches in parallel
-    const [ukResults, ocResults, eeResults] = await Promise.all([
+    // ═══════ PARALLEL SEARCH ARCHITECTURE ═══════
+    // 1. UK Companies House (direct API — best for UK)
+    // 2. OpenCorporates general (catches all 140+ countries)
+    // 3. Targeted jurisdiction searches via OC (ensures key markets surface)
+    // 4. Bonus: direct ariregister attempt for Estonia
+
+    const TARGET_JURISDICTIONS = [
+      { code: 'ee', label: 'Estonia e-Business Register', registerUrl: (num) => `https://ariregister.rik.ee/eng/company/${num}` },
+      { code: 'lt', label: 'Lithuania Register of Legal Entities', registerUrl: (num) => `https://rekvizitai.vz.lt/en/company/-/${num}/` },
+      { code: 'pl', label: 'Poland KRS', registerUrl: null },
+      { code: 'cz', label: 'Czech Commercial Register', registerUrl: (num) => `https://or.justice.cz/ias/ui/rejstrik-firma?ico=${num}` },
+      { code: 'de', label: 'Germany Handelsregister', registerUrl: null },
+      { code: 'sg', label: 'Singapore ACRA', registerUrl: null },
+      { code: 'us_de', label: 'Delaware Division of Corporations', registerUrl: null },
+      { code: 'ie', label: 'Ireland CRO', registerUrl: null },
+    ];
+
+    // Build all parallel promises
+    const searchPromises = [
       searchCompaniesHouse(query).catch(e => { warnings.push('UK Companies House unavailable'); return []; }),
       searchOpenCorporates(query).catch(e => { warnings.push('OpenCorporates unavailable'); return []; }),
-      searchEstoniaRegister(query).catch(e => { warnings.push('Estonia register unavailable'); return []; }),
-    ]);
+      ...TARGET_JURISDICTIONS.map(j =>
+        searchOCByJurisdiction(query, j.code, j.label, j.registerUrl)
+          .catch(() => [])
+      ),
+      // Bonus: direct ariregister (may be blocked by Cloudflare)
+      searchEstoniaViaDirect(query).catch(() => []),
+    ];
 
-    let results = [...ukResults, ...eeResults, ...ocResults];
+    const allResults = await Promise.all(searchPromises);
+
+    const ukResults = allResults[0];
+    const ocGeneralResults = allResults[1];
+    const jurisdictionResults = allResults.slice(2, 2 + TARGET_JURISDICTIONS.length).flat();
+    const ariResults = allResults[allResults.length - 1];
+
+    // If direct ariregister returned results, replace OC Estonia results
+    let eeFromOC = jurisdictionResults.filter(r => r.jurisdiction === 'EE');
+    let nonEEJurisdiction = jurisdictionResults.filter(r => r.jurisdiction !== 'EE');
+    let eeResults = ariResults.length > 0 ? ariResults : eeFromOC;
+
+    // Merge: UK first, then targeted jurisdictions, then general OC
+    let results = [...ukResults, ...eeResults, ...nonEEJurisdiction, ...ocGeneralResults];
 
     // Remove duplicates by company number + jurisdiction + normalized name
     const uniqueResults = [];
@@ -62,15 +97,17 @@ exports.handler = async (event, context) => {
     uniqueResults.sort((a, b) => {
       if (a.address && !b.address) return -1;
       if (!a.address && b.address) return 1;
-      const sourceOrder = { 'Companies House UK': 0, 'Estonia e-Business Register': 1, 'OpenCorporates': 2 };
-      return (sourceOrder[a.source] || 3) - (sourceOrder[b.source] || 3);
+      // Prefer direct register sources over generic OpenCorporates
+      const aIsOC = a.source === 'OpenCorporates' ? 1 : 0;
+      const bIsOC = b.source === 'OpenCorporates' ? 1 : 0;
+      return aIsOC - bIsOC;
     });
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        results: uniqueResults.slice(0, 12),
+        results: uniqueResults.slice(0, 15),
         warning: warnings.length > 0 ? warnings.join('; ') : undefined,
       }),
     };
@@ -148,80 +185,80 @@ async function searchCompaniesHouse(query) {
   }
 }
 
-// ═══════ Estonia e-Business Register (ariregister) ═══════
-async function searchEstoniaRegister(query) {
-  // Try both Estonian and English API endpoints
+// ═══════ OpenCorporates: Search by Jurisdiction ═══════
+async function searchOCByJurisdiction(query, jurisdictionCode, sourceLabel, registerUrlFn) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(
+      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&jurisdiction_code=${jurisdictionCode}&per_page=3`,
+      { headers: { "User-Agent": "NDA-Generator/1.0" }, signal: controller.signal }
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data.results || !data.results.companies) return [];
+    return data.results.companies.map(c => {
+      const company = c.company;
+      let address = company.registered_address_in_full;
+      if (!address && company.registered_address) {
+        const addr = company.registered_address;
+        address = [addr.street_address, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean).join(', ');
+      }
+      const jurisdiction = mapJurisdiction(company.jurisdiction_code);
+      return {
+        source: sourceLabel,
+        name: company.name,
+        jurisdiction: jurisdiction,
+        address: address || null,
+        status: company.current_status || 'Active',
+        companyNumber: company.company_number,
+        incorporationDate: company.incorporation_date,
+        companyType: company.company_type,
+        url: registerUrlFn ? registerUrlFn(company.company_number) : company.opencorporates_url,
+      };
+    });
+  } catch (e) {
+    clearTimeout(timeout);
+    return [];
+  }
+}
+
+// ═══════ Estonia: Direct ariregister API (bonus — may be blocked by Cloudflare) ═══════
+async function searchEstoniaViaDirect(query) {
   const endpoints = [
     `https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`,
     `https://ariregister.rik.ee/eng/api/autocomplete?q=${encodeURIComponent(query)}`,
   ];
-
   for (const url of endpoints) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-
+    const timeout = setTimeout(() => controller.abort(), 5000);
     try {
       const eeRes = await fetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           "Accept": "application/json, text/plain, */*",
-          "Accept-Language": "en-US,en;q=0.9,et;q=0.8",
-          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Language": "en-US,en;q=0.9",
           "Referer": "https://ariregister.rik.ee/",
           "Origin": "https://ariregister.rik.ee",
-          "Cache-Control": "no-cache",
-          "Connection": "keep-alive",
         },
         signal: controller.signal,
       });
       clearTimeout(timeout);
-
-      if (!eeRes.ok) {
-        console.log(`Estonia API returned ${eeRes.status} for ${url}`);
-        continue; // Try next endpoint
-      }
-
-      // Check content-type to avoid parsing HTML (Cloudflare challenge)
-      const contentType = eeRes.headers.get('content-type') || '';
-      if (contentType.includes('text/html')) {
-        console.log('Estonia API returned HTML (likely Cloudflare challenge), skipping');
-        continue; // Try next endpoint
-      }
-
-      const responseText = await eeRes.text();
-
-      // Safety check: ensure response is actually JSON
-      if (!responseText.trim().startsWith('[') && !responseText.trim().startsWith('{')) {
-        console.log('Estonia API returned non-JSON response, skipping');
-        continue; // Try next endpoint
-      }
-
-      const eeData = JSON.parse(responseText);
-
-      // The API returns an array of company objects
-      if (!Array.isArray(eeData) || eeData.length === 0) return [];
-
+      if (!eeRes.ok) continue;
+      const ct = eeRes.headers.get('content-type') || '';
+      if (ct.includes('text/html')) continue;
+      const text = await eeRes.text();
+      if (!text.trim().startsWith('[')) continue;
+      const eeData = JSON.parse(text);
+      if (!Array.isArray(eeData) || eeData.length === 0) continue;
       return eeData.map(company => {
-        // Build address from legal_address and zip_code
         let address = company.legal_address || null;
-        if (address && company.zip_code) {
-          address = `${address}, ${company.zip_code}`;
-        }
-        // Append ", Estonia" if address exists and doesn't already mention it
+        if (address && company.zip_code) address = `${address}, ${company.zip_code}`;
         if (address && !address.toLowerCase().includes('estonia') && !address.toLowerCase().includes('eesti')) {
           address = `${address}, Estonia`;
         }
-
-        // Map status to English
-        const statusMap = {
-          'R': 'Registered',
-          'Registrisse kantud': 'Registered',
-          'K': 'Deleted',
-          'Kustutatud': 'Deleted',
-          'L': 'In liquidation',
-          'Likvideerimisel': 'In liquidation',
-        };
-
+        const statusMap = { 'R': 'Registered', 'Registrisse kantud': 'Registered', 'K': 'Deleted', 'Kustutatud': 'Deleted', 'L': 'In liquidation', 'Likvideerimisel': 'In liquidation' };
         return {
           source: 'Estonia e-Business Register',
           name: company.name || company.nimi,
@@ -236,13 +273,10 @@ async function searchEstoniaRegister(query) {
       }).filter(r => r.name && r.companyNumber);
     } catch (e) {
       clearTimeout(timeout);
-      console.log(`Estonia API error for ${url}: ${e.message}`);
-      continue; // Try next endpoint
+      continue;
     }
   }
-
-  // All endpoints failed
-  throw new Error('Estonia register unavailable');
+  return [];
 }
 
 // ═══════ OpenCorporates (140+ countries) ═══════
@@ -252,7 +286,7 @@ async function searchOpenCorporates(query) {
 
   try {
     const ocRes = await fetch(
-      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=8`,
+      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=5`,
       {
         headers: { "User-Agent": "NDA-Generator/1.0" },
         signal: controller.signal,
