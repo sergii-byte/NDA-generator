@@ -1,9 +1,13 @@
 exports.handler = async (event, context) => {
-  // Handle preflight CORS
+  // Handle CORS preflight
   if (event.httpMethod === "OPTIONS") {
     return {
-      statusCode: 200,
-      headers: getCorsHeaders(),
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
       body: "",
     };
   }
@@ -12,7 +16,11 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  const headers = getCorsHeaders();
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Content-Type": "application/json",
+  };
 
   try {
     const { query, source, fetchDetails, companyUrl } = JSON.parse(event.body);
@@ -26,44 +34,44 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: "Query is required" }) };
     }
 
-    const results = [];
-    const errors = [];
+    let warnings = [];
 
-    // Run searches in parallel for speed
-    const searches = [];
+    // Run all searches in parallel
+    const [ukResults, ocResults, eeResults] = await Promise.all([
+      searchCompaniesHouse(query).catch(e => { warnings.push('UK Companies House unavailable'); return []; }),
+      searchOpenCorporates(query).catch(e => { warnings.push('OpenCorporates unavailable'); return []; }),
+      searchEstoniaRegister(query).catch(e => { warnings.push('Estonia register unavailable'); return []; }),
+    ]);
 
-    // Companies House (UK) - FREE API, excellent data
-    if (!source || source === 'uk' || source === 'companieshouse') {
-      searches.push(searchCompaniesHouse(query).catch(e => { errors.push('Companies House: ' + e.message); return []; }));
-    }
+    let results = [...ukResults, ...eeResults, ...ocResults];
 
-    // OpenCorporates (140+ countries)
-    if (!source || source === 'opencorporates' || source === 'global') {
-      searches.push(searchOpenCorporates(query).catch(e => { errors.push('OpenCorporates: ' + e.message); return []; }));
-    }
-
-    const searchResults = await Promise.all(searches);
-    searchResults.forEach(r => results.push(...r));
-
-    // Remove duplicates by company number + jurisdiction
-    const uniqueResults = deduplicateResults(results);
+    // Remove duplicates by company number + jurisdiction + normalized name
+    const uniqueResults = [];
+    const seen = new Set();
+    results.forEach(r => {
+      const key = `${r.companyNumber}-${(r.jurisdiction || '').toLowerCase()}`;
+      const nameKey = (r.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!seen.has(key) && !seen.has(nameKey)) {
+        seen.add(key);
+        if (nameKey) seen.add(nameKey);
+        uniqueResults.push(r);
+      }
+    });
 
     // Sort: prioritize results with addresses, then by source quality
     uniqueResults.sort((a, b) => {
       if (a.address && !b.address) return -1;
       if (!a.address && b.address) return 1;
-      // Prefer Companies House over OpenCorporates
-      if (a.source === 'Companies House UK' && b.source !== 'Companies House UK') return -1;
-      if (a.source !== 'Companies House UK' && b.source === 'Companies House UK') return 1;
-      return 0;
+      const sourceOrder = { 'Companies House UK': 0, 'Estonia e-Business Register': 1, 'OpenCorporates': 2 };
+      return (sourceOrder[a.source] || 3) - (sourceOrder[b.source] || 3);
     });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         results: uniqueResults.slice(0, 12),
-        ...(errors.length > 0 ? { warnings: errors } : {})
+        warning: warnings.length > 0 ? warnings.join('; ') : undefined,
       }),
     };
   } catch (error) {
@@ -76,133 +84,202 @@ exports.handler = async (event, context) => {
   }
 };
 
-// ─── Companies House UK ───
+// ═══════ UK Companies House ═══════
 async function searchCompaniesHouse(query) {
-  const results = [];
   const apiKey = process.env.COMPANIES_HOUSE_API_KEY;
-  const authHeaders = apiKey 
+  const authHeaders = apiKey
     ? { "Authorization": "Basic " + Buffer.from(apiKey + ":").toString('base64') }
     : {};
 
-  const chRes = await fetchWithTimeout(
-    `https://api.company-information.service.gov.uk/search/companies?q=${encodeURIComponent(query)}&items_per_page=6`,
-    { headers: { "User-Agent": "NDA-Generator/1.0", ...authHeaders } },
-    8000
-  );
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
 
-  if (!chRes.ok) return results;
+  try {
+    const chRes = await fetch(
+      `https://api.company-information.service.gov.uk/search/companies?q=${encodeURIComponent(query)}&items_per_page=5`,
+      {
+        headers: { "User-Agent": "NDA-Generator/1.0", ...authHeaders },
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
 
-  const chData = await chRes.json();
-  if (!chData.items) return results;
+    if (!chRes.ok) return [];
+    const chData = await chRes.json();
+    if (!chData.items) return [];
 
-  // Fetch full profiles in parallel if we have API key
-  const profilePromises = chData.items.map(async (company) => {
-    let fullAddress = company.address_snippet || formatUKAddress(company.address);
+    // Fetch full profiles in parallel for better address data
+    const profilePromises = chData.items.map(async (company) => {
+      let fullAddress = company.address_snippet || formatUKAddress(company.address);
 
-    if (apiKey && company.company_number) {
-      try {
-        const profileRes = await fetchWithTimeout(
-          `https://api.company-information.service.gov.uk/company/${company.company_number}`,
-          { headers: { "User-Agent": "NDA-Generator/1.0", ...authHeaders } },
-          5000
-        );
-        if (profileRes.ok) {
-          const profile = await profileRes.json();
-          if (profile.registered_office_address) {
-            fullAddress = formatUKAddress(profile.registered_office_address);
-          }
-        }
-      } catch (e) { /* use search address */ }
-    }
-
-    return {
-      source: 'Companies House UK',
-      name: company.title,
-      jurisdiction: 'GB',
-      address: fullAddress,
-      status: company.company_status,
-      companyNumber: company.company_number,
-      incorporationDate: company.date_of_creation,
-      companyType: company.company_type,
-      url: `https://find-and-update.company-information.service.gov.uk/company/${company.company_number}`
-    };
-  });
-
-  const resolved = await Promise.allSettled(profilePromises);
-  resolved.forEach(r => { if (r.status === 'fulfilled') results.push(r.value); });
-  return results;
-}
-
-// ─── OpenCorporates ───
-async function searchOpenCorporates(query) {
-  const results = [];
-  
-  const ocRes = await fetchWithTimeout(
-    `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=10`,
-    { headers: { "User-Agent": "NDA-Generator/1.0" } },
-    10000
-  );
-
-  if (!ocRes.ok) return results;
-
-  const ocData = await ocRes.json();
-  if (!ocData.results || !ocData.results.companies) return results;
-
-  for (const c of ocData.results.companies) {
-    const company = c.company;
-    let address = company.registered_address_in_full;
-
-    if (!address && company.registered_address) {
-      const addr = company.registered_address;
-      const parts = [addr.street_address, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean);
-      address = parts.join(', ');
-    }
-
-    // For results without address, try to fetch details (but don't block)
-    if (!address && company.opencorporates_url) {
-      try {
-        const detailRes = await fetchWithTimeout(
-          company.opencorporates_url + '?format=json',
-          { headers: { "User-Agent": "NDA-Generator/1.0" } },
-          4000
-        );
-        if (detailRes.ok) {
-          const detailData = await detailRes.json();
-          const detail = detailData.results?.company;
-          if (detail) {
-            address = detail.registered_address_in_full;
-            if (!address && detail.registered_address) {
-              const addr = detail.registered_address;
-              const parts = [addr.street_address, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean);
-              address = parts.join(', ');
+      if (apiKey && company.company_number) {
+        try {
+          const profileRes = await fetch(
+            `https://api.company-information.service.gov.uk/company/${company.company_number}`,
+            { headers: { "User-Agent": "NDA-Generator/1.0", ...authHeaders } }
+          );
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            if (profile.registered_office_address) {
+              fullAddress = formatUKAddress(profile.registered_office_address);
             }
           }
-        }
-      } catch (e) { /* continue without detailed address */ }
-    }
+        } catch (e) { /* use search address */ }
+      }
 
-    results.push({
-      source: 'OpenCorporates',
-      name: company.name,
-      jurisdiction: mapJurisdiction(company.jurisdiction_code),
-      address: address || null,
-      status: company.current_status,
-      companyNumber: company.company_number,
-      incorporationDate: company.incorporation_date,
-      companyType: company.company_type,
-      url: company.opencorporates_url
+      return {
+        source: 'Companies House UK',
+        name: company.title,
+        jurisdiction: 'GB',
+        address: fullAddress,
+        status: company.company_status,
+        companyNumber: company.company_number,
+        incorporationDate: company.date_of_creation,
+        companyType: company.company_type,
+        url: `https://find-and-update.company-information.service.gov.uk/company/${company.company_number}`
+      };
     });
-  }
 
-  return results;
+    const results = await Promise.allSettled(profilePromises);
+    return results.filter(r => r.status === 'fulfilled').map(r => r.value);
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
 }
 
-// ─── Fetch company details ───
+// ═══════ Estonia e-Business Register (ariregister) ═══════
+async function searchEstoniaRegister(query) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    // Free public autocomplete API — no authentication required
+    const eeRes = await fetch(
+      `https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`,
+      {
+        headers: {
+          "User-Agent": "NDA-Generator/1.0",
+          "Accept": "application/json",
+        },
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
+
+    if (!eeRes.ok) return [];
+    const eeData = await eeRes.json();
+
+    // The API returns an array of company objects
+    if (!Array.isArray(eeData) || eeData.length === 0) return [];
+
+    return eeData.map(company => {
+      // Build address from legal_address and zip_code
+      let address = company.legal_address || null;
+      if (address && company.zip_code) {
+        address = `${address}, ${company.zip_code}`;
+      }
+      // Append ", Estonia" if address exists and doesn't already mention it
+      if (address && !address.toLowerCase().includes('estonia') && !address.toLowerCase().includes('eesti')) {
+        address = `${address}, Estonia`;
+      }
+
+      // Map status to English
+      const statusMap = {
+        'R': 'Registered',
+        'Registrisse kantud': 'Registered',
+        'K': 'Deleted',
+        'Kustutatud': 'Deleted',
+        'L': 'In liquidation',
+        'Likvideerimisel': 'In liquidation',
+      };
+
+      return {
+        source: 'Estonia e-Business Register',
+        name: company.name || company.nimi,
+        jurisdiction: 'EE',
+        address: address,
+        status: statusMap[company.status] || company.status || 'Active',
+        companyNumber: String(company.reg_code || company.ariregistri_kood || ''),
+        incorporationDate: null,
+        companyType: null,
+        url: company.url || `https://ariregister.rik.ee/eng/company/${company.reg_code}`,
+      };
+    }).filter(r => r.name && r.companyNumber);
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+
+// ═══════ OpenCorporates (140+ countries) ═══════
+async function searchOpenCorporates(query) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const ocRes = await fetch(
+      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=8`,
+      {
+        headers: { "User-Agent": "NDA-Generator/1.0" },
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
+
+    if (!ocRes.ok) return [];
+    const ocData = await ocRes.json();
+    if (!ocData.results || !ocData.results.companies) return [];
+
+    return ocData.results.companies.map(c => {
+      const company = c.company;
+
+      // Get full address
+      let address = company.registered_address_in_full;
+      if (!address && company.registered_address) {
+        const addr = company.registered_address;
+        const parts = [
+          addr.street_address,
+          addr.locality,
+          addr.region,
+          addr.postal_code,
+          addr.country
+        ].filter(Boolean);
+        address = parts.join(', ');
+      }
+
+      // Map jurisdiction codes
+      const jurisdiction = mapJurisdiction(company.jurisdiction_code);
+
+      return {
+        source: 'OpenCorporates',
+        name: company.name,
+        jurisdiction: jurisdiction,
+        address: address || null,
+        status: company.current_status,
+        companyNumber: company.company_number,
+        incorporationDate: company.incorporation_date,
+        companyType: company.company_type,
+        url: company.opencorporates_url
+      };
+    });
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+
+// ═══════ Fetch Full Company Details (OpenCorporates) ═══════
 async function fetchCompanyDetails(url, headers) {
   try {
-    const res = await fetchWithTimeout(url + '?format=json', {
-      headers: { "User-Agent": "NDA-Generator/1.0" }
-    }, 10000);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const res = await fetch(url + '?format=json', {
+      headers: { "User-Agent": "NDA-Generator/1.0" },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
 
     if (!res.ok) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: "Company not found" }) };
@@ -218,7 +295,10 @@ async function fetchCompanyDetails(url, headers) {
     let address = company.registered_address_in_full;
     if (!address && company.registered_address) {
       const addr = company.registered_address;
-      const parts = [addr.street_address, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean);
+      const parts = [
+        addr.street_address, addr.locality, addr.region,
+        addr.postal_code, addr.country
+      ].filter(Boolean);
       address = parts.join(', ');
     }
 
@@ -246,63 +326,33 @@ async function fetchCompanyDetails(url, headers) {
   }
 }
 
-// ─── Helpers ───
-function getCorsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json",
-  };
-}
-
-async function fetchWithTimeout(url, options = {}, timeout = 8000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return response;
-  } catch (error) {
-    clearTimeout(id);
-    throw error;
-  }
-}
-
-function deduplicateResults(results) {
-  const unique = [];
-  const seen = new Set();
-  results.forEach(r => {
-    const key = `${(r.companyNumber || '').toLowerCase()}-${(r.jurisdiction || '').toLowerCase()}`;
-    const nameKey = (r.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (!seen.has(key) && !seen.has(nameKey)) {
-      seen.add(key);
-      seen.add(nameKey);
-      unique.push(r);
-    }
-  });
-  return unique;
-}
-
+// ═══════ Helpers ═══════
 function formatUKAddress(addr) {
   if (!addr) return null;
-  const parts = [addr.premises, addr.address_line_1, addr.address_line_2, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean);
+  const parts = [
+    addr.premises,
+    addr.address_line_1,
+    addr.address_line_2,
+    addr.locality,
+    addr.region,
+    addr.postal_code,
+    addr.country
+  ].filter(Boolean);
   return parts.join(', ');
 }
 
-// Map OpenCorporates jurisdiction codes to readable format
 function mapJurisdiction(code) {
   if (!code) return null;
   const upper = code.toUpperCase();
+  // Handle compound codes like US_DE → US-DE, GB_SCT → GB-SCT
+  const mapped = upper.replace(/_/g, '-');
+  // Common mappings
   const map = {
-    'GB': 'GB', 'US_DE': 'US-DE', 'US_NY': 'US-NY', 'US_CA': 'US-CA', 'US_TX': 'US-TX',
-    'US_FL': 'US-FL', 'US_NV': 'US-NV', 'US_WY': 'US-WY', 'DE': 'DE', 'FR': 'FR',
-    'NL': 'NL', 'EE': 'EE', 'PL': 'PL', 'CZ': 'CZ', 'LT': 'LT', 'ES': 'ES',
-    'HU': 'HU', 'AE': 'AE', 'IE': 'IE', 'BE': 'BE', 'AT': 'AT', 'IT': 'IT',
-    'CH': 'CH', 'SE': 'SE', 'DK': 'DK', 'FI': 'FI', 'PT': 'PT', 'RO': 'RO',
-    'BG': 'BG', 'HR': 'HR', 'SK': 'SK', 'SI': 'SI', 'LV': 'LV', 'UA': 'UA',
-    'SG': 'SG', 'HK': 'HK', 'AU': 'AU', 'NZ': 'NZ', 'CA': 'CA', 'JP': 'JP',
-    'KR': 'KR', 'IN': 'IN', 'IL': 'IL', 'BR': 'BR', 'MX': 'MX',
+    'GB': 'GB', 'US-DE': 'US-DE', 'US-NY': 'US-NY', 'US-CA': 'US-CA',
+    'EE': 'EE', 'LT': 'LT', 'PL': 'PL', 'CZ': 'CZ', 'ES': 'ES',
+    'HU': 'HU', 'DE': 'DE', 'FR': 'FR', 'NL': 'NL', 'IE': 'IE',
+    'AE': 'AE', 'AE-DU': 'AE-DU', 'AE-AZ': 'AE-AZ', 'SG': 'SG', 'HK': 'HK',
+    'CH': 'CH', 'SV': 'SV', 'BE': 'BE', 'AT': 'AT', 'IT': 'IT', 'PT': 'PT',
   };
-  return map[upper] || upper;
+  return map[mapped] || mapped;
 }
