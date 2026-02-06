@@ -316,7 +316,7 @@
         .checkbox-card {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 10px 14px;
             border: 1px solid var(--border-light);
             border-radius: 10px;
@@ -324,8 +324,21 @@
             transition: all 0.2s;
             font-size: 0.85rem;
             color: var(--text-secondary);
+            margin: 0;
         }
         .checkbox-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+        .checkbox-card input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            margin: 0;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-card span {
+            line-height: 1.3;
+        }
         .checkbox-card input:checked + span { color: var(--text); font-weight: 500; }
 
         /* ─── Buttons ─── */
@@ -1015,18 +1028,35 @@
                 <div id="arbFields" class="hidden">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Arbitration Rules</label>
-                            <select id="arbRules">
-                                <option value="ICC Rules">ICC Rules</option>
-                                <option value="AAA Commercial Rules">AAA Commercial Rules</option>
-                                <option value="LCIA Rules">LCIA Rules</option>
-                                <option value="UNCITRAL Rules">UNCITRAL Rules</option>
+                            <label>Arbitration Institution</label>
+                            <select id="arbRules" onchange="onArbInstitutionChange()">
+                                <option value="ICC">ICC — International Chamber of Commerce</option>
+                                <option value="LCIA">LCIA — London Court of International Arbitration</option>
+                                <option value="AAA_ICDR">AAA/ICDR — International Centre for Dispute Resolution</option>
+                                <option value="SIAC">SIAC — Singapore International Arbitration Centre</option>
+                                <option value="SCC">SCC — Stockholm Chamber of Commerce</option>
+                                <option value="DIAC">DIAC — Dubai International Arbitration Centre</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Arbitration Location</label>
-                            <input type="text" id="arbLocation" placeholder="e.g., London, UK">
+                            <label>Seat of Arbitration</label>
+                            <input type="text" id="arbLocation" placeholder="Auto-filled or enter manually">
                         </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 4px;">
+                        <label>Arbitration Language</label>
+                        <select id="arbLanguage">
+                            <option value="English">English</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Russian">Russian</option>
+                        </select>
+                    </div>
+                    <div id="arbClausePreview" style="margin-top: 10px; padding: 14px 16px; background: var(--bg-alt); border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.8rem; line-height: 1.65; color: var(--text-secondary); font-family: Georgia, 'Times New Roman', serif; display: none;">
+                        <div style="font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
+                        <div id="arbClauseText"></div>
                     </div>
                 </div>
             </div>
@@ -1274,18 +1304,28 @@
         async function parseWebsite(party) {
             const url = document.getElementById(`website${party}`).value;
             if (!url) return alert('Enter a website URL');
+            const btn = event.target;
+            btn.textContent = 'Fetching...';
+            btn.disabled = true;
             try {
                 const res = await fetch('/.netlify/functions/parse-company', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url: url.startsWith('http') ? url : 'https://' + url })
                 });
                 const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch');
                 if (data.name) document.getElementById(`party${party}Name`).value = data.name;
-                if (data.address) document.getElementById(`party${party}Address`).value = data.address;
+                // Backend returns "addresses" array, take the first one
+                const addr = data.address || (Array.isArray(data.addresses) && data.addresses[0]) || '';
+                if (addr) document.getElementById(`party${party}Address`).value = addr;
                 if (data.email) document.getElementById(`party${party}Email`).value = data.email;
                 updateGoverningLawOptions();
-            } catch (e) { alert('Failed to parse website'); }
+                if (!data.name && !addr && !data.email) {
+                    alert('Could not extract company info from this website. Try the contact page URL directly.');
+                }
+            } catch (e) { alert('Failed to parse website: ' + e.message); }
+            finally { btn.textContent = 'Fetch'; btn.disabled = false; }
         }
 
         async function parseEmail(party) {
@@ -1293,6 +1333,9 @@
             if (!email || !email.includes('@')) return alert('Enter a valid email');
             const domain = email.split('@')[1];
             document.getElementById(`party${party}Email`).value = email;
+            const btn = event.target;
+            btn.textContent = 'Fetching...';
+            btn.disabled = true;
             try {
                 const res = await fetch('/.netlify/functions/parse-company', {
                     method: 'POST',
@@ -1301,9 +1344,11 @@
                 });
                 const data = await res.json();
                 if (data.name) document.getElementById(`party${party}Name`).value = data.name;
-                if (data.address) document.getElementById(`party${party}Address`).value = data.address;
+                const addr = data.address || (Array.isArray(data.addresses) && data.addresses[0]) || '';
+                if (addr) document.getElementById(`party${party}Address`).value = addr;
                 updateGoverningLawOptions();
             } catch (e) { /* silently fail */ }
+            finally { btn.textContent = 'Fetch'; btn.disabled = false; }
         }
 
         async function parseCard(party) {
@@ -1434,8 +1479,89 @@
 
         function toggleArbFields() {
             const val = document.getElementById('disputeMethod').value;
-            document.getElementById('arbFields').classList.toggle('hidden', val === 'Courts');
+            const arbFields = document.getElementById('arbFields');
+            arbFields.classList.toggle('hidden', val === 'Courts');
+            if (val !== 'Courts') {
+                onArbInstitutionChange();
+            }
         }
+
+        const ARB_INSTITUTIONS = {
+            ICC: {
+                name: 'International Chamber of Commerce (ICC)',
+                defaultSeat: 'Paris, France',
+                modelClause: (seat, lang, govLaw) =>
+                    `All disputes arising out of or in connection with this Agreement shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce by a sole arbitrator appointed in accordance with the said Rules. The seat of arbitration shall be ${seat}. The language of the arbitration shall be ${lang}. The arbitral proceedings and the award shall be kept confidential. The award shall be final and binding upon the Parties, who hereby waive any right to any form of recourse insofar as such waiver can validly be made. The prevailing Party shall be entitled to recover its reasonable legal fees and costs from the other Party.`
+            },
+            LCIA: {
+                name: 'London Court of International Arbitration (LCIA)',
+                defaultSeat: 'London, England',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration under the LCIA Rules, which Rules are deemed to be incorporated by reference into this clause. The number of arbitrators shall be one. The seat, or legal place, of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. The governing law of this Agreement shall be the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            AAA_ICDR: {
+                name: 'International Centre for Dispute Resolution (ICDR)',
+                defaultSeat: 'New York, USA',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any controversy or claim arising out of or relating to this Agreement, or the breach thereof, shall be determined by arbitration administered by the International Centre for Dispute Resolution in accordance with its International Arbitration Rules. The number of arbitrators shall be one. The place of arbitration shall be ${seat}. The arbitration shall be held, and the award shall be rendered, in ${lang}. The award rendered by the arbitrator shall be final and binding upon the Parties, and judgment on the award may be entered in any court having jurisdiction thereof. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable attorneys\' fees and costs.`
+            },
+            SIAC: {
+                name: 'Singapore International Arbitration Centre (SIAC)',
+                defaultSeat: 'Singapore',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration administered by the Singapore International Arbitration Centre ("SIAC") in accordance with the Arbitration Rules of the Singapore International Arbitration Centre ("SIAC Rules") for the time being in force, which rules are deemed to be incorporated by reference in this clause. The seat of the arbitration shall be ${seat}. The Tribunal shall consist of one arbitrator. The language of the arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            SCC: {
+                name: 'Arbitration Institute of the Stockholm Chamber of Commerce (SCC)',
+                defaultSeat: 'Stockholm, Sweden',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute, controversy or claim arising out of or in connection with this Agreement, or the breach, termination or invalidity thereof, shall be finally settled by arbitration in accordance with the Arbitration Rules of the Arbitration Institute of the Stockholm Chamber of Commerce. The arbitral tribunal shall be composed of a sole arbitrator. The seat of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. This Agreement shall be governed by the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            DIAC: {
+                name: 'Dubai International Arbitration Centre (DIAC)',
+                defaultSeat: 'Dubai, UAE',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of the formation, performance, interpretation, nullification, termination or invalidation of this Agreement or arising therefrom or related thereto in any manner whatsoever, shall be settled by arbitration in accordance with the Arbitration Rules of the Dubai International Arbitration Centre ("DIAC Rules"), by a sole arbitrator appointed in compliance with the DIAC Rules. The seat of arbitration shall be ${seat}. The language of arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            }
+        };
+
+        function onArbInstitutionChange() {
+            const key = document.getElementById('arbRules').value;
+            const inst = ARB_INSTITUTIONS[key];
+            if (!inst) return;
+
+            // Auto-fill seat if empty or still a default
+            const seatInput = document.getElementById('arbLocation');
+            const allDefaults = Object.values(ARB_INSTITUTIONS).map(i => i.defaultSeat);
+            if (!seatInput.value || allDefaults.includes(seatInput.value)) {
+                seatInput.value = inst.defaultSeat;
+            }
+
+            // Update clause preview
+            updateArbClausePreview();
+        }
+
+        function updateArbClausePreview() {
+            const key = document.getElementById('arbRules').value;
+            const inst = ARB_INSTITUTIONS[key];
+            if (!inst) return;
+
+            const seat = document.getElementById('arbLocation').value || inst.defaultSeat;
+            const lang = document.getElementById('arbLanguage').value || 'English';
+            const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
+            const clause = inst.modelClause(seat, lang, govLaw);
+
+            document.getElementById('arbClauseText').textContent = clause;
+            document.getElementById('arbClausePreview').style.display = 'block';
+        }
+
+        // Update preview when seat or language changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const arbLoc = document.getElementById('arbLocation');
+            const arbLang = document.getElementById('arbLanguage');
+            if (arbLoc) arbLoc.addEventListener('input', updateArbClausePreview);
+            if (arbLang) arbLang.addEventListener('change', updateArbClausePreview);
+        });
 
         // ═══════ NDA Generation ═══════
         function buildPrompt1() {
@@ -1460,7 +1586,7 @@
             const dateVal = document.getElementById('agreementDate').value;
             if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            return `You are an expert international corporate lawyer. Draft a comprehensive, professionally structured Non-Disclosure Agreement.
+            return `You are a senior international corporate lawyer at a top-tier law firm with 20+ years of experience drafting NDAs for Fortune 500 companies, technology firms, and cross-border transactions. Draft a comprehensive, professionally structured Non-Disclosure Agreement.
 
 PARTY A (Disclosing Party):
 - Full Legal Name: ${pA.name}
@@ -1483,54 +1609,145 @@ CONFIDENTIALITY PERIOD: ${document.getElementById('confPeriod').value} years
 GOVERNING LAW: ${getGoverningLaw() || '[To be determined]'}
 EFFECTIVE DATE: ${formattedDate}
 
-FORMATTING AND STRUCTURE REQUIREMENTS — FOLLOW EXACTLY:
+═══ DOCUMENT STRUCTURE — FOLLOW THIS EXACT FORMAT ═══
 
-1. **Title**: Start with "# MUTUAL NON-DISCLOSURE AGREEMENT" (or "# NON-DISCLOSURE AGREEMENT" if unilateral) centered.
+# ${document.getElementById('ndaType').value === 'Mutual' ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT
 
-2. **Preamble**: State the effective date. Introduce both parties with their full legal names, entity types, registration numbers (if provided), and registered addresses. Use defined terms in **bold** (e.g., **"Disclosing Party"**, **"Receiving Party"**). Include WHEREAS recitals explaining the purpose.
+Start with: "Effective date: **${formattedDate}**"
 
-3. **Numbered Sections**: Use "## 1. SUBJECT OF AGREEMENT", "## 2. SCOPE OF CONFIDENTIAL INFORMATION", etc. Each major clause must be a numbered heading.
+Then the introductory paragraph identifying the parties:
+"This ${document.getElementById('ndaType').value === 'Mutual' ? 'Mutual ' : ''}Non-Disclosure Agreement (the **"Agreement"**) is entered into by and between:"
 
-4. **Sub-clauses**: Use "1.1.", "1.2.", "2.1.", etc. for sub-paragraphs within each section.
+Identify Party A with full legal name in bold, entity type, registered address, then "and" then Party B the same way. Define each as a **"Party"** and collectively the **"Parties"**.
 
-5. **Defined Terms**: Bold all defined terms when first introduced (e.g., **"Confidential Information"**, **"Purpose"**, **"Project"**, **"Unlawful Disclosure"**).
+Then WHEREAS recitals:
+- First WHEREAS: explain that each Party may disclose confidential and proprietary information to evaluate or pursue the Purpose
+- Define **"Project"** and **"Purpose"**
+- Second WHEREAS: define **"Disclosing Party"** and **"Receiving Party"**
+- "NOW, THEREFORE, in consideration of the mutual covenants contained herein, the Parties agree as follows:"
 
-6. **Required Sections** (in this order):
-   - Subject of Agreement
-   - Scope of Confidential Information (with detailed enumerated list of what constitutes confidential info)
-   - Confidentiality Obligations
-   - Permitted Disclosure
-   - Return or Destruction of Confidential Information
-   - Reservation of Rights
-   - Responsibility and Remedies
-   - Term and Termination
-   - Miscellaneous (Assignment, Entire Agreement, Amendments, Waiver, Severability, Counterparts, Governing Law, Effective Date)
+═══ REQUIRED SECTIONS (use this exact numbering style) ═══
 
-7. **Signature Block**: End with a signature table showing both parties with lines for signature, full name, title, and email.
+## 1. Subject of Agreement.
+Use sub-clauses 1.1., 1.2. Explain parties wish to protect confidential information. Define **"Unlawful Disclosure"**.
 
-8. **Language Style**: Professional legal English. Clear, precise, and enforceable. Use plain English where possible but maintain legal rigor. Justify claims with proper legal terminology.
+## 2. Scope of Confidential Information.
+2.1. Define **"Confidential Information"** broadly — any non-public information in written, electronic, oral, tangible, or intangible form.
+2.2. Provide a DETAILED enumerated bullet list of what constitutes Confidential Information based on: ${confInfo}. Include at minimum 8-10 specific bullet items covering: legal structure/ownership, operations/trade secrets/algorithms, business plans/financials, client/customer information, investor information, other projects and contacts, business development plans, employee/contractor information, IP and licenses, security systems, any information marked "Confidential", and any other project-related information.
 
-9. **Length**: Comprehensive — aim for 2000-3000 words. This should be a thorough, enforceable agreement, not a summary.
+## 3. Confidentiality Obligations.
+Bullet list of obligations: keep secret, not exploit except for Purpose, not disclose directly or indirectly, not copy or record except as strictly necessary, establish adequate security measures.
 
-Do NOT include any preamble text before the agreement title. Start directly with the NDA title.`;
+## 4. Permitted Disclosure.
+Allow disclosure to personnel/contractors/affiliates when directly required for the Purpose, with conditions: inform of confidential nature first, procure compliance equivalent to this Agreement including written agreement, Receiving Party liable for their actions.
+
+## 5. Return or Destruction of Confidential Information.
+If requested by Disclosing Party — destroy/return all documents, erase from systems, erase from third-party storage where practicable, certify compliance in writing.
+
+## 6. Reservation of Rights.
+Disclosing Party reserves all rights. No license granted by disclosure.
+
+## 7. Non-Solicitation.
+7.1. For ${document.getElementById('confPeriod').value} year(s) from Effective Date, neither Party shall solicit employees/contractors of the other.
+7.2. Liquidated damages clause: USD $50,000 per person solicited in violation.
+
+## 8. Responsibility and Remedies.
+8.1. Rights under this Agreement are in addition to rights provided by law.
+8.2. Violation may cause irreparable harm entitling injunctive relief, specific performance, and compensation of all direct damages and expenses.
+
+## 9. Term and Termination.
+9.1. Termination governed by this Agreement and applicable law.
+9.2. Written notice required if either Party decides not to continue.
+9.3. Obligations survive termination for ${document.getElementById('confPeriod').value} year(s) from termination date.
+
+## 10. Dispute Resolution.
+10.1. First resolve through negotiations.
+10.2. If ${getGoverningLaw() || 'not specified'} — provide appropriate dispute resolution. Include specifics about the arbitration body, seat, language, confidentiality of proceedings, and that the prevailing party is entitled to legal fees.
+
+## 11. Miscellaneous.
+11.1. **Assignment.** No assignment without consent.
+11.2. **Entire Agreement.** Supersedes all previous agreements.
+11.3. **Amendments.** Written and signed only.
+11.4. **Waiver.** No failure to exercise shall constitute waiver.
+11.5. **Severance.** Invalid provisions modified to minimum extent or deleted.
+11.6. **Counterparts.** May be executed in counterparts; electronic delivery effective.
+11.7. **Governing Law.** ${getGoverningLaw() || '[Jurisdiction]'}.
+11.8. **Effective Date.** Entered into on the date stated at the beginning.
+
+End with "Signatures follow" and a signature block table:
+
+| ${pA.name} | ${pB.name} |
+|---|---|
+| ______________________ | ______________________ |
+| Full name: | Full name: |
+| Title: | Title: |
+| Email: ${pA.email || ''} | Email: ${pB.email || ''} |
+
+═══ LANGUAGE AND STYLE RULES ═══
+- Professional legal English — clear, precise, enforceable
+- Bold ALL defined terms when first introduced: **"Agreement"**, **"Confidential Information"**, **"Purpose"**, **"Project"**, **"Disclosing Party"**, **"Receiving Party"**, **"Unlawful Disclosure"**
+- Use "shall" for obligations, "may" for permissions
+- Every section and sub-section must be substantive — no placeholder text
+- Length: 2500-3500 words. This must be a thorough, enforceable agreement
+- Do NOT include any commentary, explanations, or text outside the agreement itself
+- Start directly with the title heading. No preamble.`;
         }
 
         function buildPrompt2() {
             const v = id => document.getElementById(id).value;
-            return `You are an expert international corporate lawyer. Enhance the following NDA with additional protections. Output the COMPLETE updated NDA with the same formatting structure and quality.
+            return `You are a senior international corporate lawyer. Enhance the following NDA with additional protections. Output the COMPLETE updated NDA maintaining the exact same formatting, section numbering, defined terms in bold, and professional quality.
 
 EXISTING NDA:
 ${generatedNDAText}
 
-ADD OR STRENGTHEN THESE CLAUSES:
-1. Residual Knowledge: ${v('residualKnowledge')} — ${v('residualKnowledge') === 'Restricted' ? 'The Receiving Party shall not use any residual knowledge for competitive purposes.' : 'Standard residual knowledge clause permitting incidental retention of general knowledge.'}
-2. Return of Materials: Within ${v('returnDays')} days. Written certification required: ${v('writtenCert')}.
-3. Non-Solicitation: ${v('prohibitSoliciting')} — Duration: ${v('solicitDuration')} months. Include liquidated damages clause (USD $50,000 per breach).
-4. Professional Advisors: ${v('allowAdvisors')} — ${v('allowAdvisors') === 'Yes' ? 'Allow disclosure to professional advisors (lawyers, accountants) under equivalent confidentiality obligations.' : 'No disclosure to advisors without written consent.'}
-5. Compelled Disclosure: ${v('notifyCompelled')} — ${v('notifyCompelled') === 'Yes' ? 'Require prior written notice and cooperation to resist disclosure.' : 'Standard legal disclosure exception.'}
-6. Dispute Resolution: ${v('disputeMethod')}${v('disputeMethod') !== 'Courts' ? `, Rules: ${v('arbRules')}, Seat: ${v('arbLocation') || '[Location]'}` : ''}
+═══ ENHANCEMENTS TO ADD OR STRENGTHEN ═══
 
-FORMATTING: Maintain the exact same structure, section numbering format, defined terms in bold, and professional quality as the original. Output the complete enhanced NDA with signature blocks. Start directly with the NDA title.`;
+1. **Residual Knowledge** (add as new Section 3A or integrate into Section 3):
+   ${v('residualKnowledge') === 'Restricted' ? 'RESTRICTED — The Receiving Party shall not use any residual knowledge (information retained in unaided memory) for competitive purposes or to develop competing products/services. This is a strict restriction.' : 'PERMITTED — Standard residual knowledge clause: nothing in this Agreement shall prevent the Receiving Party from using general knowledge, skills, and experience retained in unaided memory, provided it does not intentionally memorize Confidential Information for later use.'}
+
+2. **Return of Materials** (strengthen Section 5):
+   Materials must be returned or destroyed within ${v('returnDays')} days of written request.
+   Written certification of destruction required: ${v('writtenCert')}.
+
+3. **Non-Solicitation** (strengthen Section 7):
+   Prohibition on soliciting: ${v('prohibitSoliciting')}
+   Duration: ${v('solicitDuration')} months from Effective Date
+   Include liquidated damages clause: USD $50,000 per employee/contractor solicited or hired in violation.
+
+4. **Professional Advisors** (add to Section 4 - Permitted Disclosure):
+   ${v('allowAdvisors') === 'Yes' ? 'Allow disclosure to professional advisors (lawyers, accountants, financial advisors) who are bound by professional duties of confidentiality or have signed equivalent confidentiality agreements.' : 'No disclosure to professional advisors without prior written consent of the Disclosing Party.'}
+
+5. **Compelled Disclosure** (add as Section 4A or integrate):
+   ${v('notifyCompelled') === 'Yes' ? 'If legally compelled to disclose, the Receiving Party must: (a) provide prompt prior written notice to the Disclosing Party, (b) cooperate with efforts to resist or narrow the disclosure, (c) disclose only the minimum information legally required, and (d) use reasonable efforts to obtain confidential treatment.' : 'Standard legal disclosure exception — disclosure permitted when required by law, regulation, or court order.'}
+
+6. **Dispute Resolution** (rewrite Section 10):
+   Method: ${v('disputeMethod')}
+   ${v('disputeMethod') !== 'Courts' ? (() => {
+       const key = v('arbRules');
+       const inst = ARB_INSTITUTIONS[key];
+       const seat = v('arbLocation') || (inst ? inst.defaultSeat : '[To be specified]');
+       const lang = document.getElementById('arbLanguage').value || 'English';
+       const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
+       const clauseText = inst ? inst.modelClause(seat, lang, govLaw) : '';
+       return `Institution: ${inst ? inst.name : key}
+   Seat/Place: ${seat}
+   Language: ${lang}
+
+   USE THIS EXACT MODEL CLAUSE as the basis for Section 10 (you may adapt formatting to fit section/sub-section numbering style, but preserve ALL substantive terms verbatim):
+
+   "${clauseText}"
+
+   ${v('disputeMethod') === 'Mediation then Arbitration' ? 'ADD a mediation step BEFORE arbitration: The Parties shall first attempt to resolve any dispute through good-faith negotiations for a period of thirty (30) days. If the dispute is not resolved, the Parties shall attempt mediation for a further thirty (30) days before commencing arbitration.' : ''}`;
+   })() : `Courts of the jurisdiction of the governing law shall have exclusive jurisdiction. The Parties irrevocably submit to the exclusive jurisdiction of the courts of ${getGoverningLaw() || '[governing law jurisdiction]'}.`}
+
+═══ RULES ═══
+- Output the COMPLETE enhanced NDA from title to signature block
+- Maintain all existing sections and add/strengthen as specified above
+- Keep all defined terms in bold
+- Keep the same section numbering style (## 1., ## 2., etc.)
+- Maintain the signature block table at the end
+- Do NOT include commentary — start directly with the NDA title
+- Length should be 3000-4000 words`;
         }
 
         async function generateNDA() {
