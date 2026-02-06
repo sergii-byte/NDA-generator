@@ -119,6 +119,19 @@ async function fetchContactPage(baseUrl) {
 }
 
 exports.handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
+      body: "",
+    };
+  }
+
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
@@ -210,6 +223,9 @@ JSON only:`
     companyData.addresses = companyData.addresses
       .filter(addr => addr && typeof addr === 'string' && addr.length > 10)
       .map(addr => addr.trim());
+
+    // Include singular "address" field (first from array) for frontend compatibility
+    companyData.address = companyData.addresses[0] || null;
 
     return { statusCode: 200, headers, body: JSON.stringify(companyData) };
   } catch (error) {
