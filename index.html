@@ -1,4 +1,4 @@
-       <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1318,7 +1318,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ query })
                     });
-                    const data = await res.json();
+                    const data = await safeJson(res);
                     if (data.results && data.results.length > 0) {
                         dropdown.innerHTML = data.results.map(r => `
                             <div class="autocomplete-item" onclick='selectCompany("${party}", ${JSON.stringify(r).replace(/'/g, "&#39;")})'>
@@ -1377,7 +1377,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: url.startsWith('http') ? url : 'https://' + url })
                 });
-                const data = await res.json();
+                const data = await safeJson(res);
                 if (!res.ok) throw new Error(data.error || 'Failed to fetch');
                 if (data.name) document.getElementById(`party${party}Name`).value = data.name;
                 // Backend returns "addresses" array, take the first one
@@ -1406,7 +1406,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url: `https://${domain}` })
                 });
-                const data = await res.json();
+                const data = await safeJson(res);
                 if (data.name) document.getElementById(`party${party}Name`).value = data.name;
                 const addr = data.address || (Array.isArray(data.addresses) && data.addresses[0]) || '';
                 if (addr) document.getElementById(`party${party}Address`).value = addr;
@@ -1426,7 +1426,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ image: reader.result })
                     });
-                    const data = await res.json();
+                    const data = await safeJson(res);
                     if (data.name) document.getElementById(`party${party}Name`).value = data.name;
                     if (data.address) document.getElementById(`party${party}Address`).value = data.address;
                     if (data.email) document.getElementById(`party${party}Email`).value = data.email;
@@ -1885,6 +1885,88 @@ ${generatedNDAText}
 - Length should be 3000-4000 words`;
         }
 
+        async function safeJson(res) {
+            const text = await res.text();
+            try { return JSON.parse(text); }
+            catch (e) {
+                if (text.trim().startsWith('<')) throw new Error('Server returned an error page. The function may have timed out — try again.');
+                throw new Error('Invalid response from server');
+            }
+        }
+
+        // Streaming helper: calls edge function, streams text into contentEl, returns full text
+        async function streamGenerate(prompt, contentEl, resultEl, loadingEl) {
+            if (resultEl) { resultEl.classList.remove('hidden'); }
+            if (contentEl) { contentEl.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Generating...</p>'; }
+
+            const res = await fetch('/api/generate-nda-stream', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+
+            // If edge function returns JSON error (not SSE)
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+                const data = await res.json();
+                throw new Error(data.error || 'Generation failed');
+            }
+
+            if (!res.ok) {
+                const text = await res.text();
+                if (text.trim().startsWith('<')) throw new Error('Server error — please try again.');
+                throw new Error('Generation failed (status ' + res.status + ')');
+            }
+
+            // Read SSE stream
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+            let buffer = '';
+            let renderTimer = null;
+
+            // Throttled render: update DOM at most every 100ms for performance
+            function scheduleRender() {
+                if (renderTimer) return;
+                renderTimer = setTimeout(() => {
+                    renderTimer = null;
+                    if (contentEl) contentEl.innerHTML = formatNDA(fullText + '▊');
+                }, 100);
+            }
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (!line.startsWith('data: ')) continue;
+                    const data = line.slice(6).trim();
+                    if (data === '[DONE]') continue;
+
+                    try {
+                        const parsed = JSON.parse(data);
+                        if (parsed.error) throw new Error(parsed.error);
+                        if (parsed.text) {
+                            fullText += parsed.text;
+                            scheduleRender();
+                        }
+                    } catch (e) {
+                        if (e.message && !e.message.includes('JSON')) throw e;
+                    }
+                }
+            }
+
+            // Final render without cursor
+            if (renderTimer) { clearTimeout(renderTimer); }
+            if (contentEl) contentEl.innerHTML = formatNDA(fullText);
+            if (loadingEl) loadingEl.classList.add('hidden');
+            return fullText;
+        }
+
         async function generateNDA() {
             const prompt = buildPrompt1();
             document.getElementById('generateBtn1').disabled = true;
@@ -1892,17 +1974,11 @@ ${generatedNDAText}
             document.getElementById('result1').classList.add('hidden');
 
             try {
-                const res = await fetch('/.netlify/functions/generate-nda', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
+                const contentEl = document.getElementById('ndaContent1');
+                const resultEl = document.getElementById('result1');
+                const loadingEl = document.getElementById('loadingState1');
 
-                generatedNDAText = data.result;
-                document.getElementById('ndaContent1').innerHTML = formatNDA(data.result);
-                document.getElementById('result1').classList.remove('hidden');
+                generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
                 document.getElementById('footerCTA').classList.remove('hidden');
                 updateBadge(1);
 
@@ -1924,17 +2000,11 @@ ${generatedNDAText}
             document.getElementById('result2').classList.add('hidden');
 
             try {
-                const res = await fetch('/.netlify/functions/generate-nda', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
+                const contentEl = document.getElementById('ndaContent2');
+                const resultEl = document.getElementById('result2');
+                const loadingEl = document.getElementById('loadingState2');
 
-                generatedNDAText2 = data.result;
-                document.getElementById('ndaContent2').innerHTML = formatNDA(data.result);
-                document.getElementById('result2').classList.remove('hidden');
+                generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
                 updateBadge(2);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
@@ -1962,17 +2032,11 @@ REQUIREMENTS:
             document.getElementById('result3').classList.add('hidden');
 
             try {
-                const res = await fetch('/.netlify/functions/generate-nda', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
+                const contentEl = document.getElementById('summaryContent');
+                const resultEl = document.getElementById('result3');
+                const loadingEl = document.getElementById('loadingState3');
 
-                generatedSummaryText = data.result;
-                document.getElementById('summaryContent').innerHTML = formatNDA(data.result);
-                document.getElementById('result3').classList.remove('hidden');
+                generatedSummaryText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
                 updateBadge(3);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
@@ -2028,4 +2092,4 @@ REQUIREMENTS:
         });
     </script>
 </body>
-</html>     
+</html>
