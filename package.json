@@ -1,8 +1,0 @@
-{
-  "name": "nda-generator",
-  "version": "1.0.0",
-  "description": "AI-powered NDA Generator",
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
-  }
-}
