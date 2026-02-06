@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash NDA Generator | SBLC Business Lawyers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'claude-bg': '#FFFCF5',
+                        'claude-card': '#FFFFFF',
+                        'claude-border': '#E8E4DB',
+                        'claude-text': '#2D2B28',
+                        'claude-muted': '#8C8780',
+                        'claude-orange': '#D97757',
+                        'claude-orange-hover': '#C5684A',
+                        'claude-cream': '#FAF7F2',
+                        'claude-warm': '#F5F1EA',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #FFFCF5; color: #2D2B28; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        @media (max-width: 640px) { .checkbox-grid { grid-template-columns: 1fr; } }
+        .loading { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .generated-nda { font-family: 'Times New Roman', serif; line-height: 1.8; color: #2D2B28; }
+        .generated-nda h1 { font-size: 1.5rem; font-weight: bold; margin-top: 1.5em; margin-bottom: 0.5em; text-align: center; }
+        .generated-nda h2 { font-size: 1.1rem; font-weight: bold; margin-top: 1.2em; margin-bottom: 0.5em; }
+        .generated-nda p { margin-bottom: 0.8em; text-align: justify; }
+        input, select { 
+            background-color: #FFFFFF !important; 
+            border: 1px solid #E8E4DB !important; 
+            color: #2D2B28 !important; 
+        }
+        input::placeholder { color: #8C8780 !important; }
+        input:focus, select:focus { 
+            border-color: #D97757 !important; 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.15);
+        }
+        .fill-tab.active { background-color: #D97757 !important; color: white !important; }
+        .autocomplete-dropdown { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: white; border: 1px solid #E8E4DB; border-radius: 0.5rem; 
+            max-height: 240px; overflow-y: auto; z-index: 50; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        .autocomplete-item { padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #F5F1EA; }
+        .autocomplete-item:hover { background-color: #FAF7F2; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .section-title { font-weight: 600; color: #2D2B28; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #E8E4DB; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white border-b border-claude-border sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-claude-text">Flash NDA Generator</h1>
+                    <p class="text-sm text-claude-muted">Generate enforceable NDAs in 90 seconds</p>
+                </div>
+                <a href="https://sblc.com.ua" target="_blank">
+                    <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC" class="h-6">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-8">
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-center mb-8 flex-wrap gap-2">
+            <div class="flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
+                <div id="step1-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-orange text-white rounded-full text-sm font-medium">
+                    <span class="w-6 h-6 bg-white text-claude-orange rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                    <span class="hidden sm:inline">Flash NDA</span>
+                </div>
+                <svg class="w-5 h-5 text-claude-border" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <div id="step2-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-warm text-claude-muted rounded-full text-sm font-medium border border-claude-border">
+                    <span class="w-6 h-6 bg-claude-border text-claude-muted rounded-full flex items-center justify-center text-xs font-bold">+</span>
+                    <span class="hidden sm:inline">Enhanced</span>
+                </div>
+                <div id="step3-badge" class="flex items-center gap-2 px-4 py-2 bg-claude-warm text-claude-muted rounded-full text-sm font-medium border border-claude-border">
+                    <span class="w-6 h-6 bg-claude-border text-claude-muted rounded-full flex items-center justify-center text-xs font-bold">+</span>
+                    <span class="hidden sm:inline">Summary</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Flash NDA -->
+        <div id="step1" class="space-y-6">
+            <div class="grid lg:grid-cols-2 gap-6">
+                
+                <!-- Party A (Your Details) -->
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-claude-border">
+                        <h3 class="font-semibold text-claude-text">Party A (You)</h3>
+                        <button onclick="savePartyData('A')" class="text-xs text-claude-muted hover:text-claude-orange flex items-center gap-1">
+                            <span id="savePartyAIcon">💾</span> <span id="savePartyAText">Save</span>
+                        </button>
+                    </div>
+                    <div id="savedPartyANotice" class="hidden mb-4 p-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700 flex items-center justify-between">
+                        <span>✓ Loaded from saved</span>
+                        <button onclick="clearPartyData('A')" class="text-red-500 hover:text-red-700">Clear</button>
+                    </div>
+                    
+                    <!-- Quick Fill Options for Party A -->
+                    <div class="mb-5 p-4 bg-claude-cream rounded-xl border border-claude-border">
+                        <div class="flex gap-2 mb-3 flex-wrap">
+                            <button onclick="showFillOption('A', 'name')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-orange text-white active">🔍 Name</button>
+                            <button onclick="showFillOption('A', 'url')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🔗 Website</button>
+                            <button onclick="showFillOption('A', 'email')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📧 Email</button>
+                            <button onclick="showFillOption('A', 'card')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📇 Card</button>
+                            <button onclick="showFillOption('A', 'history')" class="fill-tab fill-tab-A px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🕐 History</button>
+                        </div>
+                        
+                        <div id="fillOption-A-name" class="fill-option-A">
+                            <div class="relative">
+                                <input type="text" id="partyANameSearch" placeholder="Start typing company name..." oninput="searchCompanyByName('A')" class="w-full px-4 py-2 rounded-lg text-sm">
+                                <div id="partyAAutocomplete" class="autocomplete-dropdown hidden"></div>
+                            </div>
+                            <p class="text-xs text-claude-muted mt-1">Search UK, EU, US company registries</p>
+                        </div>
+                        
+                        <div id="fillOption-A-url" class="fill-option-A hidden">
+                            <div class="flex gap-2">
+                                <input type="url" id="partyAUrl" placeholder="https://company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
+                                <button onclick="parseWebsite('A')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            </div>
+                        </div>
+                        
+                        <div id="fillOption-A-email" class="fill-option-A hidden">
+                            <div class="flex gap-2">
+                                <input type="email" id="partyAEmailInput" placeholder="contact@company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
+                                <button onclick="parseFromEmail('A')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            </div>
+                            <p class="text-xs text-claude-muted mt-1">We'll parse the company website from the email domain</p>
+                        </div>
+                        
+                        <div id="fillOption-A-card" class="fill-option-A hidden">
+                            <label class="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-claude-border rounded-lg cursor-pointer hover:border-claude-orange transition-colors">
+                                <span class="text-claude-muted text-sm">📇 Click to upload business card</span>
+                                <span class="text-xs text-claude-muted mt-1">JPG, PNG</span>
+                                <input type="file" id="partyACardInput" accept="image/*" class="hidden" onchange="parseBusinessCard(event, 'A')">
+                            </label>
+                        </div>
+                        
+                        <div id="fillOption-A-history" class="fill-option-A hidden">
+                            <select id="partyAHistoryDropdown" onchange="loadFromHistory('A')" class="w-full px-4 py-2 rounded-lg text-sm">
+                                <option value="">-- Select from recent --</option>
+                            </select>
+                            <p id="noHistoryMsgA" class="hidden text-xs text-claude-muted mt-2">No history yet</p>
+                        </div>
+                        
+                        <p id="parseStatusA" class="text-xs text-claude-muted mt-2 hidden"></p>
+                        
+                        <div id="addressSelectionA" class="hidden mt-3">
+                            <label class="block text-sm text-claude-muted mb-1">Select address:</label>
+                            <select id="addressDropdownA" onchange="handleAddressSelection('A')" class="w-full px-4 py-2 rounded-lg text-sm"></select>
+                            <input type="text" id="customAddressInputA" placeholder="Enter custom address" class="hidden w-full px-4 py-2 rounded-lg text-sm mt-2">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Company / Person Name *</label>
+                            <input type="text" id="partyAName" placeholder="Acme Corp LLC" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Type</label>
+                                <select id="partyAType" class="w-full px-4 py-3 rounded-lg text-sm">
+                                    <option value="company">Company</option>
+                                    <option value="individual">Individual</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Company Number</label>
+                                <input type="text" id="partyACompanyNumber" placeholder="12345678" class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Registered Address *</label>
+                            <input type="text" id="partyAAddress" placeholder="123 Main St, City, Country" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Email</label>
+                            <input type="email" id="partyAEmail" placeholder="legal@company.com" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Party B (Counterparty) -->
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-claude-border">
+                        <h3 class="font-semibold text-claude-text">Party B (Counterparty)</h3>
+                        <button onclick="savePartyData('B')" class="text-xs text-claude-muted hover:text-claude-orange flex items-center gap-1">
+                            <span id="savePartyBIcon">💾</span> <span id="savePartyBText">Save</span>
+                        </button>
+                    </div>
+                    <div id="savedPartyBNotice" class="hidden mb-4 p-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700 flex items-center justify-between">
+                        <span>✓ Loaded from saved</span>
+                        <button onclick="clearPartyData('B')" class="text-red-500 hover:text-red-700">Clear</button>
+                    </div>
+                    
+                    <!-- Quick Fill Options for Party B -->
+                    <div class="mb-5 p-4 bg-claude-cream rounded-xl border border-claude-border">
+                        <div class="flex gap-2 mb-3 flex-wrap">
+                            <button onclick="showFillOption('B', 'name')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-orange text-white active">🔍 Name</button>
+                            <button onclick="showFillOption('B', 'url')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🔗 Website</button>
+                            <button onclick="showFillOption('B', 'email')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📧 Email</button>
+                            <button onclick="showFillOption('B', 'card')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">📇 Card</button>
+                            <button onclick="showFillOption('B', 'history')" class="fill-tab fill-tab-B px-3 py-1.5 text-xs rounded-lg bg-claude-border text-claude-muted hover:bg-claude-orange hover:text-white transition-colors">🕐 History</button>
+                        </div>
+                        
+                        <div id="fillOption-B-name" class="fill-option-B">
+                            <div class="relative">
+                                <input type="text" id="partyBNameSearch" placeholder="Start typing company name..." oninput="searchCompanyByName('B')" class="w-full px-4 py-2 rounded-lg text-sm">
+                                <div id="partyBAutocomplete" class="autocomplete-dropdown hidden"></div>
+                            </div>
+                            <p class="text-xs text-claude-muted mt-1">Search UK, EU, US company registries</p>
+                        </div>
+                        
+                        <div id="fillOption-B-url" class="fill-option-B hidden">
+                            <div class="flex gap-2">
+                                <input type="url" id="partyBUrl" placeholder="https://company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
+                                <button onclick="parseWebsite('B')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            </div>
+                        </div>
+                        
+                        <div id="fillOption-B-email" class="fill-option-B hidden">
+                            <div class="flex gap-2">
+                                <input type="email" id="partyBEmailInput" placeholder="contact@company.com" class="flex-1 px-4 py-2 rounded-lg text-sm">
+                                <button onclick="parseFromEmail('B')" class="px-4 py-2 bg-claude-orange text-white text-sm rounded-lg hover:bg-claude-orange-hover transition-colors">Autofill</button>
+                            </div>
+                            <p class="text-xs text-claude-muted mt-1">We'll parse the company website from the email domain</p>
+                        </div>
+                        
+                        <div id="fillOption-B-card" class="fill-option-B hidden">
+                            <label class="flex flex-col items-center justify-center w-full h-20 border-2 border-dashed border-claude-border rounded-lg cursor-pointer hover:border-claude-orange transition-colors">
+                                <span class="text-claude-muted text-sm">📇 Click to upload business card</span>
+                                <span class="text-xs text-claude-muted mt-1">JPG, PNG</span>
+                                <input type="file" id="partyBCardInput" accept="image/*" class="hidden" onchange="parseBusinessCard(event, 'B')">
+                            </label>
+                        </div>
+                        
+                        <div id="fillOption-B-history" class="fill-option-B hidden">
+                            <select id="partyBHistoryDropdown" onchange="loadFromHistory('B')" class="w-full px-4 py-2 rounded-lg text-sm">
+                                <option value="">-- Select from recent --</option>
+                            </select>
+                            <p id="noHistoryMsgB" class="hidden text-xs text-claude-muted mt-2">No history yet</p>
+                        </div>
+                        
+                        <p id="parseStatusB" class="text-xs text-claude-muted mt-2 hidden"></p>
+                        
+                        <div id="addressSelectionB" class="hidden mt-3">
+                            <label class="block text-sm text-claude-muted mb-1">Select address:</label>
+                            <select id="addressDropdownB" onchange="handleAddressSelection('B')" class="w-full px-4 py-2 rounded-lg text-sm"></select>
+                            <input type="text" id="customAddressInputB" placeholder="Enter custom address" class="hidden w-full px-4 py-2 rounded-lg text-sm mt-2">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Company / Person Name *</label>
+                            <input type="text" id="partyBName" placeholder="XYZ Ltd" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Type</label>
+                                <select id="partyBType" class="w-full px-4 py-3 rounded-lg text-sm">
+                                    <option value="company">Company</option>
+                                    <option value="individual">Individual</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Company Number</label>
+                                <input type="text" id="partyBCompanyNumber" placeholder="12345678" class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Registered Address *</label>
+                            <input type="text" id="partyBAddress" placeholder="456 Oak Ave, City, Country" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Email</label>
+                            <input type="email" id="partyBEmail" placeholder="contact@xyz.com" class="w-full px-4 py-3 rounded-lg text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Role</label>
+                                <select id="partyBRole" class="w-full px-4 py-3 rounded-lg text-sm">
+                                    <option value="contractor">Contractor</option>
+                                    <option value="consultant">Consultant</option>
+                                    <option value="advisor">Advisor</option>
+                                    <option value="partner">Partner</option>
+                                    <option value="investor">Investor</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Bind employees?</label>
+                                <select id="bindOthers" class="w-full px-4 py-3 rounded-lg text-sm">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NDA Terms -->
+            <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                <h3 class="section-title">NDA Terms</h3>
+                
+                <!-- Quick Templates -->
+                <div class="mb-6 p-4 bg-claude-cream rounded-xl border border-claude-border">
+                    <label class="block text-sm text-claude-muted mb-2">📋 Quick Templates</label>
+                    <select id="ndaTemplate" onchange="applyTemplate()" class="w-full px-4 py-2 rounded-lg text-sm">
+                        <option value="">-- Select a template --</option>
+                        <option value="contractor">🔧 Contractor / Freelancer</option>
+                        <option value="investor">💰 Investor / Due Diligence</option>
+                        <option value="partner">🤝 Business Partner</option>
+                        <option value="employee">👤 Employee / New Hire</option>
+                        <option value="vendor">📦 Vendor / Supplier</option>
+                    </select>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm text-claude-muted mb-1">Purpose</label>
+                        <select id="purpose" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <option value="Discussing potential business cooperation">Business cooperation</option>
+                            <option value="Evaluating service engagement">Service engagement</option>
+                            <option value="Exploring partnership">Partnership</option>
+                            <option value="Conducting due diligence">Due diligence</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-claude-muted mb-1">NDA Type</label>
+                        <select id="ndaType" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <option value="One-way">One-way (you disclose)</option>
+                            <option value="Mutual">Mutual (both disclose)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-claude-muted mb-1">Period</label>
+                        <select id="confPeriod" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3" selected>3 years</option>
+                            <option value="5">5 years</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-claude-muted mb-1">Governing Law</label>
+                        <select id="governingLawSelect" onchange="handleGoverningLawChange()" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <option value="">-- Select --</option>
+                            <option value="__partyA__" id="govLawPartyA" class="hidden">📍 Party A jurisdiction</option>
+                            <option value="__partyB__" id="govLawPartyB" class="hidden">📍 Party B jurisdiction</option>
+                            <option value="__custom__">✏️ Enter custom...</option>
+                        </select>
+                        <input type="text" id="governingLaw" placeholder="e.g. England and Wales" class="hidden w-full px-4 py-3 rounded-lg text-sm mt-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-claude-muted mb-1">Agreement Date</label>
+                        <input type="date" id="agreementDate" class="w-full px-4 py-3 rounded-lg text-sm">
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="block text-sm text-claude-muted mb-2">Confidential Information Includes</label>
+                    <div class="checkbox-grid">
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" checked class="confInfo rounded" value="Technical data"><span>Technical data</span></label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Product data"><span>Product data</span></label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" checked class="confInfo rounded" value="Business data"><span>Business data</span></label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Customer data"><span>Customer data</span></label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Financial data"><span>Financial data</span></label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" class="confInfo rounded" value="Commercial data"><span>Commercial data</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="generateNDA()" id="generateBtn1" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-all flex items-center justify-center gap-2 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Generate Flash NDA
+            </button>
+
+            <!-- Loading State -->
+            <div id="loadingState1" class="hidden">
+                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
+                    <div class="loading">
+                        <svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-claude-text font-medium">Generating your Flash NDA...</p>
+                    <p class="text-claude-muted text-sm mt-1">This usually takes 10-20 seconds</p>
+                </div>
+            </div>
+
+            <!-- Generated NDA Result -->
+            <div id="result1" class="hidden">
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+                        <h3 class="font-semibold text-claude-text flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Flash NDA Generated
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="copyText(generatedNDAText)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border transition-colors">Copy</button>
+                            <button onclick="downloadPDF('ndaContent1', 'NDA.pdf')" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border transition-colors">PDF</button>
+                        </div>
+                    </div>
+                    <div id="ndaContent1" class="generated-nda bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
+                </div>
+                <div class="mt-6 grid sm:grid-cols-2 gap-4">
+                    <button onclick="goToStep2()" class="py-3 px-6 bg-white rounded-xl hover:bg-claude-cream border border-claude-border flex items-center justify-center gap-2 transition-colors">+ Enhanced Protections</button>
+                    <button onclick="goToStep3()" class="py-3 px-6 bg-white rounded-xl hover:bg-claude-cream border border-claude-border flex items-center justify-center gap-2 transition-colors">+ Summary for Counterparty</button>
+                </div>
+            </div>
+
+            <!-- Footer CTA -->
+            <div id="footerCTA" class="hidden mt-8">
+                <div class="bg-white border border-claude-border rounded-2xl p-5 shadow-sm">
+                    <p class="text-sm text-claude-muted text-center mb-4">Want more?</p>
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="https://sblc.com.ua/buy-nda" target="_blank" class="flex items-center gap-3 px-5 py-3 bg-claude-cream border border-claude-border rounded-xl hover:border-claude-orange transition-all w-full sm:w-auto">
+                            <div class="w-10 h-10 bg-claude-warm rounded-lg flex items-center justify-center text-xl">📄</div>
+                            <div class="flex-1">
+                                <div class="font-medium text-sm text-claude-text">Editable Word Doc</div>
+                                <div class="text-xs text-claude-muted">Professional formatting</div>
+                            </div>
+                            <div class="text-claude-orange font-semibold">$10</div>
+                        </a>
+                        <a href="https://sblc.com.ua/legal-review" target="_blank" class="flex items-center gap-3 px-5 py-3 bg-claude-orange text-white rounded-xl hover:bg-claude-orange-hover transition-all w-full sm:w-auto">
+                            <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-xl">⚖️</div>
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">Legal Audit</div>
+                                <div class="text-xs text-white/80">Personal lawyer review</div>
+                            </div>
+                            <div class="font-semibold">$100</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: Enhanced Protections -->
+        <div id="step2" class="hidden space-y-6">
+            <button onclick="backToStep1()" class="flex items-center gap-2 text-claude-muted hover:text-claude-orange transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back to Flash NDA
+            </button>
+            
+            <div class="bg-claude-cream border border-claude-border rounded-2xl p-4">
+                <p class="text-claude-text"><span class="font-medium">Step 2:</span> Add additional protections to your Flash NDA.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <h3 class="section-title">Materials & Knowledge</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Retain general skills?</label>
+                            <select id="residualKnowledge" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Return materials within</label>
+                            <select id="returnDays" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="7">7 days</option>
+                                <option value="14" selected>14 days</option>
+                                <option value="30">30 days</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Written destruction certificate?</label>
+                            <select id="writtenCert" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <h3 class="section-title">Non-Solicitation</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Prohibit soliciting</label>
+                            <select id="prohibitSoliciting" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Employees">Employees</option>
+                                <option value="Employees + Contractors">Employees + Contractors</option>
+                                <option value="All + Clients">All + Clients</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Duration</label>
+                            <select id="solicitDuration" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="12" selected>12 months</option>
+                                <option value="18">18 months</option>
+                                <option value="24">24 months</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <h3 class="section-title">Disclosures</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Allow professional advisors?</label>
+                            <select id="allowAdvisors" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Notify before legal disclosure?</label>
+                            <select id="notifyCompelled" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <h3 class="section-title">Disputes</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-claude-muted mb-1">Resolution method</label>
+                            <select id="disputeMethod" onchange="toggleArbFields()" class="w-full px-4 py-3 rounded-lg text-sm">
+                                <option value="Litigation">Litigation</option>
+                                <option value="Arbitration" selected>Arbitration</option>
+                            </select>
+                        </div>
+                        <div id="arbFields">
+                            <div class="mb-4">
+                                <label class="block text-sm text-claude-muted mb-1">Arbitration Rules</label>
+                                <select id="arbRules" class="w-full px-4 py-3 rounded-lg text-sm">
+                                    <option value="ICC">ICC</option>
+                                    <option value="LCIA">LCIA</option>
+                                    <option value="AAA">AAA</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-claude-muted mb-1">Location</label>
+                                <input type="text" id="arbLocation" placeholder="London, UK" class="w-full px-4 py-3 rounded-lg text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="generateEnhancedNDA()" id="generateBtn2" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-all flex items-center justify-center gap-2 shadow-sm">
+                Generate Enhanced NDA
+            </button>
+
+            <div id="loadingState2" class="hidden">
+                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
+                    <div class="loading"><svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path></svg></div>
+                    <p class="text-claude-text font-medium">Adding enhanced protections...</p>
+                </div>
+            </div>
+
+            <div id="result2" class="hidden">
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+                        <h3 class="font-semibold text-claude-text flex items-center gap-2"><span class="text-green-500">✓</span> Enhanced NDA Generated</h3>
+                        <div class="flex gap-2">
+                            <button onclick="copyText(generatedNDAText2)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">Copy</button>
+                            <button onclick="downloadPDF('ndaContent2', 'NDA_Enhanced.pdf')" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">PDF</button>
+                        </div>
+                    </div>
+                    <div id="ndaContent2" class="generated-nda bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
+                </div>
+                <div class="mt-6 grid sm:grid-cols-2 gap-4">
+                    <button onclick="backToStep1()" class="py-3 bg-white rounded-xl border border-claude-border hover:bg-claude-cream transition-colors">← Back to NDA</button>
+                    <button onclick="goToStep3()" class="py-3 bg-claude-orange text-white rounded-xl hover:bg-claude-orange-hover transition-colors">+ Create Summary</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Summary -->
+        <div id="step3" class="hidden space-y-6">
+            <button onclick="backToResults()" class="flex items-center gap-2 text-claude-muted hover:text-claude-orange transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back
+            </button>
+            
+            <div class="bg-claude-cream border border-claude-border rounded-2xl p-4">
+                <p class="text-claude-text"><span class="font-medium">Step 3:</span> Generate a friendly summary to share with the counterparty.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                <p class="text-claude-muted mb-4">This will explain the <span id="summarySource" class="text-claude-text font-medium">Flash NDA</span> in simple terms for the other party.</p>
+                <button onclick="generateSummary()" id="generateBtn3" class="w-full py-4 bg-claude-orange text-white font-semibold rounded-xl hover:bg-claude-orange-hover transition-colors">
+                    Generate Plain-English Summary
+                </button>
+            </div>
+
+            <div id="loadingState3" class="hidden">
+                <div class="bg-white rounded-2xl p-8 border border-claude-border text-center shadow-sm">
+                    <div class="loading"><svg class="w-12 h-12 text-claude-orange mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>
+                    <p class="text-claude-text font-medium">Creating summary...</p>
+                </div>
+            </div>
+
+            <div id="result3" class="hidden">
+                <div class="bg-white rounded-2xl p-6 border border-claude-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+                        <h3 class="font-semibold text-claude-text flex items-center gap-2"><span class="text-green-500">✓</span> Summary Ready</h3>
+                        <button onclick="copyText(generatedSummaryText)" class="px-4 py-2 bg-claude-cream rounded-lg hover:bg-claude-warm text-sm border border-claude-border">Copy</button>
+                    </div>
+                    <div id="summaryContent" class="bg-claude-cream p-6 rounded-xl max-h-[500px] overflow-y-auto border border-claude-border"></div>
+                </div>
+                <div class="mt-6 p-4 bg-white border border-claude-border rounded-2xl text-center shadow-sm">
+                    <p class="text-claude-text font-medium">🎉 All done! Your NDA package is ready.</p>
+                    <button onclick="backToStep1()" class="mt-3 px-6 py-2 bg-claude-orange text-white rounded-lg hover:bg-claude-orange-hover transition-colors">← Back to NDA</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-claude-border mt-12 bg-white">
+        <div class="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-4">
+            <p class="text-sm text-claude-muted">© 2025 SBLC Law Firm. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+                <a href="mailto:hello@sblc.com.ua" class="text-sm text-claude-muted hover:text-claude-orange transition-colors">hello@sblc.com.ua</a>
+                <a href="https://sblc.com.ua" target="_blank" class="text-sm text-claude-muted hover:text-claude-orange transition-colors">sblc.com.ua</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let generatedNDAText = '';
+        let generatedNDAText2 = '';
+        let generatedSummaryText = '';
+        let searchTimeout = null;
+
+        // Save/Load Party Data
+        function savePartyData(party) {
+            const data = {
+                name: document.getElementById(`party${party}Name`).value,
+                type: document.getElementById(`party${party}Type`).value,
+                companyNumber: document.getElementById(`party${party}CompanyNumber`).value,
+                address: document.getElementById(`party${party}Address`).value,
+                email: document.getElementById(`party${party}Email`).value
+            };
+            localStorage.setItem(`nda_party_${party}`, JSON.stringify(data));
+            document.getElementById(`saveParty${party}Icon`).textContent = '✓';
+            document.getElementById(`saveParty${party}Text`).textContent = 'Saved!';
+            setTimeout(() => {
+                document.getElementById(`saveParty${party}Icon`).textContent = '💾';
+                document.getElementById(`saveParty${party}Text`).textContent = 'Save';
+            }, 2000);
+        }
+
+        function loadPartyData(party) {
+            const saved = localStorage.getItem(`nda_party_${party}`);
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.name) document.getElementById(`party${party}Name`).value = data.name;
+                if (data.type) document.getElementById(`party${party}Type`).value = data.type;
+                if (data.companyNumber) document.getElementById(`party${party}CompanyNumber`).value = data.companyNumber;
+                if (data.address) document.getElementById(`party${party}Address`).value = data.address;
+                if (data.email) document.getElementById(`party${party}Email`).value = data.email;
+                document.getElementById(`savedParty${party}Notice`).classList.remove('hidden');
+                updateGoverningLawOptions();
+            }
+        }
+
+        function clearPartyData(party) {
+            localStorage.removeItem(`nda_party_${party}`);
+            document.getElementById(`party${party}Name`).value = '';
+            document.getElementById(`party${party}Type`).value = 'company';
+            document.getElementById(`party${party}CompanyNumber`).value = '';
+            document.getElementById(`party${party}Address`).value = '';
+            document.getElementById(`party${party}Email`).value = '';
+            document.getElementById(`savedParty${party}Notice`).classList.add('hidden');
+        }
+
+        // Templates
+        function applyTemplate() {
+            const template = document.getElementById('ndaTemplate').value;
+            if (!template) return;
+            const templates = {
+                contractor: { purpose: 'Evaluating service engagement', confInfo: ['Technical data', 'Business data', 'Customer data'], type: 'One-way', period: '3', role: 'contractor', bind: 'Yes' },
+                investor: { purpose: 'Conducting due diligence', confInfo: ['Financial data', 'Business data', 'Commercial data'], type: 'Mutual', period: '5', role: 'investor', bind: 'No' },
+                partner: { purpose: 'Exploring partnership', confInfo: ['Technical data', 'Business data', 'Product data'], type: 'Mutual', period: '3', role: 'partner', bind: 'Yes' },
+                employee: { purpose: 'Discussing potential business cooperation', confInfo: ['Technical data', 'Business data', 'Customer data', 'Financial data'], type: 'One-way', period: '5', role: 'contractor', bind: 'No' },
+                vendor: { purpose: 'Evaluating service engagement', confInfo: ['Technical data', 'Business data'], type: 'Mutual', period: '2', role: 'contractor', bind: 'Yes' }
+            };
+            const t = templates[template];
+            if (t) {
+                document.getElementById('purpose').value = t.purpose;
+                document.getElementById('partyBRole').value = t.role;
+                document.getElementById('ndaType').value = t.type;
+                document.getElementById('confPeriod').value = t.period;
+                document.getElementById('bindOthers').value = t.bind;
+                document.querySelectorAll('.confInfo').forEach(cb => { cb.checked = t.confInfo.includes(cb.value); });
+            }
+        }
+
+        // Fill Options
+        function showFillOption(party, option) {
+            document.querySelectorAll(`.fill-option-${party}`).forEach(el => el.classList.add('hidden'));
+            document.getElementById(`fillOption-${party}-${option}`).classList.remove('hidden');
+            document.querySelectorAll(`.fill-tab-${party}`).forEach(btn => {
+                btn.classList.remove('bg-claude-orange', 'text-white', 'active');
+                btn.classList.add('bg-claude-border', 'text-claude-muted');
+            });
+            event.target.classList.remove('bg-claude-border', 'text-claude-muted');
+            event.target.classList.add('bg-claude-orange', 'text-white', 'active');
+            if (option === 'history') loadHistoryDropdown(party);
+        }
+
+        // Company Name Search
+        async function searchCompanyByName(party) {
+            const input = document.getElementById(`party${party}NameSearch`);
+            const dropdown = document.getElementById(`party${party}Autocomplete`);
+            const query = input.value.trim();
+            
+            if (query.length < 3) { dropdown.classList.add('hidden'); return; }
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                try {
+                    dropdown.innerHTML = '<div class="p-3 text-claude-muted text-sm">🔍 Searching registries...</div>';
+                    dropdown.classList.remove('hidden');
+                    
+                    const res = await fetch('/.netlify/functions/search-company', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query, sources: ['uk', 'opencorporates'] })
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.results && data.results.length > 0) {
+                        dropdown.innerHTML = data.results.slice(0, 10).map((r, idx) => `
+                            <div class="autocomplete-item" onclick="selectCompanyFromSearch('${party}', ${idx})">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-claude-text">${escapeHtml(r.name)}</div>
+                                        <div class="text-xs text-claude-muted mt-1">
+                                            ${r.companyNumber ? `<span class="bg-claude-warm px-1.5 py-0.5 rounded font-mono">${r.companyNumber}</span> ` : ''}
+                                            <span class="font-medium">${r.jurisdiction || ''}</span>
+                                            ${r.status ? `<span class="text-claude-border mx-1">•</span><span>${r.status}</span>` : ''}
+                                        </div>
+                                        ${r.address ? `<div class="text-xs text-green-600 mt-1">📍 ${escapeHtml(r.address.length > 80 ? r.address.substring(0, 80) + '...' : r.address)}</div>` : '<div class="text-xs text-yellow-600 mt-1">⚠️ Address will be fetched</div>'}
+                                    </div>
+                                    <div class="text-xs text-claude-muted whitespace-nowrap">${r.source}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                        window.lastSearchResults = data.results;
+                    } else {
+                        dropdown.innerHTML = '<div class="p-3 text-claude-muted text-sm">No companies found. Try a different name.</div>';
+                    }
+                } catch (e) {
+                    dropdown.innerHTML = '<div class="p-3 text-red-500 text-sm">Search error. Please try again.</div>';
+                }
+            }, 400);
+        }
+
+        function selectCompanyFromSearch(party, idx) {
+            const r = window.lastSearchResults[idx];
+            if (!r) return;
+            
+            // Fill basic info immediately
+            document.getElementById(`party${party}Name`).value = r.name || '';
+            document.getElementById(`party${party}CompanyNumber`).value = r.companyNumber || '';
+            document.getElementById(`party${party}Type`).value = 'company';
+            
+            document.getElementById(`party${party}Autocomplete`).classList.add('hidden');
+            document.getElementById(`party${party}NameSearch`).value = '';
+            
+            // If we have address, fill it
+            if (r.address) {
+                document.getElementById(`party${party}Address`).value = r.address;
+                updateGoverningLawOptions();
+                showStatus(party, `✓ Loaded: ${r.name}`, 'green');
+            } else if (r.url) {
+                // No address - try to fetch full details
+                showStatus(party, `🔍 Fetching full details for ${r.name}...`, 'gray');
+                fetchCompanyDetails(party, r.url, r.name);
+            } else {
+                showStatus(party, `✓ Loaded: ${r.name} (no address found)`, 'yellow');
+            }
+        }
+        
+        // Fetch full company details from OpenCorporates/Companies House
+        async function fetchCompanyDetails(party, url, companyName) {
+            try {
+                const res = await fetch('/.netlify/functions/search-company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fetchDetails: true, companyUrl: url })
+                });
+                
+                const data = await res.json();
+                
+                if (data.address) {
+                    document.getElementById(`party${party}Address`).value = data.address;
+                    updateGoverningLawOptions();
+                    showStatus(party, `✓ Loaded: ${companyName} with address`, 'green');
+                } else {
+                    showStatus(party, `✓ Loaded: ${companyName} (address not available in registry)`, 'yellow');
+                }
+                
+                // Update other fields if available
+                if (data.companyNumber && !document.getElementById(`party${party}CompanyNumber`).value) {
+                    document.getElementById(`party${party}CompanyNumber`).value = data.companyNumber;
+                }
+            } catch (e) {
+                showStatus(party, `✓ Loaded: ${companyName} (could not fetch address)`, 'yellow');
+            }
+        }
+
+        // Website Parsing
+        async function parseWebsite(party) {
+            const urlInput = document.getElementById(`party${party}Url`);
+            let url = urlInput.value.trim();
+            if (!url) { alert('Please enter a website URL'); return; }
+            if (!url.startsWith('http')) url = 'https://' + url;
+            
+            showStatus(party, '🔍 Fetching company info...', 'gray');
+            
+            try {
+                const res = await fetch('/.netlify/functions/parse-company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await res.json();
+                
+                // Handle rate limit
+                if (res.status === 429) {
+                    showStatus(party, '⏳ Rate limit reached. Please wait 30 seconds and try again.', 'yellow');
+                    return;
+                }
+                
+                if (!res.ok) throw new Error(data.error);
+                
+                let filled = [];
+                if (data.name) { document.getElementById(`party${party}Name`).value = data.name; filled.push('name'); }
+                if (data.email) { document.getElementById(`party${party}Email`).value = data.email; filled.push('email'); }
+                
+                if (data.addresses && data.addresses.length > 0) {
+                    filled.push(data.addresses.length + ' address(es)');
+                    showAddressDropdown(party, data.addresses);
+                    document.getElementById(`party${party}Address`).value = data.addresses[0];
+                }
+                
+                if (data.name && /LLC|Inc|Ltd|Corp|GmbH|S\.A\.|Limited|LLP/i.test(data.name)) {
+                    document.getElementById(`party${party}Type`).value = 'company';
+                }
+                
+                updateGoverningLawOptions();
+                showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠️ No info found', filled.length ? 'green' : 'yellow');
+            } catch (e) {
+                showStatus(party, `✗ ${e.message}`, 'red');
+            }
+        }
+
+        // Email Parsing
+        function parseFromEmail(party) {
+            const email = document.getElementById(`party${party}EmailInput`).value.trim();
+            if (!email || !email.includes('@')) { alert('Please enter a valid email'); return; }
+            const domain = email.split('@')[1];
+            document.getElementById(`party${party}Url`).value = 'https://' + domain;
+            showFillOption(party, 'url');
+            parseWebsite(party);
+        }
+
+        // Business Card Parsing
+        async function parseBusinessCard(event, party) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showStatus(party, '🔍 Analyzing business card...', 'gray');
+            
+            try {
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+                
+                const res = await fetch('/.netlify/functions/parse-card', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64, mimeType: file.type })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                let filled = [];
+                if (data.name) { document.getElementById(`party${party}Name`).value = data.name; filled.push('name'); }
+                if (data.company) { document.getElementById(`party${party}Name`).value = data.company; filled.push('company'); }
+                if (data.address) { document.getElementById(`party${party}Address`).value = data.address; filled.push('address'); }
+                if (data.email) { document.getElementById(`party${party}Email`).value = data.email; filled.push('email'); }
+                
+                showStatus(party, filled.length ? `✓ Found: ${filled.join(', ')}` : '⚠️ Could not extract info', filled.length ? 'green' : 'yellow');
+            } catch (e) {
+                showStatus(party, `✗ ${e.message}`, 'red');
+            }
+            event.target.value = '';
+        }
+
+        // History
+        function saveToHistory(party, name, address, email, type, companyNumber) {
+            if (!name) return;
+            let history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
+            const exists = history.findIndex(h => h.name === name);
+            if (exists > -1) history.splice(exists, 1);
+            history.unshift({ name, address, email, type, companyNumber, date: new Date().toISOString() });
+            history = history.slice(0, 10);
+            localStorage.setItem(`nda_history_${party}`, JSON.stringify(history));
+        }
+
+        function loadHistoryDropdown(party) {
+            const dropdown = document.getElementById(`party${party}HistoryDropdown`);
+            const noMsg = document.getElementById(`noHistoryMsg${party}`);
+            const history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
+            
+            dropdown.innerHTML = '<option value="">-- Select from recent --</option>';
+            if (history.length === 0) { noMsg.classList.remove('hidden'); return; }
+            noMsg.classList.add('hidden');
+            
+            history.forEach((h, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = h.name + (h.date ? ' (' + new Date(h.date).toLocaleDateString() + ')' : '');
+                dropdown.appendChild(opt);
+            });
+        }
+
+        function loadFromHistory(party) {
+            const idx = parseInt(document.getElementById(`party${party}HistoryDropdown`).value);
+            if (isNaN(idx)) return;
+            const history = JSON.parse(localStorage.getItem(`nda_history_${party}`) || '[]');
+            const h = history[idx];
+            if (!h) return;
+            
+            if (h.name) document.getElementById(`party${party}Name`).value = h.name;
+            if (h.address) document.getElementById(`party${party}Address`).value = h.address;
+            if (h.email) document.getElementById(`party${party}Email`).value = h.email;
+            if (h.type) document.getElementById(`party${party}Type`).value = h.type;
+            if (h.companyNumber) document.getElementById(`party${party}CompanyNumber`).value = h.companyNumber;
+            
+            updateGoverningLawOptions();
+            showStatus(party, '✓ Loaded from history', 'green');
+        }
+
+        // Helper Functions
+        function showStatus(party, msg, color) {
+            const el = document.getElementById(`parseStatus${party}`);
+            el.textContent = msg;
+            el.className = `text-xs mt-2 ${color === 'green' ? 'text-green-600' : color === 'red' ? 'text-red-500' : color === 'yellow' ? 'text-yellow-600' : 'text-claude-muted'}`;
+            el.classList.remove('hidden');
+        }
+
+        function showAddressDropdown(party, addresses) {
+            const selection = document.getElementById(`addressSelection${party}`);
+            const dropdown = document.getElementById(`addressDropdown${party}`);
+            dropdown.innerHTML = addresses.map(addr => 
+                `<option value="${escapeHtml(addr)}">${addr.length > 60 ? addr.substring(0, 60) + '...' : addr}</option>`
+            ).join('') + '<option value="__custom__">✏️ Enter custom...</option>';
+            selection.classList.remove('hidden');
+        }
+
+        function handleAddressSelection(party) {
+            const dropdown = document.getElementById(`addressDropdown${party}`);
+            const customInput = document.getElementById(`customAddressInput${party}`);
+            const addressField = document.getElementById(`party${party}Address`);
+            
+            if (dropdown.value === '__custom__') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+                customInput.oninput = () => { addressField.value = customInput.value; };
+            } else {
+                customInput.classList.add('hidden');
+                addressField.value = dropdown.value;
+            }
+            updateGoverningLawOptions();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Governing Law
+        function extractJurisdiction(address) {
+            if (!address) return null;
+            const parts = address.split(',').map(p => p.trim());
+            if (parts.length === 0) return null;
+            const lastPart = parts[parts.length - 1];
+            const secondLast = parts.length > 1 ? parts[parts.length - 2] : '';
+            
+            if (lastPart.match(/USA|United States|U\.S\.A\.|US$/i)) {
+                const states = ['Delaware', 'California', 'New York', 'Texas', 'Florida', 'Nevada', 'Wyoming'];
+                for (const state of states) {
+                    if (secondLast.toLowerCase().includes(state.toLowerCase())) return state + ', USA';
+                }
+                return 'Delaware, USA';
+            }
+            if (lastPart.match(/UK|United Kingdom|England|GB$/i)) return 'England and Wales';
+            if (lastPart.match(/Germany|Deutschland/i)) return 'Germany';
+            if (lastPart.match(/France/i)) return 'France';
+            if (lastPart.match(/Netherlands|Holland/i)) return 'Netherlands';
+            if (lastPart.match(/Estonia/i)) return 'Estonia';
+            if (lastPart.match(/Poland|Polska/i)) return 'Poland';
+            if (lastPart.match(/Czech|Czechia/i)) return 'Czech Republic';
+            return lastPart || null;
+        }
+
+        function updateGoverningLawOptions() {
+            const addrA = document.getElementById('partyAAddress').value;
+            const addrB = document.getElementById('partyBAddress').value;
+            const optA = document.getElementById('govLawPartyA');
+            const optB = document.getElementById('govLawPartyB');
+            
+            const jurA = extractJurisdiction(addrA);
+            const jurB = extractJurisdiction(addrB);
+            
+            if (jurA) { optA.textContent = '📍 Party A: ' + jurA; optA.dataset.value = jurA; optA.classList.remove('hidden'); }
+            else { optA.classList.add('hidden'); }
+            
+            if (jurB) { optB.textContent = '📍 Party B: ' + jurB; optB.dataset.value = jurB; optB.classList.remove('hidden'); }
+            else { optB.classList.add('hidden'); }
+        }
+
+        function handleGoverningLawChange() {
+            const select = document.getElementById('governingLawSelect');
+            const input = document.getElementById('governingLaw');
+            
+            if (select.value === '__custom__') { input.classList.remove('hidden'); input.focus(); }
+            else if (select.value === '__partyA__') { input.classList.add('hidden'); input.value = document.getElementById('govLawPartyA').dataset.value || ''; }
+            else if (select.value === '__partyB__') { input.classList.add('hidden'); input.value = document.getElementById('govLawPartyB').dataset.value || ''; }
+            else { input.classList.add('hidden'); input.value = ''; }
+        }
+
+        function getGoverningLaw() {
+            const select = document.getElementById('governingLawSelect');
+            const input = document.getElementById('governingLaw');
+            if (select.value === '__partyA__') return document.getElementById('govLawPartyA').dataset.value || '';
+            if (select.value === '__partyB__') return document.getElementById('govLawPartyB').dataset.value || '';
+            return input.value;
+        }
+
+        // Navigation
+        function goToStep2() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            updateBadge(2);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep3() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
+            updateBadge(3);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function backToStep1() {
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            if (generatedNDAText) document.getElementById('result1').classList.remove('hidden');
+            updateBadge(1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function backToResults() { backToStep1(); }
+
+        function updateBadge(step) {
+            const b1 = document.getElementById('step1-badge');
+            const b2 = document.getElementById('step2-badge');
+            const b3 = document.getElementById('step3-badge');
+            
+            if (generatedNDAText) {
+                b1.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
+                b1.querySelector('span:first-child').textContent = '✓';
+            }
+            
+            if (step === 2 || generatedNDAText2) {
+                b2.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
+                if (generatedNDAText2) b2.querySelector('span:first-child').textContent = '✓';
+            } else {
+                b2.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-warm text-claude-muted border border-claude-border';
+                b2.querySelector('span:first-child').textContent = '+';
+            }
+            
+            if (step === 3 || generatedSummaryText) {
+                b3.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-orange text-white';
+                if (generatedSummaryText) b3.querySelector('span:first-child').textContent = '✓';
+            } else {
+                b3.className = 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-claude-warm text-claude-muted border border-claude-border';
+                b3.querySelector('span:first-child').textContent = '+';
+            }
+        }
+
+        function toggleArbFields() {
+            document.getElementById('arbFields').classList.toggle('hidden', document.getElementById('disputeMethod').value !== 'Arbitration');
+        }
+
+        // NDA Generation
+        function buildPrompt1() {
+            const pA = {
+                name: document.getElementById('partyAName').value || '[Party A Name]',
+                type: document.getElementById('partyAType').value,
+                companyNumber: document.getElementById('partyACompanyNumber').value,
+                address: document.getElementById('partyAAddress').value || '[Party A Address]',
+                email: document.getElementById('partyAEmail').value
+            };
+            const pB = {
+                name: document.getElementById('partyBName').value || '[Party B Name]',
+                type: document.getElementById('partyBType').value,
+                companyNumber: document.getElementById('partyBCompanyNumber').value,
+                address: document.getElementById('partyBAddress').value || '[Party B Address]',
+                email: document.getElementById('partyBEmail').value,
+                role: document.getElementById('partyBRole').value
+            };
+            
+            const confInfo = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ') || 'business information';
+            let formattedDate = '[Date]';
+            const dateVal = document.getElementById('agreementDate').value;
+            if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            return `Create a comprehensive, professional Non-Disclosure Agreement.
+
+PARTY A (Disclosing Party):
+- Name: ${pA.name}
+- Type: ${pA.type}${pA.companyNumber ? `, Company Number: ${pA.companyNumber}` : ''}
+- Address: ${pA.address}
+- Email: ${pA.email || 'N/A'}
+
+PARTY B (Receiving Party):
+- Name: ${pB.name}
+- Type: ${pB.type}${pB.companyNumber ? `, Company Number: ${pB.companyNumber}` : ''}
+- Address: ${pB.address}
+- Email: ${pB.email || 'N/A'}
+- Role: ${pB.role}
+- Bind employees/contractors: ${document.getElementById('bindOthers').value}
+
+PURPOSE: ${document.getElementById('purpose').value}
+CONFIDENTIAL INFORMATION: ${confInfo}
+NDA TYPE: ${document.getElementById('ndaType').value}
+CONFIDENTIALITY PERIOD: ${document.getElementById('confPeriod').value} years
+GOVERNING LAW: ${getGoverningLaw() || '[Jurisdiction]'}
+DATE: ${formattedDate}
+
+Requirements:
+- Professional legal language, plain English
+- Standard exclusions (public info, prior knowledge, legal disclosure)
+- Return/destruction of materials clause
+- Include signature blocks at the end`;
+        }
+
+        function buildPrompt2() {
+            const v = id => document.getElementById(id).value;
+            return `Enhance this NDA with additional protections. Output the complete updated NDA.
+
+EXISTING NDA:
+${generatedNDAText}
+
+ADD THESE CLAUSES:
+1. Residual Knowledge: ${v('residualKnowledge')}
+2. Return materials within: ${v('returnDays')} days, Written cert: ${v('writtenCert')}
+3. Non-Solicitation: ${v('prohibitSoliciting')}, ${v('solicitDuration')} months
+4. Advisors allowed: ${v('allowAdvisors')}
+5. Notify before legal disclosure: ${v('notifyCompelled')}
+6. Disputes: ${v('disputeMethod')}${v('disputeMethod') === 'Arbitration' ? `, ${v('arbRules')}, ${v('arbLocation') || '[Location]'}` : ''}
+
+Output complete enhanced NDA with signature blocks.`;
+        }
+
+        async function generateNDA() {
+            const prompt = buildPrompt1();
+            document.getElementById('generateBtn1').disabled = true;
+            document.getElementById('loadingState1').classList.remove('hidden');
+            document.getElementById('result1').classList.add('hidden');
+
+            try {
+                const res = await fetch('/.netlify/functions/generate-nda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                generatedNDAText = data.result;
+                document.getElementById('ndaContent1').innerHTML = formatNDA(data.result);
+                document.getElementById('result1').classList.remove('hidden');
+                document.getElementById('footerCTA').classList.remove('hidden');
+                updateBadge(1);
+                
+                saveToHistory('A', document.getElementById('partyAName').value, document.getElementById('partyAAddress').value, document.getElementById('partyAEmail').value, document.getElementById('partyAType').value, document.getElementById('partyACompanyNumber').value);
+                saveToHistory('B', document.getElementById('partyBName').value, document.getElementById('partyBAddress').value, document.getElementById('partyBEmail').value, document.getElementById('partyBType').value, document.getElementById('partyBCompanyNumber').value);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState1').classList.add('hidden');
+                document.getElementById('generateBtn1').disabled = false;
+            }
+        }
+
+        async function generateEnhancedNDA() {
+            const prompt = buildPrompt2();
+            document.getElementById('generateBtn2').disabled = true;
+            document.getElementById('loadingState2').classList.remove('hidden');
+            document.getElementById('result2').classList.add('hidden');
+
+            try {
+                const res = await fetch('/.netlify/functions/generate-nda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                generatedNDAText2 = data.result;
+                document.getElementById('ndaContent2').innerHTML = formatNDA(data.result);
+                document.getElementById('result2').classList.remove('hidden');
+                updateBadge(2);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState2').classList.add('hidden');
+                document.getElementById('generateBtn2').disabled = false;
+            }
+        }
+
+        async function generateSummary() {
+            const nda = generatedNDAText2 || generatedNDAText;
+            const prompt = `Create a plain-English summary of this NDA for the receiving party:
+
+${nda}
+
+Explain in friendly terms: what it is, what they agree to, what's confidential, duration, their rights. End with: "This summary is for convenience only. The NDA is the binding document."`;
+
+            document.getElementById('generateBtn3').disabled = true;
+            document.getElementById('loadingState3').classList.remove('hidden');
+            document.getElementById('result3').classList.add('hidden');
+
+            try {
+                const res = await fetch('/.netlify/functions/generate-nda', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                
+                generatedSummaryText = data.result;
+                document.getElementById('summaryContent').innerHTML = formatNDA(data.result);
+                document.getElementById('result3').classList.remove('hidden');
+                updateBadge(3);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState3').classList.add('hidden');
+                document.getElementById('generateBtn3').disabled = false;
+            }
+        }
+
+        function formatNDA(text) {
+            marked.setOptions({ breaks: true, gfm: true });
+            return marked.parse(text);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+
+        function downloadPDF(elementId, filename) {
+            html2pdf().set({
+                margin: [15, 15, 15, 15],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(document.getElementById(elementId)).save();
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('agreementDate').value = new Date().toISOString().split('T')[0];
+            loadPartyData('A');
+            loadPartyData('B');
+            document.getElementById('partyAAddress').addEventListener('input', updateGoverningLawOptions);
+            document.getElementById('partyBAddress').addEventListener('input', updateGoverningLawOptions);
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.relative')) {
+                    document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.add('hidden'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
