@@ -36,49 +36,32 @@ exports.handler = async (event, context) => {
 
     let warnings = [];
 
-    // ═══════ PARALLEL SEARCH ARCHITECTURE ═══════
-    // 1. UK Companies House (direct API — best for UK)
-    // 2. OpenCorporates general (catches all 140+ countries)
-    // 3. Targeted jurisdiction searches via OC (ensures key markets surface)
-    // 4. Bonus: direct ariregister attempt for Estonia
+    // ═══════ 3 PARALLEL SEARCHES (rate-limit safe) ═══════
+    // 1. UK Companies House (direct API)
+    // 2. OpenCorporates (140+ countries, single call, 15 results)
+    // 3. Estonia ariregister direct (bonus, may be Cloudflare-blocked)
 
-    const TARGET_JURISDICTIONS = [
-      { code: 'ee', label: 'Estonia e-Business Register', registerUrl: (num) => `https://ariregister.rik.ee/eng/company/${num}` },
-      { code: 'lt', label: 'Lithuania Register of Legal Entities', registerUrl: (num) => `https://rekvizitai.vz.lt/en/company/-/${num}/` },
-      { code: 'pl', label: 'Poland KRS', registerUrl: null },
-      { code: 'cz', label: 'Czech Commercial Register', registerUrl: (num) => `https://or.justice.cz/ias/ui/rejstrik-firma?ico=${num}` },
-      { code: 'de', label: 'Germany Handelsregister', registerUrl: null },
-      { code: 'sg', label: 'Singapore ACRA', registerUrl: null },
-      { code: 'us_de', label: 'Delaware Division of Corporations', registerUrl: null },
-      { code: 'ie', label: 'Ireland CRO', registerUrl: null },
-    ];
-
-    // Build all parallel promises
-    const searchPromises = [
+    const [ukResults, ocResults, ariResults] = await Promise.all([
       searchCompaniesHouse(query).catch(e => { warnings.push('UK Companies House unavailable'); return []; }),
       searchOpenCorporates(query).catch(e => { warnings.push('OpenCorporates unavailable'); return []; }),
-      ...TARGET_JURISDICTIONS.map(j =>
-        searchOCByJurisdiction(query, j.code, j.label, j.registerUrl)
-          .catch(() => [])
-      ),
-      // Bonus: direct ariregister (may be blocked by Cloudflare)
       searchEstoniaViaDirect(query).catch(() => []),
-    ];
+    ]);
 
-    const allResults = await Promise.all(searchPromises);
+    // Label OC results with proper register names per jurisdiction
+    const labeledOC = ocResults.map(r => ({
+      ...r,
+      source: JURISDICTION_LABELS[r.jurisdiction] || JURISDICTION_LABELS[(r.jurisdiction || '').split('-')[0]] || 'OpenCorporates',
+      url: getRegisterUrl(r.jurisdiction, r.companyNumber) || r.url,
+    }));
 
-    const ukResults = allResults[0];
-    const ocGeneralResults = allResults[1];
-    const jurisdictionResults = allResults.slice(2, 2 + TARGET_JURISDICTIONS.length).flat();
-    const ariResults = allResults[allResults.length - 1];
+    // If ariregister returned results, they replace OC Estonian results
+    let finalOC = labeledOC;
+    if (ariResults.length > 0) {
+      finalOC = labeledOC.filter(r => r.jurisdiction !== 'EE');
+    }
 
-    // If direct ariregister returned results, replace OC Estonia results
-    let eeFromOC = jurisdictionResults.filter(r => r.jurisdiction === 'EE');
-    let nonEEJurisdiction = jurisdictionResults.filter(r => r.jurisdiction !== 'EE');
-    let eeResults = ariResults.length > 0 ? ariResults : eeFromOC;
-
-    // Merge: UK first, then targeted jurisdictions, then general OC
-    let results = [...ukResults, ...eeResults, ...nonEEJurisdiction, ...ocGeneralResults];
+    // Merge: UK first, then Estonia direct, then OC (labeled)
+    let results = [...ukResults, ...ariResults, ...finalOC];
 
     // Remove duplicates by company number + jurisdiction + normalized name
     const uniqueResults = [];
@@ -93,14 +76,11 @@ exports.handler = async (event, context) => {
       }
     });
 
-    // Sort: prioritize results with addresses, then by source quality
+    // Sort: prioritize results with addresses
     uniqueResults.sort((a, b) => {
       if (a.address && !b.address) return -1;
       if (!a.address && b.address) return 1;
-      // Prefer direct register sources over generic OpenCorporates
-      const aIsOC = a.source === 'OpenCorporates' ? 1 : 0;
-      const bIsOC = b.source === 'OpenCorporates' ? 1 : 0;
-      return aIsOC - bIsOC;
+      return 0;
     });
 
     return {
@@ -120,6 +100,46 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// ═══════ Jurisdiction Labels & Register URLs ═══════
+const JURISDICTION_LABELS = {
+  'EE': 'Estonia e-Business Register',
+  'LT': 'Lithuania Register of Legal Entities',
+  'PL': 'Poland KRS',
+  'CZ': 'Czech Commercial Register',
+  'DE': 'Germany Handelsregister',
+  'HU': 'Hungary Company Register',
+  'ES': 'Spain Registro Mercantil',
+  'FR': 'France RCS',
+  'NL': 'Netherlands KVK',
+  'BE': 'Belgium CBE',
+  'IE': 'Ireland CRO',
+  'AT': 'Austria Firmenbuch',
+  'IT': 'Italy Registro Imprese',
+  'PT': 'Portugal Registo Comercial',
+  'CH': 'Switzerland ZEFIX',
+  'GB': 'Companies House UK',
+  'SG': 'Singapore ACRA',
+  'HK': 'Hong Kong Companies Registry',
+  'AE': 'UAE Commercial Register',
+  'US': 'US Corporate Registry',
+  'US-DE': 'Delaware Division of Corporations',
+  'US-NY': 'New York DOS',
+  'US-CA': 'California SOS',
+  'SV': 'El Salvador Registro de Comercio',
+};
+
+function getRegisterUrl(jurisdiction, companyNumber) {
+  if (!jurisdiction || !companyNumber) return null;
+  const urls = {
+    'EE': `https://ariregister.rik.ee/eng/company/${companyNumber}`,
+    'LT': `https://rekvizitai.vz.lt/en/company/-/${companyNumber}/`,
+    'CZ': `https://or.justice.cz/ias/ui/rejstrik-firma?ico=${companyNumber}`,
+    'GB': `https://find-and-update.company-information.service.gov.uk/company/${companyNumber}`,
+    'IE': `https://core.cro.ie/company/${companyNumber}`,
+  };
+  return urls[jurisdiction] || null;
+}
 
 // ═══════ UK Companies House ═══════
 async function searchCompaniesHouse(query) {
@@ -185,46 +205,62 @@ async function searchCompaniesHouse(query) {
   }
 }
 
-// ═══════ OpenCorporates: Search by Jurisdiction ═══════
-async function searchOCByJurisdiction(query, jurisdictionCode, sourceLabel, registerUrlFn) {
+// ═══════ OpenCorporates (140+ countries, single call) ═══════
+async function searchOpenCorporates(query) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
   try {
-    const res = await fetch(
-      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&jurisdiction_code=${jurisdictionCode}&per_page=3`,
-      { headers: { "User-Agent": "NDA-Generator/1.0" }, signal: controller.signal }
+    const ocRes = await fetch(
+      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=15`,
+      {
+        headers: { "User-Agent": "NDA-Generator/1.0" },
+        signal: controller.signal,
+      }
     );
     clearTimeout(timeout);
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (!data.results || !data.results.companies) return [];
-    return data.results.companies.map(c => {
+
+    if (!ocRes.ok) return [];
+    const ocData = await ocRes.json();
+    if (!ocData.results || !ocData.results.companies) return [];
+
+    return ocData.results.companies.map(c => {
       const company = c.company;
+
       let address = company.registered_address_in_full;
       if (!address && company.registered_address) {
         const addr = company.registered_address;
-        address = [addr.street_address, addr.locality, addr.region, addr.postal_code, addr.country].filter(Boolean).join(', ');
+        const parts = [
+          addr.street_address,
+          addr.locality,
+          addr.region,
+          addr.postal_code,
+          addr.country
+        ].filter(Boolean);
+        address = parts.join(', ');
       }
+
       const jurisdiction = mapJurisdiction(company.jurisdiction_code);
+
       return {
-        source: sourceLabel,
+        source: 'OpenCorporates', // Will be relabeled by JURISDICTION_LABELS
         name: company.name,
         jurisdiction: jurisdiction,
         address: address || null,
-        status: company.current_status || 'Active',
+        status: company.current_status,
         companyNumber: company.company_number,
         incorporationDate: company.incorporation_date,
         companyType: company.company_type,
-        url: registerUrlFn ? registerUrlFn(company.company_number) : company.opencorporates_url,
+        url: company.opencorporates_url
       };
     });
   } catch (e) {
     clearTimeout(timeout);
-    return [];
+    throw e;
   }
 }
 
-// ═══════ Estonia: Direct ariregister API (bonus — may be blocked by Cloudflare) ═══════
+// ═══════ Estonia: Direct ariregister API (bonus) ═══════
 async function searchEstoniaViaDirect(query) {
   const endpoints = [
     `https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`,
@@ -277,63 +313,6 @@ async function searchEstoniaViaDirect(query) {
     }
   }
   return [];
-}
-
-// ═══════ OpenCorporates (140+ countries) ═══════
-async function searchOpenCorporates(query) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
-
-  try {
-    const ocRes = await fetch(
-      `https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=5`,
-      {
-        headers: { "User-Agent": "NDA-Generator/1.0" },
-        signal: controller.signal,
-      }
-    );
-    clearTimeout(timeout);
-
-    if (!ocRes.ok) return [];
-    const ocData = await ocRes.json();
-    if (!ocData.results || !ocData.results.companies) return [];
-
-    return ocData.results.companies.map(c => {
-      const company = c.company;
-
-      // Get full address
-      let address = company.registered_address_in_full;
-      if (!address && company.registered_address) {
-        const addr = company.registered_address;
-        const parts = [
-          addr.street_address,
-          addr.locality,
-          addr.region,
-          addr.postal_code,
-          addr.country
-        ].filter(Boolean);
-        address = parts.join(', ');
-      }
-
-      // Map jurisdiction codes
-      const jurisdiction = mapJurisdiction(company.jurisdiction_code);
-
-      return {
-        source: 'OpenCorporates',
-        name: company.name,
-        jurisdiction: jurisdiction,
-        address: address || null,
-        status: company.current_status,
-        companyNumber: company.company_number,
-        incorporationDate: company.incorporation_date,
-        companyType: company.company_type,
-        url: company.opencorporates_url
-      };
-    });
-  } catch (e) {
-    clearTimeout(timeout);
-    throw e;
-  }
 }
 
 // ═══════ Fetch Full Company Details (OpenCorporates) ═══════
@@ -411,9 +390,7 @@ function formatUKAddress(addr) {
 function mapJurisdiction(code) {
   if (!code) return null;
   const upper = code.toUpperCase();
-  // Handle compound codes like US_DE → US-DE, GB_SCT → GB-SCT
   const mapped = upper.replace(/_/g, '-');
-  // Common mappings
   const map = {
     'GB': 'GB', 'US-DE': 'US-DE', 'US-NY': 'US-NY', 'US-CA': 'US-CA',
     'EE': 'EE', 'LT': 'LT', 'PL': 'PL', 'CZ': 'CZ', 'ES': 'ES',
