@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@anthropic-ai/sdk"]
+
+[functions."generate-nda"]
+  timeout = 60
+
+[functions."parse-company"]
+  timeout = 30
+
+[functions."parse-card"]
+  timeout = 30
