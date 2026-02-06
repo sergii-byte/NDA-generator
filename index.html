@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+       <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -929,9 +929,10 @@
 
                 <div class="form-group">
                     <label>Governing Law</label>
-                    <select id="governingLaw">
+                    <select id="governingLaw" onchange="toggleCustomGoverningLaw()">
                         <option value="">Auto-detect from addresses</option>
                     </select>
+                    <input type="text" id="governingLawCustom" class="hidden" style="margin-top:8px;" placeholder="e.g. Laws of the Republic of Singapore" />
                 </div>
 
                 <div class="form-group">
@@ -1176,8 +1177,8 @@
                     <h4>🎉 Your NDA package is complete</h4>
                     <p>Need a polished Word document or want a lawyer to review your NDA?</p>
                     <div class="cta-links">
-                        <a href="mailto:hello@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                        <a href="mailto:hello@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                        <a href="/cdn-cgi/l/email-protection#94fcf1f8f8fbd4e7f6f8f7baf7fbf9bae1f5abe7e1f6fef1f7e0a9dad0d5b1a6a4c3fbe6f0b1a6a4d0fbf7e1f9f1fae0b1a6a4c6f1e5e1f1e7e0" class="cta-primary">Word Document — $10</a>
+                        <a href="/cdn-cgi/l/email-protection#ff979a939390bf8c9d939cd19c9092d18a9ec08c8a9d959a9c8bc2b1bbbedacdcfb39a989e93dacdcfbe8a9b968bdacdcfad9a8e8a9a8c8b" class="cta-secondary">Legal Audit — $100</a>
                     </div>
                 </div>
 
@@ -1193,8 +1194,8 @@
                 <h4>Want a polished Word document?</h4>
                 <p>Get a professionally formatted .docx ready for signing, or have a lawyer review your NDA.</p>
                 <div class="cta-links">
-                    <a href="mailto:hello@sblc.com.ua?subject=NDA%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                    <a href="mailto:hello@sblc.com.ua?subject=NDA%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                    <a href="/cdn-cgi/l/email-protection#ef878a838380af9c8d838cc18c8082c19a8ed09c9a8d858a8c9bd2a1abaecadddfb8809d8bcadddfab808c9a828a819bcadddfbd8a9e9a8a9c9b" class="cta-primary">Word Document — $10</a>
+                    <a href="/cdn-cgi/l/email-protection#4028252c2c2f0033222c236e232f2d6e35217f3335222a2523347d0e04016572700c2527212c657270013524293465727012253135253334" class="cta-secondary">Legal Audit — $100</a>
                 </div>
             </div>
         </div>
@@ -1204,13 +1205,13 @@
         <div class="footer-inner">
             <p>© 2025 SBLC Law Firm. All rights reserved.</p>
             <div style="display:flex;gap:16px;">
-                <a href="mailto:hello@sblc.com.ua">hello@sblc.com.ua</a>
+                <a href="/cdn-cgi/l/email-protection#5a323f3636351a2938363974393537742f3b"><span class="__cf_email__" data-cfemail="5b333e3737341b2839373875383436752e3a">[email&#160;protected]</span></a>
                 <a href="https://sblc.com.ua" target="_blank">sblc.com.ua</a>
             </div>
         </div>
     </footer>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         let generatedNDAText = '';
         let generatedNDAText2 = '';
         let generatedSummaryText = '';
@@ -1302,35 +1303,6 @@
 
         // ═══════ Company Search ═══════
         // ═══════ Client-side Estonia Register fallback ═══════
-        async function searchEstoniaClient(query) {
-            try {
-                const res = await fetch(`https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`, {
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!res.ok) return [];
-                const ct = res.headers.get('content-type') || '';
-                if (ct.includes('text/html')) return []; // Cloudflare challenge
-                const data = await res.json();
-                if (!Array.isArray(data)) return [];
-                return data.map(c => {
-                    let addr = c.legal_address || null;
-                    if (addr && c.zip_code) addr = `${addr}, ${c.zip_code}`;
-                    if (addr && !addr.toLowerCase().includes('estonia')) addr = `${addr}, Estonia`;
-                    const statusMap = { 'R': 'Registered', 'Registrisse kantud': 'Registered', 'K': 'Deleted', 'Kustutatud': 'Deleted', 'L': 'In liquidation', 'Likvideerimisel': 'In liquidation' };
-                    return {
-                        source: 'Estonia e-Business Register',
-                        name: c.name || c.nimi,
-                        jurisdiction: 'EE',
-                        address: addr,
-                        status: statusMap[c.status] || c.status || 'Active',
-                        companyNumber: String(c.reg_code || ''),
-                        companyType: null,
-                        url: c.url || `https://ariregister.rik.ee/eng/company/${c.reg_code}`,
-                    };
-                }).filter(r => r.name && r.companyNumber);
-            } catch (e) { return []; }
-        }
-
         function searchCompany(party, query) {
             const dropdown = document.getElementById(`dropdown${party}`);
             clearTimeout(searchTimeout);
@@ -1341,29 +1313,14 @@
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    // Run server search and client-side Estonia search in parallel
-                    const [serverRes, eeClientResults] = await Promise.all([
-                        fetch('/.netlify/functions/search-company', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ query })
-                        }).then(r => r.json()),
-                        searchEstoniaClient(query),
-                    ]);
-
-                    let results = serverRes.results || [];
-
-                    // Merge client-side Estonian results if server didn't return any Estonian ones
-                    const hasServerEE = results.some(r => r.source === 'Estonia e-Business Register');
-                    if (!hasServerEE && eeClientResults.length > 0) {
-                        // Deduplicate by company number
-                        const existingNums = new Set(results.map(r => r.companyNumber));
-                        const newEE = eeClientResults.filter(r => !existingNums.has(r.companyNumber));
-                        results = [...results, ...newEE];
-                    }
-
-                    if (results.length > 0) {
-                        dropdown.innerHTML = results.slice(0, 12).map(r => `
+                    const res = await fetch('/.netlify/functions/search-company', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query })
+                    });
+                    const data = await res.json();
+                    if (data.results && data.results.length > 0) {
+                        dropdown.innerHTML = data.results.map(r => `
                             <div class="autocomplete-item" onclick='selectCompany("${party}", ${JSON.stringify(r).replace(/'/g, "&#39;")})'>
                                 <div class="ac-name">${escapeHtml(r.name)}</div>
                                 <div class="ac-meta">
@@ -1379,12 +1336,8 @@
                     } else {
                         dropdown.innerHTML = '<div class="ac-loading">No results found</div>';
                     }
-                    // Show warnings except Estonia (handled by client fallback)
-                    if (serverRes.warning) {
-                        const warning = serverRes.warning.replace(/;?\s*Estonia register unavailable\s*;?/g, '').trim();
-                        if (warning) {
-                            dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(warning)}</div>`;
-                        }
+                    if (data.warning) {
+                        dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(data.warning)}</div>`;
                     }
                 } catch (e) {
                     dropdown.innerHTML = '<div class="ac-loading">Search error. Try again.</div>';
@@ -1486,7 +1439,11 @@
         // ═══════ Governing Law ═══════
         function getGoverningLaw() {
             const sel = document.getElementById('governingLaw');
+            if (sel.value === 'custom') {
+                return document.getElementById('governingLawCustom').value.trim();
+            }
             if (sel.value) return sel.value;
+            // Auto-detect from addresses
             const addrA = document.getElementById('partyAAddress').value;
             const addrB = document.getElementById('partyBAddress').value;
             const combined = (addrA + ' ' + addrB).toLowerCase();
@@ -1502,15 +1459,15 @@
                 'ADGM Law': ['adgm'],
                 'Republic of Estonia': ['estonia', 'tallinn', 'tartu'],
                 'Republic of Lithuania': ['lithuania', 'vilnius', 'kaunas'],
-                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw'],
+                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw', 'warszawa'],
                 'Czech Republic': ['czech', 'prague', 'praha', 'brno'],
                 'Kingdom of Spain': ['spain', 'madrid', 'barcelona'],
                 'Hungary': ['hungary', 'budapest'],
-                'Germany': ['germany', 'berlin', 'munich', 'frankfurt'],
+                'Germany': ['germany', 'berlin', 'munich', 'frankfurt', 'münchen'],
                 'France': ['france', 'paris'],
                 'Republic of Ireland': ['ireland', 'dublin'],
                 'The Netherlands': ['netherlands', 'amsterdam', 'rotterdam'],
-                'Switzerland': ['switzerland', 'zurich', 'geneva'],
+                'Switzerland': ['switzerland', 'zurich', 'geneva', 'zürich'],
                 'Singapore': ['singapore'],
                 'Hong Kong': ['hong kong'],
                 'Republic of El Salvador': ['el salvador', 'san salvador'],
@@ -1524,19 +1481,86 @@
             return '';
         }
 
+        function detectJurisdictionFromAddress(address) {
+            if (!address) return null;
+            const addr = address.toLowerCase();
+            const map = {
+                'England and Wales': ['england', 'wales', 'london', 'united kingdom', ', uk', 'manchester', 'birmingham'],
+                'Scotland': ['scotland', 'edinburgh', 'glasgow'],
+                'Delaware, USA': ['delaware', 'wilmington'],
+                'State of New York, USA': ['new york'],
+                'State of California, USA': ['california', 'san francisco', 'los angeles'],
+                'Republic of Estonia': ['estonia', 'tallinn', 'tartu'],
+                'Republic of Lithuania': ['lithuania', 'vilnius', 'kaunas'],
+                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw', 'warszawa'],
+                'Czech Republic': ['czech', 'prague', 'praha', 'brno'],
+                'Kingdom of Spain': ['spain', 'madrid', 'barcelona'],
+                'Hungary': ['hungary', 'budapest'],
+                'Germany': ['germany', 'berlin', 'munich', 'frankfurt', 'münchen'],
+                'France': ['france', 'paris'],
+                'Republic of Ireland': ['ireland', 'dublin'],
+                'The Netherlands': ['netherlands', 'amsterdam', 'rotterdam'],
+                'Switzerland': ['switzerland', 'zurich', 'geneva', 'zürich'],
+                'UAE Federal Law': ['dubai', 'abu dhabi', 'uae', 'emirates', 'sharjah'],
+                'DIFC Law': ['difc'],
+                'ADGM Law': ['adgm'],
+                'Singapore': ['singapore'],
+                'Hong Kong': ['hong kong'],
+                'Republic of El Salvador': ['el salvador', 'san salvador'],
+            };
+            for (const [law, keywords] of Object.entries(map)) {
+                for (const kw of keywords) {
+                    if (addr.includes(kw)) return law;
+                }
+            }
+            return null;
+        }
+
+        function toggleCustomGoverningLaw() {
+            const sel = document.getElementById('governingLaw');
+            const customInput = document.getElementById('governingLawCustom');
+            customInput.classList.toggle('hidden', sel.value !== 'custom');
+        }
+
         function updateGoverningLawOptions() {
             const sel = document.getElementById('governingLaw');
-            const detected = getGoverningLaw();
             const current = sel.value;
             sel.innerHTML = '<option value="">Auto-detect from addresses</option>';
-            const options = ['Delaware, USA', 'State of New York, USA', 'State of California, USA', 'England and Wales', 'Scotland', 'Republic of Estonia', 'Republic of Lithuania', 'Republic of Poland', 'Czech Republic', 'Kingdom of Spain', 'Hungary', 'Germany', 'France', 'Republic of Ireland', 'The Netherlands', 'Switzerland', 'UAE Federal Law', 'DIFC Law', 'ADGM Law', 'Singapore', 'Hong Kong', 'Republic of El Salvador'];
-            options.forEach(opt => {
+
+            // Detect jurisdictions from party addresses
+            const addrA = document.getElementById('partyAAddress').value;
+            const addrB = document.getElementById('partyBAddress').value;
+            const jurA = detectJurisdictionFromAddress(addrA);
+            const jurB = detectJurisdictionFromAddress(addrB);
+
+            const added = new Set();
+            if (jurA) {
                 const o = document.createElement('option');
-                o.value = opt;
-                o.textContent = opt + (opt === detected ? ' (detected)' : '');
+                o.value = jurA;
+                o.textContent = jurA + ' (Party A)';
                 sel.appendChild(o);
-            });
-            if (current) sel.value = current;
+                added.add(jurA);
+            }
+            if (jurB && !added.has(jurB)) {
+                const o = document.createElement('option');
+                o.value = jurB;
+                o.textContent = jurB + ' (Party B)';
+                sel.appendChild(o);
+            }
+
+            // Custom option
+            const customOpt = document.createElement('option');
+            customOpt.value = 'custom';
+            customOpt.textContent = 'Custom (type your own)...';
+            sel.appendChild(customOpt);
+
+            // Restore previous selection if still valid
+            if (current) {
+                const exists = Array.from(sel.options).some(o => o.value === current);
+                if (exists) sel.value = current;
+                else sel.value = '';
+            }
+            toggleCustomGoverningLaw();
         }
 
         // ═══════ Step Navigation ═══════
@@ -2004,4 +2028,4 @@ REQUIREMENTS:
         });
     </script>
 </body>
-</html>
+</html>     
