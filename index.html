@@ -731,20 +731,10 @@
 
                 <div style="margin-top:14px;">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" style="flex:1;">
                             <label>Company Name *</label>
                             <input type="text" id="partyAName" autocomplete="off" placeholder="Full legal name">
-                        </div>
-                        <div class="form-group">
-                            <label>Entity Type</label>
-                            <select id="partyAType">
-                                <option value="Company">Company</option>
-                                <option value="Individual">Individual</option>
-                                <option value="LLC">LLC</option>
-                                <option value="LTD">LTD</option>
-                                <option value="Corporation">Corporation</option>
-                                <option value="Partnership">Partnership</option>
-                            </select>
+                            <input type="hidden" id="partyAType" value="Company">
                         </div>
                     </div>
                     <div class="form-row">
@@ -840,20 +830,10 @@
 
                 <div style="margin-top:14px;">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" style="flex:1;">
                             <label>Company Name *</label>
                             <input type="text" id="partyBName" autocomplete="off" placeholder="Full legal name">
-                        </div>
-                        <div class="form-group">
-                            <label>Entity Type</label>
-                            <select id="partyBType">
-                                <option value="Company">Company</option>
-                                <option value="Individual">Individual</option>
-                                <option value="LLC">LLC</option>
-                                <option value="LTD">LTD</option>
-                                <option value="Corporation">Corporation</option>
-                                <option value="Partnership">Partnership</option>
-                            </select>
+                            <input type="hidden" id="partyBType" value="Company">
                         </div>
                     </div>
                     <div class="form-row">
@@ -950,7 +930,7 @@
                 <div class="form-group">
                     <label>Governing Law</label>
                     <select id="governingLaw" onchange="toggleCustomGoverningLaw()">
-                        <option value="">Auto-detect from addresses</option>
+                        <option value="partyA">Party A jurisdiction (default)</option>
                     </select>
                     <input type="text" id="governingLawCustom" class="hidden" style="margin-top:8px;" placeholder="e.g. Laws of the Republic of Singapore" />
                 </div>
@@ -1494,43 +1474,17 @@
             if (sel.value === 'custom') {
                 return document.getElementById('governingLawCustom').value.trim();
             }
-            if (sel.value) return sel.value;
-            // Auto-detect from addresses
-            const addrA = document.getElementById('partyAAddress').value;
-            const addrB = document.getElementById('partyBAddress').value;
-            const combined = (addrA + ' ' + addrB).toLowerCase();
-
-            const jurisdictions = {
-                'Delaware, USA': ['delaware', 'de ', 'wilmington'],
-                'England and Wales': ['england', 'wales', 'london', 'united kingdom', ', uk', 'manchester', 'birmingham'],
-                'Scotland': ['scotland', 'edinburgh', 'glasgow'],
-                'State of New York, USA': ['new york', 'ny '],
-                'State of California, USA': ['california', 'ca ', 'san francisco', 'los angeles'],
-                'UAE Federal Law': ['dubai', 'abu dhabi', 'uae', 'emirates', 'sharjah'],
-                'DIFC Law': ['difc'],
-                'ADGM Law': ['adgm'],
-                'Republic of Estonia': ['estonia', 'tallinn', 'tartu'],
-                'Republic of Lithuania': ['lithuania', 'vilnius', 'kaunas'],
-                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw', 'warszawa'],
-                'Czech Republic': ['czech', 'prague', 'praha', 'brno'],
-                'Kingdom of Spain': ['spain', 'madrid', 'barcelona'],
-                'Hungary': ['hungary', 'budapest'],
-                'Germany': ['germany', 'berlin', 'munich', 'frankfurt', 'münchen'],
-                'France': ['france', 'paris'],
-                'Republic of Ireland': ['ireland', 'dublin'],
-                'The Netherlands': ['netherlands', 'amsterdam', 'rotterdam'],
-                'Switzerland': ['switzerland', 'zurich', 'geneva', 'zürich'],
-                'Singapore': ['singapore'],
-                'Hong Kong': ['hong kong'],
-                'Republic of El Salvador': ['el salvador', 'san salvador'],
-            };
-
-            for (const [law, keywords] of Object.entries(jurisdictions)) {
-                for (const kw of keywords) {
-                    if (combined.includes(kw)) return law;
-                }
+            if (sel.value === 'partyA' || !sel.value) {
+                // Default: detect from Party A address
+                const addrA = document.getElementById('partyAAddress').value;
+                const jurA = detectJurisdictionFromAddress(addrA);
+                if (jurA) return jurA;
+                // Fallback: try Party B
+                const addrB = document.getElementById('partyBAddress').value;
+                const jurB = detectJurisdictionFromAddress(addrB);
+                return jurB || '';
             }
-            return '';
+            return sel.value;
         }
 
         function detectJurisdictionFromAddress(address) {
@@ -1577,7 +1531,7 @@
         function updateGoverningLawOptions() {
             const sel = document.getElementById('governingLaw');
             const current = sel.value;
-            sel.innerHTML = '<option value="">Auto-detect from addresses</option>';
+            sel.innerHTML = '';
 
             // Detect jurisdictions from party addresses
             const addrA = document.getElementById('partyAAddress').value;
@@ -1585,19 +1539,18 @@
             const jurA = detectJurisdictionFromAddress(addrA);
             const jurB = detectJurisdictionFromAddress(addrB);
 
-            const added = new Set();
-            if (jurA) {
-                const o = document.createElement('option');
-                o.value = jurA;
-                o.textContent = jurA + ' (Party A)';
-                sel.appendChild(o);
-                added.add(jurA);
-            }
-            if (jurB && !added.has(jurB)) {
-                const o = document.createElement('option');
-                o.value = jurB;
-                o.textContent = jurB + ' (Party B)';
-                sel.appendChild(o);
+            // Party A option (default)
+            const optA = document.createElement('option');
+            optA.value = 'partyA';
+            optA.textContent = jurA ? `${jurA} (Party A)` : 'Party A jurisdiction (default)';
+            sel.appendChild(optA);
+
+            // Party B option (if different)
+            if (jurB && jurB !== jurA) {
+                const optB = document.createElement('option');
+                optB.value = jurB;
+                optB.textContent = `${jurB} (Party B)`;
+                sel.appendChild(optB);
             }
 
             // Custom option
@@ -1607,10 +1560,12 @@
             sel.appendChild(customOpt);
 
             // Restore previous selection if still valid
-            if (current) {
+            if (current && current !== 'partyA') {
                 const exists = Array.from(sel.options).some(o => o.value === current);
                 if (exists) sel.value = current;
-                else sel.value = '';
+                else sel.value = 'partyA';
+            } else {
+                sel.value = 'partyA';
             }
             toggleCustomGoverningLaw();
         }
@@ -1750,11 +1705,65 @@
             if (arbLang) arbLang.addEventListener('change', updateArbClausePreview);
         });
 
+        // ═══════ Entity Type Auto-Detection ═══════
+        function detectEntityType(name, fallback) {
+            if (!name) return fallback || '';
+            const n = name.toLowerCase().trim();
+            const patterns = [
+                [/\bpte\.?\s*ltd\.?$/,  'private limited company (Pte. Ltd.)'],
+                [/\bltd\.?$/,          'private limited company (Ltd)'],
+                [/\blimited$/,         'private limited company (Limited)'],
+                [/\bplc\.?$/,          'public limited company (PLC)'],
+                [/\bllp$/,             'limited liability partnership (LLP)'],
+                [/\blp$/,              'limited partnership (LP)'],
+                [/\bllc\.?$/,          'limited liability company (LLC)'],
+                [/\binc\.?$/,          'corporation (Inc.)'],
+                [/\bcorp\.?$/,         'corporation (Corp.)'],
+                [/\bcorporation$/,     'corporation'],
+                [/\boü$/,              'private limited company (OÜ)'],
+                [/\bas$/,              'public limited company (AS)'],
+                [/\bmtü$/,            'non-profit association (MTÜ)'],
+                [/\bfie$/,             'sole proprietor (FIE)'],
+                [/\bgmbh\s*&?\s*co\.?\s*kg$/,  'limited partnership (GmbH & Co. KG)'],
+                [/\bgmbh$/,            'limited liability company (GmbH)'],
+                [/\bag$/,              'stock corporation (AG)'],
+                [/\bug\b.*haftungsbeschränkt/, 'entrepreneurial company (UG)'],
+                [/\bb\.?\s*v\.?$/,     'private limited company (B.V.)'],
+                [/\bn\.?\s*v\.?$/,     'public limited company (N.V.)'],
+                [/\bsarl$/,            'limited liability company (SARL)'],
+                [/\bsas$/,             'simplified joint-stock company (SAS)'],
+                [/\bs\.?\s*l\.?$/,     'limited liability company (S.L.)'],
+                [/\bs\.?\s*r\.?\s*o\.?$/, 'limited liability company (s.r.o.)'],
+                [/\ba\.?\s*s\.?$/,     'joint-stock company (a.s.)'],
+                [/\bv\.?\s*o\.?\s*s\.?$/, 'general partnership (v.o.s.)'],
+                [/\bk\.?\s*s\.?$/,     'limited partnership (k.s.)'],
+                [/\bsp\.?\s*z\.?\s*o\.?\s*o\.?$/, 'limited liability company (sp. z o.o.)'],
+                [/\buab$/,             'private limited company (UAB)'],
+                [/\bab$/,              'public limited company (AB)'],
+                [/\bfz-?llc$/,         'free zone LLC (FZ-LLC)'],
+                [/\bfze$/,             'free zone establishment (FZE)'],
+                [/\bs\.?\s*r\.?\s*l\.?$/, 'limited liability company (S.r.l.)'],
+                [/\bs\.?\s*p\.?\s*a\.?$/, 'joint-stock company (S.p.A.)'],
+                [/\bs\.?\s*a\.?$/,     'public limited company (S.A.)'],
+                [/\bpartnership$/,     'partnership'],
+                [/\btrust$/,           'trust'],
+                [/\bfoundation$/,      'foundation'],
+            ];
+            for (const [regex, type] of patterns) {
+                if (regex.test(n)) return type;
+            }
+            if (fallback && fallback !== 'Company') {
+                const map = { 'LTD': 'private limited company', 'LLC': 'limited liability company',
+                    'Corporation': 'corporation', 'Partnership': 'partnership', 'Individual': 'individual' };
+                return map[fallback] || fallback;
+            }
+            return '';
+        }
+
         // ═══════ NDA Generation ═══════
         function buildPrompt1() {
             const pA = {
                 name: document.getElementById('partyAName').value || '[Party A Name]',
-                type: document.getElementById('partyAType').value,
                 companyNumber: document.getElementById('partyACompanyNumber').value,
                 address: document.getElementById('partyAAddress').value || '[Party A Address]',
                 email: document.getElementById('partyAEmail').value,
@@ -1763,7 +1772,6 @@
             };
             const pB = {
                 name: document.getElementById('partyBName').value || '[Party B Name]',
-                type: document.getElementById('partyBType').value,
                 companyNumber: document.getElementById('partyBCompanyNumber').value,
                 address: document.getElementById('partyBAddress').value || '[Party B Address]',
                 email: document.getElementById('partyBEmail').value,
@@ -1771,178 +1779,262 @@
                 signatory: document.getElementById('partyBSignatory').value,
                 title: document.getElementById('partyBTitle').value
             };
+            pA.type = detectEntityType(pA.name, document.getElementById('partyAType').value);
+            pB.type = detectEntityType(pB.name, document.getElementById('partyBType').value);
 
             const confInfo = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ') || 'business information';
             let formattedDate = '[Date]';
             const dateVal = document.getElementById('agreementDate').value;
             if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const isMutual = document.getElementById('ndaType').value === 'Mutual';
+            const confPeriod = document.getElementById('confPeriod').value;
+            const govLaw = getGoverningLaw() || '[Governing Law Jurisdiction]';
+            const bindOthers = document.getElementById('bindOthers').value;
 
-            return `You are a senior international corporate lawyer at a top-tier law firm with 20+ years of experience drafting NDAs for Fortune 500 companies, technology firms, and cross-border transactions. Draft a comprehensive, professionally structured Non-Disclosure Agreement.
+            return `You are a senior international corporate lawyer. Draft a comprehensive, enforceable Non-Disclosure Agreement. The agreement must be internally consistent: every defined term must be defined exactly once and used identically throughout, every section cross-reference must be numerically accurate, and no provision may contradict another.
 
-PARTY A (Disclosing Party):
+═══ PARTY DETAILS ═══
+
+PARTY A:
 - Full Legal Name: ${pA.name}
-- Entity Type: ${pA.type}${pA.companyNumber ? `, Registration Number: ${pA.companyNumber}` : ''}
+- Entity Type: ${pA.type || '(determine from company name and jurisdiction)'}${pA.companyNumber ? `\n- Registration/Company Number: ${pA.companyNumber}` : ''}
 - Registered Address: ${pA.address}
-- Email: ${pA.email || 'N/A'}${pA.signatory ? `\n- Signatory: ${pA.signatory}` : ''}${pA.title ? `\n- Signatory Title: ${pA.title}` : ''}
+- Email: ${pA.email || '[Email]'}${pA.signatory ? `\n- Authorised Signatory: ${pA.signatory}` : ''}${pA.title ? `\n- Title/Position: ${pA.title}` : ''}
 
-PARTY B (Receiving Party):
+PARTY B:
 - Full Legal Name: ${pB.name}
-- Entity Type: ${pB.type}${pB.companyNumber ? `, Registration Number: ${pB.companyNumber}` : ''}
+- Entity Type: ${pB.type || '(determine from company name and jurisdiction)'}${pB.companyNumber ? `\n- Registration/Company Number: ${pB.companyNumber}` : ''}
 - Registered Address: ${pB.address}
-- Email: ${pB.email || 'N/A'}${pB.signatory ? `\n- Signatory: ${pB.signatory}` : ''}${pB.title ? `\n- Signatory Title: ${pB.title}` : ''}
-- Role: ${pB.role}
-- Bind employees/contractors: ${document.getElementById('bindOthers').value}
+- Email: ${pB.email || '[Email]'}${pB.signatory ? `\n- Authorised Signatory: ${pB.signatory}` : ''}${pB.title ? `\n- Title/Position: ${pB.title}` : ''}
 
+═══ KEY PARAMETERS ═══
+
+NDA TYPE: ${isMutual ? 'Mutual (both Parties may disclose and receive Confidential Information)' : 'Unilateral (Party A discloses, Party B receives)'}
 PURPOSE: ${getPurpose()}
-CONFIDENTIAL INFORMATION INCLUDES: ${confInfo}
-NDA TYPE: ${document.getElementById('ndaType').value}
-CONFIDENTIALITY PERIOD: ${document.getElementById('confPeriod').value} years
-GOVERNING LAW: ${getGoverningLaw() || '[To be determined]'}
+GOVERNING LAW: ${govLaw}
+CONFIDENTIALITY SURVIVAL PERIOD: ${confPeriod} year(s) after termination or expiry
 EFFECTIVE DATE: ${formattedDate}
+BIND REPRESENTATIVES: ${bindOthers}
+CONFIDENTIAL INFORMATION CATEGORIES: ${confInfo}
 
-═══ DOCUMENT STRUCTURE — FOLLOW THIS EXACT FORMAT ═══
+═══ DOCUMENT STRUCTURE ═══
 
-# ${document.getElementById('ndaType').value === 'Mutual' ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT
+# ${isMutual ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT
 
-Start with: "Effective date: **${formattedDate}**"
+**Effective Date: ${formattedDate}**
 
-Then the introductory paragraph identifying the parties:
-"This ${document.getElementById('ndaType').value === 'Mutual' ? 'Mutual ' : ''}Non-Disclosure Agreement (the **"Agreement"**) is entered into by and between:"
+Opening paragraph:
+"This ${isMutual ? 'Mutual ' : ''}Non-Disclosure Agreement (hereinafter the **"Agreement"**) is entered into as of the Effective Date by and between:"
 
-Identify Party A with full legal name in bold, entity type, registered address, then "and" then Party B the same way. Define each as a **"Party"** and collectively the **"Parties"**.
+Identify each Party with: bold legal name, entity type (e.g., "a private limited company incorporated under the laws of [jurisdiction]"), registration number if provided, registered address. Then: "hereinafter referred to as **"Party A"**" / **"Party B"**, each individually a **"Party"** and collectively the **"Parties"**.
 
-Then WHEREAS recitals:
-- First WHEREAS: explain that each Party may disclose confidential and proprietary information to evaluate or pursue the Purpose
-- Define **"Project"** and **"Purpose"**
-- Second WHEREAS: define **"Disclosing Party"** and **"Receiving Party"**
-- "NOW, THEREFORE, in consideration of the mutual covenants contained herein, the Parties agree as follows:"
+WHEREAS recitals:
+1. ${isMutual ? 'WHEREAS, each Party possesses certain confidential and proprietary information, and the Parties wish to explore and evaluate a potential business relationship' : 'WHEREAS, Party A possesses certain confidential and proprietary information and wishes to disclose such information to Party B'} for the following purpose: ${getPurpose()} (hereinafter the **"Purpose"**).
+2. WHEREAS, ${isMutual ? 'in the course of pursuing the Purpose, each Party (when disclosing Confidential Information, the **"Disclosing Party"**; when receiving Confidential Information, the **"Receiving Party"**) may disclose' : 'Party A (the **"Disclosing Party"**) wishes to disclose, and Party B (the **"Receiving Party"**) wishes to receive,'} Confidential Information solely in connection with the Purpose.
+3. WHEREAS, the Parties wish to establish the terms and conditions governing the disclosure, receipt, and protection of such Confidential Information.
 
-═══ REQUIRED SECTIONS (use this exact numbering style) ═══
+"NOW, THEREFORE, in consideration of the mutual covenants and agreements contained herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the Parties agree as follows:"
 
-## 1. Subject of Agreement.
-Use sub-clauses 1.1., 1.2. Explain parties wish to protect confidential information. Define **"Unlawful Disclosure"**.
+═══ SECTIONS — follow this exact numbering ═══
 
-## 2. Scope of Confidential Information.
-2.1. Define **"Confidential Information"** broadly — any non-public information in written, electronic, oral, tangible, or intangible form.
-2.2. Provide a DETAILED enumerated bullet list of what constitutes Confidential Information based on: ${confInfo}. Include at minimum 8-10 specific bullet items covering: legal structure/ownership, operations/trade secrets/algorithms, business plans/financials, client/customer information, investor information, other projects and contacts, business development plans, employee/contractor information, IP and licenses, security systems, any information marked "Confidential", and any other project-related information.
+## 1. Definitions and Interpretation.
+1.1. **"Confidential Information"** means all non-public information, whether in written, oral, electronic, visual, or any other form, disclosed by or on behalf of the Disclosing Party to the Receiving Party, directly or indirectly, that relates to the business, operations, finances, technology, products, services, or affairs of the Disclosing Party. Confidential Information includes information that is expressly marked or designated as confidential, as well as information that a reasonable person would understand to be confidential given the nature of the information and the circumstances of its disclosure.
+
+1.2. Without limiting the generality of the foregoing, Confidential Information includes the following categories:
+Provide a DETAILED enumerated list of at least 10 specific items based on: ${confInfo}. Cover at minimum: (a) corporate structure, ownership, and governance documents; (b) trade secrets, proprietary processes, and know-how; (c) business plans, strategies, and financial projections; (d) financial data, pricing models, and cost structures; (e) client lists, customer data, and supplier information; (f) investor information and fundraising activities; (g) employee and contractor information, compensation data; (h) intellectual property, patents, trademarks, copyrights, and licence agreements; (i) source code, algorithms, technical designs, and specifications; (j) security systems, access protocols, and cybersecurity measures; (k) marketing strategies and business development plans; (l) any information expressly marked or designated as "Confidential" or "Proprietary"; (m) any other information disclosed in connection with the Purpose.
+
+1.3. **"Unlawful Disclosure"** means any unauthorised disclosure, use, copying, reproduction, or exploitation of Confidential Information in breach of this Agreement.
+
+${bindOthers === 'Yes' ? '1.4. **"Authorised Recipients"** means the Receiving Party\'s directors, officers, employees, contractors, and professional advisors who have a legitimate need to access Confidential Information solely for the Purpose and who are bound by written confidentiality obligations no less restrictive than those contained in this Agreement.' : ''}
+
+1.${bindOthers === 'Yes' ? '5' : '4'}. **Interpretation.** In this Agreement: (a) headings are for convenience only and shall not affect interpretation; (b) "including" and similar expressions mean "including but not limited to"; (c) references to any statute or regulation include any amendments, re-enactments, or successor legislation; (d) words in the singular include the plural and vice versa; (e) references to Sections are to sections of this Agreement.
+
+## 2. Exclusions from Confidential Information.
+2.1. Information shall not constitute Confidential Information if the Receiving Party can demonstrate by documentary evidence that such information:
+(a) was in the public domain at the time of disclosure, or subsequently entered the public domain through no fault, act, or omission of the Receiving Party;
+(b) was lawfully in the Receiving Party's possession prior to disclosure by the Disclosing Party, without any obligation of confidentiality;
+(c) was independently developed by the Receiving Party without reference to or use of the Confidential Information; or
+(d) was lawfully received from a third party who was not subject to any obligation of confidentiality with respect to such information.
+
+2.2. The burden of proving any exclusion under this Section 2 rests solely with the Receiving Party. Any combination of information shall be treated as Confidential Information even if individual components are within the public domain, provided that the specific combination is not in the public domain.
 
 ## 3. Confidentiality Obligations.
-Bullet list of obligations: keep secret, not exploit except for Purpose, not disclose directly or indirectly, not copy or record except as strictly necessary, establish adequate security measures.
+3.1. The Receiving Party shall:
+(a) hold all Confidential Information in strict confidence and not disclose it to any person except as expressly permitted under this Agreement;
+(b) use the Confidential Information solely for the Purpose and for no other purpose whatsoever;
+(c) not copy, reproduce, or reduce to writing any Confidential Information except as strictly necessary for the Purpose;
+(d) apply no less a degree of care to protect the Confidential Information than it applies to protect its own confidential information of a similar nature, and in any event no less than reasonable care;
+(e) restrict access to Confidential Information to ${bindOthers === 'Yes' ? 'its Authorised Recipients' : 'its directors and officers'} who have a genuine need to know for the Purpose; and
+(f) promptly notify the Disclosing Party in writing upon becoming aware of any actual or suspected Unlawful Disclosure.
+
+${bindOthers === 'Yes' ? '3.2. Prior to granting any Authorised Recipient access to Confidential Information, the Receiving Party shall ensure that such Authorised Recipient: (a) has been informed of the confidential nature of the information; and (b) is bound by written confidentiality obligations no less restrictive than this Agreement. The Receiving Party shall remain fully liable for any breach by its Authorised Recipients as if it were a direct breach by the Receiving Party.' : '3.2. The Receiving Party shall not disclose any Confidential Information to any employee, contractor, or agent without the prior written consent of the Disclosing Party.'}
 
 ## 4. Permitted Disclosure.
-Allow disclosure to personnel/contractors/affiliates when directly required for the Purpose, with conditions: inform of confidential nature first, procure compliance equivalent to this Agreement including written agreement, Receiving Party liable for their actions.
+4.1. The Receiving Party may disclose Confidential Information to ${bindOthers === 'Yes' ? 'its Authorised Recipients' : 'its directors and officers'} solely to the extent necessary for the Purpose, subject to the obligations in Section 3.
+
+4.2. If the Receiving Party or any ${bindOthers === 'Yes' ? 'Authorised Recipient' : 'person to whom disclosure is permitted'} becomes legally compelled by any applicable law, regulation, judicial or governmental order, or proceeding to disclose any Confidential Information, the Receiving Party shall, to the extent legally permitted:
+(a) provide the Disclosing Party with prompt prior written notice of such requirement;
+(b) cooperate with the Disclosing Party in seeking a protective order or other appropriate remedy;
+(c) disclose only the minimum portion of Confidential Information that is legally required; and
+(d) use commercially reasonable efforts to obtain confidential treatment for any information so disclosed.
+
+4.3. Any disclosure made pursuant to Section 4.2 shall not relieve the Receiving Party of its obligations under this Agreement with respect to any Confidential Information not so disclosed.
 
 ## 5. Return or Destruction of Confidential Information.
-If requested by Disclosing Party — destroy/return all documents, erase from systems, erase from third-party storage where practicable, certify compliance in writing.
+5.1. Upon the earlier of: (a) written request by the Disclosing Party; or (b) termination or expiry of this Agreement, the Receiving Party shall promptly:
+(i) return to the Disclosing Party all originals and copies of Confidential Information in any form;
+(ii) permanently delete or destroy all Confidential Information stored in electronic systems, databases, or any other media under its control or the control of its ${bindOthers === 'Yes' ? 'Authorised Recipients' : 'representatives'}; and
+(iii) provide the Disclosing Party with written certification of compliance, signed by an authorised officer, confirming that all Confidential Information has been returned or destroyed.
 
-## 6. Reservation of Rights.
-Disclosing Party reserves all rights. No license granted by disclosure.
+5.2. Notwithstanding Section 5.1, the Receiving Party may retain copies of Confidential Information to the extent required by applicable law or regulation, or contained in routine electronic backup systems, provided that all retained copies shall remain subject to the confidentiality obligations of this Agreement for the duration of their retention.
 
-## 7. Non-Solicitation.
-7.1. For ${document.getElementById('confPeriod').value} year(s) from Effective Date, neither Party shall solicit employees/contractors of the other.
-7.2. Liquidated damages clause: USD $50,000 per person solicited in violation.
+## 6. Intellectual Property and Reservation of Rights.
+6.1. All Confidential Information shall remain the exclusive property of the Disclosing Party. Nothing in this Agreement shall be construed to grant the Receiving Party any licence, right, title, or interest in or to the Confidential Information or any intellectual property of the Disclosing Party.
+6.2. Neither Party shall acquire any right or licence under any patent, copyright, trademark, trade secret, or other intellectual property right of the other Party by reason of this Agreement or any disclosure hereunder.
+6.3. Nothing in this Agreement shall obligate either Party to enter into any further agreement, proceed with any transaction, or continue any business relationship.
 
-## 8. Responsibility and Remedies.
-8.1. Rights under this Agreement are in addition to rights provided by law.
-8.2. Violation may cause irreparable harm entitling injunctive relief, specific performance, and compensation of all direct damages and expenses.
+## 7. Remedies.
+7.1. The Parties acknowledge that the Confidential Information is of a special and unique character, and that any breach or threatened breach of this Agreement may cause irreparable harm to the Disclosing Party for which monetary damages alone would be an insufficient remedy.
+7.2. In the event of any breach or threatened breach, the Disclosing Party shall be entitled to seek injunctive relief, specific performance, and any other equitable remedies available under applicable law, without the requirement to post a bond or other security and without the need to prove actual damages.
+7.3. The rights and remedies provided in this Agreement are cumulative and in addition to, not in substitution for, any other rights and remedies available at law or in equity.
 
-## 9. Term and Termination.
-9.1. Termination governed by this Agreement and applicable law.
-9.2. Written notice required if either Party decides not to continue.
-9.3. Obligations survive termination for ${document.getElementById('confPeriod').value} year(s) from termination date.
+## 8. Term and Termination.
+8.1. This Agreement shall commence on the Effective Date and remain in force until terminated in accordance with this Section 8.
+8.2. Either Party may terminate this Agreement at any time by providing thirty (30) days' prior written notice to the other Party.
+8.3. Either Party may terminate this Agreement immediately upon written notice if the other Party commits a material breach of any provision of this Agreement.
+8.4. Upon termination or expiry of this Agreement, the provisions of Sections 1, 2, 3, 4.2, 5, 6, 7, and this Section 8.4 shall survive and continue in full force and effect for a period of ${confPeriod} year(s) from the date of termination or expiry.
+8.5. Termination of this Agreement shall not release either Party from any liability arising from any breach occurring prior to or upon such termination.
 
-## 10. Dispute Resolution.
-10.1. First resolve through negotiations.
-10.2. If ${getGoverningLaw() || 'not specified'} — provide appropriate dispute resolution. Include specifics about the arbitration body, seat, language, confidentiality of proceedings, and that the prevailing party is entitled to legal fees.
+## 9. Dispute Resolution.
+9.1. The Parties shall first attempt to resolve any dispute arising out of or in connection with this Agreement through good-faith negotiations for a period of thirty (30) days commencing from the date on which one Party provides the other with written notice of such dispute.
+9.2. If the dispute is not resolved within the period specified in Section 9.1, the courts of ${govLaw} shall have exclusive jurisdiction to hear and determine any such dispute. Each Party irrevocably submits to the exclusive jurisdiction of such courts and waives any objection to the laying of venue or any claim of inconvenient forum.
 
-## 11. Miscellaneous.
-11.1. **Assignment.** No assignment without consent.
-11.2. **Entire Agreement.** Supersedes all previous agreements.
-11.3. **Amendments.** Written and signed only.
-11.4. **Waiver.** No failure to exercise shall constitute waiver.
-11.5. **Severance.** Invalid provisions modified to minimum extent or deleted.
-11.6. **Counterparts.** May be executed in counterparts; electronic delivery effective.
-11.7. **Governing Law.** ${getGoverningLaw() || '[Jurisdiction]'}.
-11.8. **Effective Date.** Entered into on the date stated at the beginning.
+## 10. General Provisions.
+10.1. **Assignment.** Neither Party may assign, transfer, or delegate any of its rights or obligations under this Agreement without the prior written consent of the other Party. Any purported assignment in violation of this Section shall be null and void.
+10.2. **Entire Agreement.** This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior and contemporaneous negotiations, representations, warranties, and agreements, whether written or oral.
+10.3. **Amendments.** No amendment, modification, or supplement to this Agreement shall be valid or binding unless made in writing and signed by duly authorised representatives of both Parties.
+10.4. **Waiver.** No failure or delay by either Party in exercising any right, power, or remedy under this Agreement shall operate as a waiver thereof, nor shall any single or partial exercise preclude any further exercise of such right, power, or remedy.
+10.5. **Severability.** If any provision of this Agreement is held by a court of competent jurisdiction to be invalid, illegal, or unenforceable, such provision shall be modified to the minimum extent necessary to render it valid and enforceable, or if modification is not possible, shall be severed from this Agreement. The remaining provisions shall continue in full force and effect.
+10.6. **Counterparts.** This Agreement may be executed in any number of counterparts, each of which shall constitute an original, and all of which together shall constitute one and the same agreement. Execution and delivery by electronic means, including PDF or qualified electronic signature, shall be as valid and effective as original ink signatures.
+10.7. **Governing Law.** This Agreement shall be governed by and construed in accordance with the laws of ${govLaw}, without regard to its conflict of laws principles.
+10.8. **Notices.** All notices, requests, and other communications under this Agreement shall be in writing and shall be deemed duly given: (a) upon delivery, if delivered by hand or internationally recognised courier service; or (b) upon transmission, if sent by email to the addresses specified in the preamble of this Agreement, provided that the sender does not receive an automated non-delivery notification.
 
-End with "Signatures follow" and a signature block table:
+**IN WITNESS WHEREOF**, the Parties have executed this Agreement as of the Effective Date.
 
-| ${pA.name} | ${pB.name} |
+| **${pA.name}** | **${pB.name}** |
 |---|---|
-| ______________________ | ______________________ |
-| Full name: ${pA.signatory || '_______________'} | Full name: ${pB.signatory || '_______________'} |
+| Signature: ______________________ | Signature: ______________________ |
+| Name: ${pA.signatory || '_______________'} | Name: ${pB.signatory || '_______________'} |
 | Title: ${pA.title || '_______________'} | Title: ${pB.title || '_______________'} |
 | Email: ${pA.email || '_______________'} | Email: ${pB.email || '_______________'} |
+| Date: ______________________ | Date: ______________________ |
 
-═══ LANGUAGE AND STYLE RULES ═══
-- Professional legal English — clear, precise, enforceable
-- Bold ALL defined terms when first introduced: **"Agreement"**, **"Confidential Information"**, **"Purpose"**, **"Project"**, **"Disclosing Party"**, **"Receiving Party"**, **"Unlawful Disclosure"**
-- Use "shall" for obligations, "may" for permissions
-- Every section and sub-section must be substantive — no placeholder text
-- CRITICAL: Every sentence MUST end with a period. Every clause, sub-clause, and paragraph must be properly punctuated with a period at the end. Do NOT omit periods. Check every single sentence ends with appropriate punctuation (period, colon where needed).
-- Length: 2500-3500 words. This must be a thorough, enforceable agreement
-- Do NOT include any commentary, explanations, or text outside the agreement itself
-- Start directly with the title heading. No preamble.`;
+═══ MANDATORY QUALITY RULES ═══
+
+INTERNAL CONSISTENCY:
+- Every defined term (bold, in quotes) must be defined ONCE and used IDENTICALLY throughout. Do not introduce synonyms or variations.
+- ${isMutual ? 'MUTUAL NDA: Every obligation MUST apply symmetrically to both Parties. Use "each Party", "the Disclosing Party / the Receiving Party" construction. Do NOT create any asymmetric obligation.' : 'UNILATERAL NDA: Party A is always the Disclosing Party; Party B is always the Receiving Party. Maintain this consistently — never reverse the roles.'}
+- All cross-references must be numerically correct (e.g., "pursuant to Section 4.2", "as defined in Section 1.1").
+- The governing law in Section 10.7 MUST match the jurisdiction in Section 9.2.
+- The survival period in Section 8.4 MUST be "${confPeriod} year(s)".
+- Section 8.4 must list the exact section numbers that survive — verify they exist and are correct.
+
+ENFORCEABILITY:
+- Use objective, measurable standards: "thirty (30) days", "written notice", "documentary evidence".
+- Every obligation must identify: the obligated party, the required action, and the scope or limitation.
+- The exclusions in Section 2 must use the "demonstrate by documentary evidence" standard consistently.
+- Remedies must preserve both equitable (injunctive, specific performance) and legal (damages) relief.
+
+FORMATTING:
+- Professional legal English — formal, precise, enforceable.
+- "shall" for obligations, "may" for permissions.
+- Bold defined terms at first introduction only.
+- Every sentence ends with a period. Every sub-clause ends with a semicolon, comma, or period as grammatically appropriate.
+- Sub-clause numbering: 1.1., 1.2.; within sub-clauses: (a), (b), (c).
+- Length: 2500–3500 words.
+- Output ONLY the agreement text. No commentary, no preamble, no notes.
+- Start directly with the # title heading.`;
         }
 
         function buildPrompt2() {
             const v = id => document.getElementById(id).value;
-            return `You are a senior international corporate lawyer. Enhance the following NDA with additional protections. Output the COMPLETE updated NDA maintaining the exact same formatting, section numbering, defined terms in bold, and professional quality.
+            const confPeriod = v('confPeriod');
+            const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
+            const bindOthers = v('bindOthers');
+
+            return `You are a senior international corporate lawyer. You are given an existing NDA and a list of enhancements. Your task is to produce a COMPLETE, enhanced version of the NDA that integrates all specified enhancements while maintaining perfect internal consistency.
 
 EXISTING NDA:
 ${generatedNDAText}
 
-═══ ENHANCEMENTS TO ADD OR STRENGTHEN ═══
+═══ ENHANCEMENTS ═══
 
-1. **Residual Knowledge** (add as new Section 3A or integrate into Section 3):
-   ${v('residualKnowledge') === 'Restricted' ? 'RESTRICTED — The Receiving Party shall not use any residual knowledge (information retained in unaided memory) for competitive purposes or to develop competing products/services. This is a strict restriction.' : 'PERMITTED — Standard residual knowledge clause: nothing in this Agreement shall prevent the Receiving Party from using general knowledge, skills, and experience retained in unaided memory, provided it does not intentionally memorize Confidential Information for later use.'}
+1. **Residual Knowledge** — integrate into Section 3 (Confidentiality Obligations) as a new sub-clause:
+   ${v('residualKnowledge') === 'Restricted' ? 'RESTRICTED: Add a clause stating that the Receiving Party shall not use any residual knowledge (information retained in unaided memory without intentional memorisation) for competitive purposes, to develop competing products or services, or to the detriment of the Disclosing Party. This is a strict prohibition.' : 'PERMITTED: Add a standard residual knowledge clause stating that nothing in this Agreement shall prevent the Receiving Party from using general knowledge, skills, and experience retained in the unaided memory of its personnel, provided that the Receiving Party shall not intentionally memorise Confidential Information for the purpose of later use outside the Purpose.'}
 
-2. **Return of Materials** (strengthen Section 5):
-   Materials must be returned or destroyed within ${v('returnDays')} days of written request.
-   Written certification of destruction required: ${v('writtenCert')}.
+2. **Return of Materials** — strengthen Section 5 by specifying:
+   - All Confidential Information must be returned or destroyed within ${v('returnDays')} calendar days of written request or termination.
+   - Written certification of destruction required: ${v('writtenCert')}.
+   - Ensure the new timeframe is consistent with Section 5.1 and does not contradict Section 8.
 
-3. **Non-Solicitation** (strengthen Section 7):
-   Prohibition on soliciting: ${v('prohibitSoliciting')}
-   Duration: ${v('solicitDuration')} months from Effective Date
-   Include liquidated damages clause: USD $50,000 per employee/contractor solicited or hired in violation.
+3. **Non-Solicitation** — ${v('prohibitSoliciting') === 'Yes' ? `ADD as a new Section 7A (between current Section 7 Remedies and Section 8 Term):
+   - For a period of ${v('solicitDuration')} months from the Effective Date, neither Party shall directly or indirectly solicit, recruit, hire, or attempt to hire any employee, officer, contractor, or consultant of the other Party who has had access to Confidential Information, without the prior written consent of that Party.
+   - Include a liquidated damages clause of USD 50,000 per person solicited or hired in violation, which the Parties agree represents a reasonable pre-estimate of the loss that would be suffered.
+   - Update the survival clause (Section 8.4) to include this new section.` : 'No non-solicitation clause required. Do not add any non-solicitation provisions.'}
 
-4. **Professional Advisors** (add to Section 4 - Permitted Disclosure):
-   ${v('allowAdvisors') === 'Yes' ? 'Allow disclosure to professional advisors (lawyers, accountants, financial advisors) who are bound by professional duties of confidentiality or have signed equivalent confidentiality agreements.' : 'No disclosure to professional advisors without prior written consent of the Disclosing Party.'}
+4. **Professional Advisors** — enhance Section 4 (Permitted Disclosure):
+   ${v('allowAdvisors') === 'Yes' ? 'Add a sub-clause permitting disclosure to the Receiving Party\'s professional advisors (external legal counsel, accountants, auditors, and financial advisors) who: (a) require access solely for the Purpose or for the provision of professional advice in connection with this Agreement; and (b) are bound by professional duties of confidentiality or have executed written confidentiality agreements no less restrictive than this Agreement. The Receiving Party remains liable for any breach by such advisors.' : 'Add a sub-clause stating that disclosure to professional advisors requires the prior written consent of the Disclosing Party.'}
 
-5. **Compelled Disclosure** (add as Section 4A or integrate):
-   ${v('notifyCompelled') === 'Yes' ? 'If legally compelled to disclose, the Receiving Party must: (a) provide prompt prior written notice to the Disclosing Party, (b) cooperate with efforts to resist or narrow the disclosure, (c) disclose only the minimum information legally required, and (d) use reasonable efforts to obtain confidential treatment.' : 'Standard legal disclosure exception — disclosure permitted when required by law, regulation, or court order.'}
+5. **Compelled Disclosure** — verify and strengthen Section 4.2:
+   ${v('notifyCompelled') === 'Yes' ? 'Ensure Section 4.2 includes ALL of the following requirements: (a) prompt prior written notice to the Disclosing Party (where legally permitted); (b) cooperation with efforts to seek a protective order or limit the scope of disclosure; (c) disclosure of only the minimum portion legally required; and (d) commercially reasonable efforts to obtain confidential treatment. If any of these elements are missing, add them.' : 'Simplify Section 4.2 to a standard exception: Confidential Information may be disclosed to the extent required by applicable law, regulation, or binding order of a court or governmental authority, without any prior notice obligation.'}
 
-6. **Dispute Resolution** (rewrite Section 10):
+6. **Dispute Resolution** — rewrite Section 9:
    Method: ${v('disputeMethod')}
    ${v('disputeMethod') !== 'Courts' ? (() => {
        const key = v('arbRules');
        const inst = ARB_INSTITUTIONS[key];
        const seat = v('arbLocation') || (inst ? inst.defaultSeat : '[To be specified]');
        const lang = document.getElementById('arbLanguage').value || 'English';
-       const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
        const clauseText = inst ? inst.modelClause(seat, lang, govLaw) : '';
        return `Institution: ${inst ? inst.name : key}
    Seat/Place: ${seat}
    Language: ${lang}
 
-   USE THIS EXACT MODEL CLAUSE as the basis for Section 10 (you may adapt formatting to fit section/sub-section numbering style, but preserve ALL substantive terms verbatim):
-
+   Replace Section 9 with the following structure:
+   9.1. Good-faith negotiations for thirty (30) days.
+   ${v('disputeMethod') === 'Mediation then Arbitration' ? '9.2. If negotiations fail, mediation for a further thirty (30) days.\n   9.3.' : '9.2.'} Arbitration clause based on this model (preserve ALL substantive terms, adapt only formatting):
    "${clauseText}"
+   Ensure the governing law reference within the arbitration clause matches Section 10.7 exactly.`;
+   })() : `Keep courts-based resolution:
+   9.1. Good-faith negotiations for thirty (30) days from written notice.
+   9.2. Courts of ${govLaw} shall have exclusive jurisdiction. Parties irrevocably submit to such jurisdiction.
+   Ensure the jurisdiction matches Section 10.7 exactly.`}
 
-   ${v('disputeMethod') === 'Mediation then Arbitration' ? 'ADD a mediation step BEFORE arbitration: The Parties shall first attempt to resolve any dispute through good-faith negotiations for a period of thirty (30) days. If the dispute is not resolved, the Parties shall attempt mediation for a further thirty (30) days before commencing arbitration.' : ''}`;
-   })() : `Courts of the jurisdiction of the governing law shall have exclusive jurisdiction. The Parties irrevocably submit to the exclusive jurisdiction of the courts of ${getGoverningLaw() || '[governing law jurisdiction]'}.`}
+═══ MANDATORY RULES ═══
 
-═══ RULES ═══
-- Output the COMPLETE enhanced NDA from title to signature block
-- Maintain all existing sections and add/strengthen as specified above
-- Keep all defined terms in bold
-- Keep the same section numbering style (## 1., ## 2., etc.)
-- Maintain the signature block table at the end
-- CRITICAL: Every sentence MUST end with a period. Every clause, sub-clause, and paragraph must be properly punctuated. Do NOT omit periods.
-- Do NOT include commentary — start directly with the NDA title
-- Length should be 3000-4000 words`;
+OUTPUT: Produce the COMPLETE enhanced NDA from title to signature block. Do not omit any section.
+
+CONSISTENCY:
+- All defined terms must remain exactly as defined in the original. Do not introduce new defined terms unless required by the enhancements above.
+- ALL section cross-references must be numerically accurate after any additions or renumbering.
+- The survival clause (Section 8.4) must list ALL surviving sections by correct number, including any new sections added.
+- Governing law in Section 10.7 must match the dispute resolution jurisdiction in Section 9.
+- Confidentiality survival period must remain ${confPeriod} year(s) throughout.
+- ${v('ndaType') === 'Mutual' ? 'Maintain symmetry: all obligations apply equally to both Parties.' : 'Maintain unilateral structure: Party A = Disclosing Party, Party B = Receiving Party.'}
+
+SECTION NUMBERING:
+- If adding a new section (e.g., non-solicitation), insert it logically and renumber ALL subsequent sections. Update ALL cross-references accordingly.
+- After renumbering, verify every cross-reference in the document points to the correct section.
+
+FORMATTING:
+- Keep all defined terms in bold at first use.
+- Same numbering style: ## 1., ## 2., sub-clauses 1.1., (a), (b).
+- Every sentence ends with a period.
+- Maintain the signature block table.
+- Do NOT include any commentary or notes — output only the agreement text.
+- Start directly with the # title heading.
+- Length: 3000–4500 words.`;
         }
-
         async function safeJson(res) {
             const text = await res.text();
             try { return JSON.parse(text); }
