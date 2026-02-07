@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash NDA Generator | SBLC Business Lawyers</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F9F6F1;
+            --bg-warm: #F4F0E8;
+            --card: #FFFFFF;
+            --card-hover: #FDFCFA;
+            --border: #E5E0D5;
+            --border-light: #EDE9E0;
+            --text: #2B2926;
+            --text-secondary: #6B6560;
+            --text-muted: #9A9490;
+            --accent: #D97757;
+            --accent-hover: #C5684A;
+            --accent-soft: rgba(217, 119, 87, 0.08);
+            --accent-ring: rgba(217, 119, 87, 0.2);
+            --green: #3D9A5F;
+            --green-soft: rgba(61, 154, 95, 0.1);
+            --yellow-soft: rgba(217, 176, 87, 0.15);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── Header ─── */
+        header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .logo-area h1 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .logo-area a { text-decoration: none; color: inherit; }
+        header img { height: 22px; opacity: 0.7; transition: opacity 0.2s; }
+        header img:hover { opacity: 1; }
+
+        /* ─── Main ─── */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 24px 60px;
+        }
+
+        /* ─── Stepper ─── */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .step-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        .step-badge.active {
+            background: var(--accent);
+            color: white;
+        }
+        .step-badge.done {
+            background: var(--green-soft);
+            color: var(--green);
+        }
+        .step-badge.inactive {
+            background: var(--bg-warm);
+            color: var(--text-muted);
+            border: 1px solid var(--border-light);
+        }
+        .step-num {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .step-badge.active .step-num { background: rgba(255,255,255,0.25); color: white; }
+        .step-badge.done .step-num { background: var(--green); color: white; }
+        .step-badge.inactive .step-num { background: var(--border); color: var(--text-muted); }
+        .step-arrow { color: var(--border); font-size: 1rem; }
+        @media (max-width: 640px) { .step-label { display: none; } }
+
+        /* ─── Cards ─── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .card + .card { margin-top: 16px; }
+        /* ─── Side-by-side Party Cards ─── */
+        .parties-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        .parties-row .card { margin-top: 0; }
+        .parties-row .card .form-row {
+            grid-template-columns: 1fr;
+        }
+        .parties-row .fill-tabs {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .parties-row .fill-tab {
+            font-size: 0.7rem;
+            padding: 5px 6px;
+            gap: 3px;
+        }
+        .parties-row .fill-tab svg { width: 12px; height: 12px; }
+        @media (max-width: 860px) {
+            .parties-row { grid-template-columns: 1fr; }
+            .parties-row .card .form-row { grid-template-columns: 1fr 1fr; }
+            .parties-row .fill-tab { font-size: 0.75rem; padding: 6px 10px; gap: 5px; }
+            .parties-row .fill-tab svg { width: 14px; height: 14px; }
+        }
+        @media (max-width: 640px) {
+            .parties-row .card .form-row { grid-template-columns: 1fr; }
+        }
+        .card-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title .badge {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        /* ─── Info Banner ─── */
+        .info-banner {
+            background: var(--bg-warm);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .info-banner strong { color: var(--text); }
+
+        /* ─── Form Elements ─── */
+        .form-group { margin-bottom: 14px; }
+        .form-group:last-child { margin-bottom: 0; }
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--card);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-ring);
+        }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239A9490' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+
+        /* ─── Autofill Tabs ─── */
+        .fill-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .fill-tab {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .fill-tab:hover { background: var(--bg-warm); border-color: var(--accent); color: var(--accent); }
+        .fill-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .fill-tab svg { width: 14px; height: 14px; }
+
+        /* ─── Autocomplete ─── */
+        .autocomplete-wrap { position: relative; }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: var(--shadow-lg);
+        }
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.15s;
+        }
+        .autocomplete-item:hover { background: var(--bg-warm); }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .ac-name { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+        .ac-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .ac-tag {
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .ac-tag.code { background: var(--bg-warm); color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', monospace; }
+        .ac-tag.jurisdiction { background: #EEF2FF; color: #4F46E5; }
+        .ac-tag.status { background: var(--green-soft); color: var(--green); }
+        .ac-tag.address-ok { background: var(--green-soft); color: var(--green); }
+        .ac-tag.address-missing { background: var(--yellow-soft); color: #B8860B; }
+        .ac-tag.source { background: #FFF7ED; color: #C2410C; font-size: 0.65rem; }
+        .ac-address { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+        .ac-loading {
+            padding: 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .ac-loading .spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── Checkboxes ─── */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        @media (max-width: 640px) { .checkbox-grid { grid-template-columns: 1fr; } }
+        .checkbox-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .checkbox-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+        .checkbox-card input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            margin: 0;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-card span {
+            line-height: 1.3;
+        }
+        .checkbox-card input:checked + span { color: var(--text); font-weight: 500; }
+
+        /* ─── Buttons ─── */
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 2px 12px var(--accent-ring); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--card);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: var(--bg-warm); border-color: var(--accent); color: var(--accent); }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: color 0.2s;
+            margin-bottom: 16px;
+        }
+        .btn-back:hover { color: var(--accent); }
+
+        /* ─── NDA Output Styling ─── */
+        .nda-output-wrap {
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .nda-output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .nda-output-header h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nda-output-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ─── Generated NDA Document ─── */
+        .generated-nda {
+            background: #FFFEFA;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 40px 48px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.92rem;
+            line-height: 1.85;
+            color: #1A1A1A;
+        }
+        .generated-nda::-webkit-scrollbar { width: 6px; }
+        .generated-nda::-webkit-scrollbar-track { background: transparent; }
+        .generated-nda::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .generated-nda::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .generated-nda h1 {
+            font-family: Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 0 0 1.2em 0;
+            padding-bottom: 0.8em;
+            border-bottom: 2px solid #1A1A1A;
+        }
+        .generated-nda h2 {
+            font-family: Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin: 1.8em 0 0.6em 0;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .generated-nda h3 {
+            font-family: Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin: 1.4em 0 0.5em 0;
+        }
+        .generated-nda p {
+            margin: 0 0 0.9em 0;
+            text-align: justify;
+            hyphens: auto;
+        }
+        .generated-nda strong { font-weight: bold; }
+        .generated-nda em { font-style: italic; }
+        .generated-nda ul, .generated-nda ol {
+            margin: 0.6em 0 0.9em 1.8em;
+        }
+        .generated-nda li {
+            margin-bottom: 0.4em;
+            text-align: justify;
+        }
+        .generated-nda hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2em 0;
+        }
+        .generated-nda table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+        .generated-nda th, .generated-nda td {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+        @media (max-width: 640px) {
+            .generated-nda { padding: 24px 20px; font-size: 0.85rem; }
+        }
+
+        /* ─── Summary Output ─── */
+        .summary-content {
+            background: #FFFEFA;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 0.92rem;
+            line-height: 1.75;
+            color: var(--text);
+        }
+        .summary-content h1, .summary-content h2, .summary-content h3 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            margin: 1.2em 0 0.5em 0;
+        }
+        .summary-content h1 { font-size: 1.3rem; }
+        .summary-content h2 { font-size: 1.1rem; }
+        .summary-content p { margin-bottom: 0.8em; }
+        .summary-content ul, .summary-content ol { margin: 0.5em 0 0.8em 1.5em; }
+        .summary-content li { margin-bottom: 0.3em; }
+
+        /* ─── Loading ─── */
+        .loading-state {
+            padding: 40px;
+            text-align: center;
+        }
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 14px;
+        }
+        .loading-text { color: var(--text-secondary); font-size: 0.9rem; }
+
+        /* ─── Footer ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--card);
+            margin-top: 48px;
+        }
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        footer p, footer a { font-size: 0.8rem; color: var(--text-muted); }
+        footer a { text-decoration: none; transition: color 0.2s; }
+        footer a:hover { color: var(--accent); }
+
+        /* ─── CTA Footer ─── */
+        .cta-banner {
+            background: linear-gradient(135deg, var(--accent-soft), #FFF7ED);
+            border: 1px solid var(--accent-ring);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 24px;
+            text-align: center;
+        }
+        .cta-banner h4 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        .cta-banner p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; }
+        .cta-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .cta-links a {
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .cta-links .cta-primary { background: var(--accent); color: white; }
+        .cta-links .cta-primary:hover { background: var(--accent-hover); }
+        .cta-links .cta-secondary { background: var(--card); border: 1px solid var(--border); color: var(--text-secondary); }
+        .cta-links .cta-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        .hidden { display: none !important; }
+        .space-y > * + * { margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-inner">
+            <div class="logo-area">
+                <a href="https://sblc.com.ua" target="_blank">
+                    <h1>Flash NDA Generator</h1>
+                    <p>Generate enforceable NDAs in 30 seconds</p>
+                </a>
+            </div>
+            <a href="https://sblc.com.ua" target="_blank">
+                <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC Law Firm">
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Stepper -->
+        <div class="stepper">
+            <div id="step1-badge" class="step-badge active">
+                <span class="step-num">1</span>
+                <span class="step-label">Flash NDA</span>
+            </div>
+            <span class="step-arrow">›</span>
+            <div id="step2-badge" class="step-badge inactive">
+                <span class="step-num">+</span>
+                <span class="step-label">Enhanced</span>
+            </div>
+            <span class="step-arrow">›</span>
+            <div id="step3-badge" class="step-badge inactive">
+                <span class="step-num">+</span>
+                <span class="step-label">Summary</span>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 1: Flash NDA ═══════ -->
+        <div id="step1" class="space-y">
+            <div class="parties-row">
+            <!-- Party A -->
+            <div class="card">
+                <div class="card-title">
+                    Disclosing Party
+                    <span class="badge">Party A</span>
+                </div>
+
+                <div class="fill-tabs" id="fillTabsA">
+                    <button class="fill-tab active" onclick="setFillMode('A','search',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Search
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('A','website',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        Website
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('A','email',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Email
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('A','card',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Card
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('A','history',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        History
+                    </button>
+                </div>
+
+                <!-- Search Mode -->
+                <div id="fillA-search" class="fill-content">
+                    <div class="form-group autocomplete-wrap">
+                        <label>Search company register</label>
+                        <input type="text" id="searchA" placeholder="Type company name..." oninput="searchCompany('A', this.value)">
+                        <div id="dropdownA" class="autocomplete-dropdown hidden"></div>
+                    </div>
+                </div>
+                <!-- Website Mode -->
+                <div id="fillA-website" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="url" id="websiteA" placeholder="https://company.com" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseWebsite('A')">Fetch</button>
+                    </div>
+                </div>
+                <!-- Email Mode -->
+                <div id="fillA-email" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="email" id="emailFillA" placeholder="contact@company.com" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseEmail('A')">Fetch</button>
+                    </div>
+                </div>
+                <!-- Card Mode -->
+                <div id="fillA-card" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="file" id="cardA" accept="image/*" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseCard('A')">Scan</button>
+                    </div>
+                </div>
+                <!-- History Mode -->
+                <div id="fillA-history" class="fill-content hidden">
+                    <div class="form-group">
+                        <label>Load from history</label>
+                        <select id="historyA" onchange="loadFromHistory('A', this.value)">
+                            <option value="">Select previous entry...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Name *</label>
+                            <input type="text" id="partyAName" placeholder="Full legal name">
+                        </div>
+                        <div class="form-group">
+                            <label>Entity Type</label>
+                            <select id="partyAType">
+                                <option value="Company">Company</option>
+                                <option value="Individual">Individual</option>
+                                <option value="LLC">LLC</option>
+                                <option value="LTD">LTD</option>
+                                <option value="Corporation">Corporation</option>
+                                <option value="Partnership">Partnership</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Number</label>
+                            <input type="text" id="partyACompanyNumber" placeholder="Registration number">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="partyAEmail" placeholder="contact@company.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Registered Address *</label>
+                        <input type="text" id="partyAAddress" placeholder="Full registered address">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Signatory Name</label>
+                            <input type="text" id="partyASignatory" placeholder="Full name of signatory">
+                        </div>
+                        <div class="form-group">
+                            <label>Signatory Title</label>
+                            <input type="text" id="partyATitle" placeholder="e.g. CEO, Director, Managing Partner">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Party B -->
+            <div class="card">
+                <div class="card-title">
+                    Receiving Party
+                    <span class="badge">Party B</span>
+                </div>
+
+                <div class="fill-tabs" id="fillTabsB">
+                    <button class="fill-tab active" onclick="setFillMode('B','search',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        Search
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('B','website',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        Website
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('B','email',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Email
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('B','card',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                        Card
+                    </button>
+                    <button class="fill-tab" onclick="setFillMode('B','history',this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        History
+                    </button>
+                </div>
+
+                <div id="fillB-search" class="fill-content">
+                    <div class="form-group autocomplete-wrap">
+                        <label>Search company register</label>
+                        <input type="text" id="searchB" placeholder="Type company name..." oninput="searchCompany('B', this.value)">
+                        <div id="dropdownB" class="autocomplete-dropdown hidden"></div>
+                    </div>
+                </div>
+                <div id="fillB-website" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="url" id="websiteB" placeholder="https://company.com" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseWebsite('B')">Fetch</button>
+                    </div>
+                </div>
+                <div id="fillB-email" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="email" id="emailFillB" placeholder="contact@company.com" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseEmail('B')">Fetch</button>
+                    </div>
+                </div>
+                <div id="fillB-card" class="fill-content hidden">
+                    <div class="form-group" style="display:flex;gap:8px;">
+                        <input type="file" id="cardB" accept="image/*" style="flex:1;">
+                        <button class="btn-secondary" onclick="parseCard('B')">Scan</button>
+                    </div>
+                </div>
+                <div id="fillB-history" class="fill-content hidden">
+                    <div class="form-group">
+                        <label>Load from history</label>
+                        <select id="historyB" onchange="loadFromHistory('B', this.value)">
+                            <option value="">Select previous entry...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Name *</label>
+                            <input type="text" id="partyBName" placeholder="Full legal name">
+                        </div>
+                        <div class="form-group">
+                            <label>Entity Type</label>
+                            <select id="partyBType">
+                                <option value="Company">Company</option>
+                                <option value="Individual">Individual</option>
+                                <option value="LLC">LLC</option>
+                                <option value="LTD">LTD</option>
+                                <option value="Corporation">Corporation</option>
+                                <option value="Partnership">Partnership</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Number</label>
+                            <input type="text" id="partyBCompanyNumber" placeholder="Registration number">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="partyBEmail" placeholder="contact@company.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Registered Address *</label>
+                        <input type="text" id="partyBAddress" placeholder="Full registered address">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Signatory Name</label>
+                            <input type="text" id="partyBSignatory" placeholder="Full name of signatory">
+                        </div>
+                        <div class="form-group">
+                            <label>Signatory Title</label>
+                            <input type="text" id="partyBTitle" placeholder="e.g. CEO, Director, Managing Partner">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Counterparty Role</label>
+                        <select id="partyBRole">
+                            <option value="Contractor">Contractor</option>
+                            <option value="Investor">Investor</option>
+                            <option value="Partner">Partner</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Vendor">Vendor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            </div><!-- end parties-row -->
+
+            <!-- NDA Terms -->
+            <div class="card">
+                <div class="card-title">Agreement Terms</div>
+
+                <div class="form-group">
+                    <label>Purpose of Disclosure</label>
+                    <select id="purposeSelect" onchange="toggleCustomPurpose()">
+                        <option value="To evaluate and pursue a potential business collaboration between the Parties.">Business collaboration</option>
+                        <option value="To evaluate a potential investment opportunity between the Parties.">Investment evaluation</option>
+                        <option value="To discuss and negotiate the terms of a potential software development engagement between the Parties.">Software development engagement</option>
+                        <option value="To evaluate and negotiate a potential technology licensing arrangement between the Parties.">Technology licensing</option>
+                        <option value="To explore a potential merger, acquisition, or strategic partnership between the Parties.">M&A / Strategic partnership</option>
+                        <option value="To discuss and evaluate a potential joint venture between the Parties.">Joint venture</option>
+                        <option value="To evaluate the provision of consulting or advisory services between the Parties.">Consulting / Advisory services</option>
+                        <option value="To evaluate and negotiate a potential vendor or supplier engagement between the Parties.">Vendor / Supplier engagement</option>
+                        <option value="custom">Custom (write your own)...</option>
+                    </select>
+                    <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NDA Type</label>
+                        <select id="ndaType">
+                            <option value="Mutual">Mutual (both parties)</option>
+                            <option value="Unilateral">Unilateral (one-way)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Effective Date</label>
+                        <input type="date" id="agreementDate">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Confidentiality Period</label>
+                        <select id="confPeriod">
+                            <option value="1">1 year</option>
+                            <option value="2" selected>2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="5">5 years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bind employees/contractors?</label>
+                        <select id="bindOthers">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Governing Law</label>
+                    <select id="governingLaw" onchange="toggleCustomGoverningLaw()">
+                        <option value="">Auto-detect from addresses</option>
+                    </select>
+                    <input type="text" id="governingLawCustom" class="hidden" style="margin-top:8px;" placeholder="e.g. Laws of the Republic of Singapore" />
+                </div>
+
+                <div class="form-group">
+                    <label>Confidential Information Includes</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="business plans and strategies" checked> <span>Business plans & strategies</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="financial information" checked> <span>Financial information</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="technical data and trade secrets" checked> <span>Technical data & trade secrets</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="customer and supplier lists"> <span>Customer & supplier lists</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="source code and algorithms"> <span>Source code & algorithms</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="marketing and sales data"> <span>Marketing & sales data</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="intellectual property"> <span>Intellectual property</span></label>
+                        <label class="checkbox-card"><input type="checkbox" class="confInfo" value="personnel information"> <span>Personnel information</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate -->
+            <button class="btn-primary" onclick="generateNDA()" id="generateBtn1">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Generate Flash NDA
+            </button>
+
+            <!-- Loading State 1 -->
+            <div id="loadingState1" class="card hidden">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Drafting your NDA...</div>
+                </div>
+            </div>
+
+            <!-- Result 1 -->
+            <div id="result1" class="hidden">
+                <div class="nda-output-wrap">
+                    <div class="nda-output-header">
+                        <h3><span style="color:var(--green)">✓</span> Flash NDA Ready</h3>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedNDAText)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('ndaContent1', 'NDA.pdf')">PDF</button>
+                        </div>
+                    </div>
+                    <div id="ndaContent1" class="generated-nda"></div>
+                </div>
+
+                <div style="display:flex;gap:12px;margin-top:16px;">
+                    <button class="btn-primary" style="flex:1;" onclick="goToStep2()">
+                        Add Enhanced Protections →
+                    </button>
+                    <button class="btn-secondary" onclick="goToStep3()" style="padding:14px 20px;">
+                        Skip to Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 2: Enhanced ═══════ -->
+        <div id="step2" class="hidden space-y">
+            <button class="btn-back" onclick="backToStep1()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                Back to Flash NDA
+            </button>
+
+            <div class="info-banner">
+                <strong>Step 2:</strong> Add advanced protections to your NDA — residual knowledge, non-solicitation, arbitration, and more.
+            </div>
+
+            <div class="card">
+                <div class="card-title">Enhanced Protections</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Residual Knowledge</label>
+                        <select id="residualKnowledge">
+                            <option value="Permitted">Permitted (standard)</option>
+                            <option value="Restricted">Restricted (strict)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Return Materials Within</label>
+                        <select id="returnDays">
+                            <option value="10">10 days</option>
+                            <option value="14" selected>14 days</option>
+                            <option value="30">30 days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Written Certification Required</label>
+                        <select id="writtenCert">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Allow Professional Advisors</label>
+                        <select id="allowAdvisors">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prohibit Soliciting</label>
+                        <select id="prohibitSoliciting">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Non-Solicitation Duration</label>
+                        <select id="solicitDuration">
+                            <option value="12">12 months</option>
+                            <option value="24" selected>24 months</option>
+                            <option value="36">36 months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Notify Before Legal Disclosure</label>
+                        <select id="notifyCompelled">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dispute Resolution</label>
+                        <select id="disputeMethod" onchange="toggleArbFields()">
+                            <option value="Courts">Courts</option>
+                            <option value="Arbitration">Arbitration</option>
+                            <option value="Mediation then Arbitration">Mediation then Arbitration</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="arbFields" class="hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Arbitration Institution</label>
+                            <select id="arbRules" onchange="onArbInstitutionChange()">
+                                <option value="ICC">ICC — International Chamber of Commerce</option>
+                                <option value="LCIA">LCIA — London Court of International Arbitration</option>
+                                <option value="AAA_ICDR">AAA/ICDR — International Centre for Dispute Resolution</option>
+                                <option value="SIAC">SIAC — Singapore International Arbitration Centre</option>
+                                <option value="SCC">SCC — Stockholm Chamber of Commerce</option>
+                                <option value="DIAC">DIAC — Dubai International Arbitration Centre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Seat of Arbitration</label>
+                            <input type="text" id="arbLocation" placeholder="Auto-filled or enter manually">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 4px;">
+                        <label>Arbitration Language</label>
+                        <select id="arbLanguage">
+                            <option value="English">English</option>
+                            <option value="French">French</option>
+                            <option value="German">German</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="Arabic">Arabic</option>
+                            <option value="Russian">Russian</option>
+                        </select>
+                    </div>
+                    <div id="arbClausePreview" style="margin-top: 10px; padding: 14px 16px; background: var(--bg-alt); border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.8rem; line-height: 1.65; color: var(--text-secondary); font-family: Georgia, 'Times New Roman', serif; display: none;">
+                        <div style="font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
+                        <div id="arbClauseText"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="generateEnhancedNDA()" id="generateBtn2">
+                Generate Enhanced NDA
+            </button>
+
+            <div id="loadingState2" class="card hidden">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Enhancing your NDA with additional protections...</div>
+                </div>
+            </div>
+
+            <div id="result2" class="hidden">
+                <div class="nda-output-wrap">
+                    <div class="nda-output-header">
+                        <h3><span style="color:var(--green)">✓</span> Enhanced NDA Ready</h3>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedNDAText2)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('ndaContent2', 'NDA_Enhanced.pdf')">PDF</button>
+                        </div>
+                    </div>
+                    <div id="ndaContent2" class="generated-nda"></div>
+                </div>
+
+                <button class="btn-primary" style="margin-top:16px;" onclick="goToStep3()">
+                    Generate Plain-English Summary →
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════ STEP 3: Summary ═══════ -->
+        <div id="step3" class="hidden space-y">
+            <button class="btn-back" onclick="backToResults()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                Back
+            </button>
+
+            <div class="info-banner">
+                <strong>Step 3:</strong> Generate a friendly summary to share with the counterparty. They'll understand the key terms without legal jargon.
+            </div>
+
+            <div class="card">
+                <p style="color:var(--text-secondary);margin-bottom:14px;">
+                    This will explain the <strong id="summarySource">Flash NDA</strong> in simple terms for the other party.
+                </p>
+                <button class="btn-primary" onclick="generateSummary()" id="generateBtn3">
+                    Generate Plain-English Summary
+                </button>
+            </div>
+
+            <div id="loadingState3" class="card hidden">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Creating plain-English summary...</div>
+                </div>
+            </div>
+
+            <div id="result3" class="hidden">
+                <div class="nda-output-wrap">
+                    <div class="nda-output-header">
+                        <h3><span style="color:var(--green)">✓</span> Summary Ready</h3>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedSummaryText)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('summaryContent', 'NDA_Summary.pdf')">PDF</button>
+                        </div>
+                    </div>
+                    <div id="summaryContent" class="summary-content"></div>
+                </div>
+
+                <div class="cta-banner">
+                    <h4>🎉 Your NDA package is complete</h4>
+                    <p>Need a polished Word document or want a lawyer to review your NDA?</p>
+                    <div class="cta-links">
+                        <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
+                        <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                    </div>
+                </div>
+
+                <button class="btn-secondary" style="margin-top:16px;" onclick="backToStep1()">
+                    ← Create Another NDA
+                </button>
+            </div>
+        </div>
+
+        <!-- CTA (hidden until NDA generated) -->
+        <div id="footerCTA" class="hidden">
+            <div class="cta-banner">
+                <h4>Want a polished Word document?</h4>
+                <p>Get a professionally formatted .docx ready for signing, or have a lawyer review your NDA.</p>
+                <div class="cta-links">
+                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
+                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <p>© 2025 SBLC Law Firm. All rights reserved.</p>
+            <div style="display:flex;gap:16px;">
+                <a href="mailto:hello@sblc.com.ua">hello@sblc.com.ua</a>
+                <a href="https://sblc.com.ua" target="_blank">sblc.com.ua</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let generatedNDAText = '';
+        let generatedNDAText2 = '';
+        let generatedSummaryText = '';
+        let searchTimeout = null;
+
+        // ═══════ Save/Load Party Data ═══════
+        function savePartyData(party) {
+            const data = {
+                name: document.getElementById(`party${party}Name`).value,
+                type: document.getElementById(`party${party}Type`).value,
+                companyNumber: document.getElementById(`party${party}CompanyNumber`).value,
+                address: document.getElementById(`party${party}Address`).value,
+                email: document.getElementById(`party${party}Email`).value,
+                signatory: document.getElementById(`party${party}Signatory`).value,
+                title: document.getElementById(`party${party}Title`).value,
+            };
+            localStorage.setItem(`nda_party${party}`, JSON.stringify(data));
+        }
+        function loadPartyData(party) {
+            const saved = localStorage.getItem(`nda_party${party}`);
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.name) document.getElementById(`party${party}Name`).value = data.name;
+                if (data.type) document.getElementById(`party${party}Type`).value = data.type;
+                if (data.companyNumber) document.getElementById(`party${party}CompanyNumber`).value = data.companyNumber;
+                if (data.address) document.getElementById(`party${party}Address`).value = data.address;
+                if (data.email) document.getElementById(`party${party}Email`).value = data.email;
+                if (data.signatory) document.getElementById(`party${party}Signatory`).value = data.signatory;
+                if (data.title) document.getElementById(`party${party}Title`).value = data.title;
+            }
+        }
+        function saveToHistory(party, name, address, email, type, companyNumber, signatory, title) {
+            if (!name) return;
+            let history = JSON.parse(localStorage.getItem('nda_history') || '[]');
+            history = history.filter(h => h.name !== name);
+            history.unshift({ party, name, address, email, type, companyNumber, signatory, title, date: new Date().toISOString() });
+            history = history.slice(0, 20);
+            localStorage.setItem('nda_history', JSON.stringify(history));
+            populateHistoryDropdowns();
+        }
+        function populateHistoryDropdowns() {
+            const history = JSON.parse(localStorage.getItem('nda_history') || '[]');
+            ['A', 'B'].forEach(party => {
+                const sel = document.getElementById(`history${party}`);
+                sel.innerHTML = '<option value="">Select previous entry...</option>';
+                history.forEach((h, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = `${h.name}${h.address ? ' — ' + h.address.substring(0,30) + '...' : ''}`;
+                    sel.appendChild(opt);
+                });
+            });
+        }
+        function loadFromHistory(party, index) {
+            if (index === '') return;
+            const history = JSON.parse(localStorage.getItem('nda_history') || '[]');
+            const h = history[index];
+            if (h) {
+                document.getElementById(`party${party}Name`).value = h.name || '';
+                document.getElementById(`party${party}Type`).value = h.type || 'Company';
+                document.getElementById(`party${party}CompanyNumber`).value = h.companyNumber || '';
+                document.getElementById(`party${party}Address`).value = h.address || '';
+                document.getElementById(`party${party}Email`).value = h.email || '';
+                document.getElementById(`party${party}Signatory`).value = h.signatory || '';
+                document.getElementById(`party${party}Title`).value = h.title || '';
+            }
+        }
+
+        // ═══════ Fill Mode Tabs ═══════
+        function toggleCustomPurpose() {
+            const sel = document.getElementById('purposeSelect');
+            const custom = document.getElementById('purposeCustom');
+            if (sel.value === 'custom') {
+                custom.classList.remove('hidden');
+                custom.focus();
+            } else {
+                custom.classList.add('hidden');
+            }
+        }
+
+        function getPurpose() {
+            const sel = document.getElementById('purposeSelect');
+            if (sel.value === 'custom') {
+                return document.getElementById('purposeCustom').value || 'To evaluate and pursue a potential business relationship between the Parties.';
+            }
+            return sel.value;
+        }
+
+        function setFillMode(party, mode, btn) {
+            document.querySelectorAll(`#fillTabs${party} .fill-tab`).forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll(`[id^="fill${party}-"]`).forEach(el => el.classList.add('hidden'));
+            document.getElementById(`fill${party}-${mode}`).classList.remove('hidden');
+        }
+
+        // ═══════ Company Search ═══════
+        // ═══════ Client-side Estonia Register fallback ═══════
+        function searchCompany(party, query) {
+            const dropdown = document.getElementById(`dropdown${party}`);
+            clearTimeout(searchTimeout);
+            if (query.length < 2) { dropdown.classList.add('hidden'); return; }
+
+            dropdown.innerHTML = '<div class="ac-loading"><span class="spinner"></span>Searching registers...</div>';
+            dropdown.classList.remove('hidden');
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch('/.netlify/functions/search-company', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query })
+                    });
+                    const data = await safeJson(res);
+                    if (data.results && data.results.length > 0) {
+                        dropdown.innerHTML = data.results.map(r => `
+                            <div class="autocomplete-item" onclick='selectCompany("${party}", ${JSON.stringify(r).replace(/'/g, "&#39;")})'>
+                                <div class="ac-name">${escapeHtml(r.name)}</div>
+                                <div class="ac-meta">
+                                    ${r.companyNumber ? `<span class="ac-tag code">${escapeHtml(r.companyNumber)}</span>` : ''}
+                                    ${r.jurisdiction ? `<span class="ac-tag jurisdiction">${escapeHtml(r.jurisdiction)}</span>` : ''}
+                                    ${r.status ? `<span class="ac-tag status">${escapeHtml(r.status)}</span>` : ''}
+                                    ${r.address ? '<span class="ac-tag address-ok">Address ✓</span>' : '<span class="ac-tag address-missing">No address</span>'}
+                                    <span class="ac-tag source">${escapeHtml(r.source)}</span>
+                                </div>
+                                ${r.address ? `<div class="ac-address">${escapeHtml(r.address)}</div>` : ''}
+                            </div>
+                        `).join('');
+                    } else {
+                        dropdown.innerHTML = '<div class="ac-loading">No results found</div>';
+                    }
+                    if (data.warning) {
+                        dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(data.warning)}</div>`;
+                    }
+                } catch (e) {
+                    dropdown.innerHTML = '<div class="ac-loading">Search error. Try again.</div>';
+                }
+            }, 400);
+        }
+
+        function selectCompany(party, company) {
+            document.getElementById(`party${party}Name`).value = company.name || '';
+            document.getElementById(`party${party}CompanyNumber`).value = company.companyNumber || '';
+            document.getElementById(`party${party}Address`).value = company.address || '';
+            if (company.companyType) {
+                const typeMap = { 'ltd': 'LTD', 'private-limited-guarant-nsc': 'LTD', 'plc': 'Corporation', 'llp': 'Partnership' };
+                const mapped = typeMap[(company.companyType || '').toLowerCase()];
+                if (mapped) document.getElementById(`party${party}Type`).value = mapped;
+            }
+            document.getElementById(`dropdown${party}`).classList.add('hidden');
+            document.getElementById(`search${party}`).value = '';
+            updateGoverningLawOptions();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        // ═══════ Website / Email / Card Parsing ═══════
+        async function parseWebsite(party) {
+            const url = document.getElementById(`website${party}`).value;
+            if (!url) return alert('Enter a website URL');
+            const btn = event.target;
+            btn.textContent = 'Fetching...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/.netlify/functions/parse-company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url.startsWith('http') ? url : 'https://' + url })
+                });
+                const data = await safeJson(res);
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch');
+                if (data.name) document.getElementById(`party${party}Name`).value = data.name;
+                // Backend returns "addresses" array, take the first one
+                const addr = data.address || (Array.isArray(data.addresses) && data.addresses[0]) || '';
+                if (addr) document.getElementById(`party${party}Address`).value = addr;
+                if (data.email) document.getElementById(`party${party}Email`).value = data.email;
+                updateGoverningLawOptions();
+                if (!data.name && !addr && !data.email) {
+                    alert('Could not extract company info from this website. Try the contact page URL directly.');
+                }
+            } catch (e) { alert('Failed to parse website: ' + e.message); }
+            finally { btn.textContent = 'Fetch'; btn.disabled = false; }
+        }
+
+        async function parseEmail(party) {
+            const email = document.getElementById(`emailFill${party}`).value;
+            if (!email || !email.includes('@')) return alert('Enter a valid email');
+            const domain = email.split('@')[1];
+            document.getElementById(`party${party}Email`).value = email;
+            const btn = event.target;
+            btn.textContent = 'Fetching...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/.netlify/functions/parse-company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: `https://${domain}` })
+                });
+                const data = await safeJson(res);
+                if (data.name) document.getElementById(`party${party}Name`).value = data.name;
+                const addr = data.address || (Array.isArray(data.addresses) && data.addresses[0]) || '';
+                if (addr) document.getElementById(`party${party}Address`).value = addr;
+                updateGoverningLawOptions();
+            } catch (e) { /* silently fail */ }
+            finally { btn.textContent = 'Fetch'; btn.disabled = false; }
+        }
+
+        async function parseCard(party) {
+            const file = document.getElementById(`card${party}`).files[0];
+            if (!file) return alert('Select an image of a business card');
+            const reader = new FileReader();
+            reader.onload = async () => {
+                try {
+                    const res = await fetch('/.netlify/functions/parse-card', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: reader.result })
+                    });
+                    const data = await safeJson(res);
+                    // Card returns: { name: "Person", company: "Company", title: "CEO", email, phone, address }
+                    if (data.company) document.getElementById(`party${party}Name`).value = data.company;
+                    else if (data.name) document.getElementById(`party${party}Name`).value = data.name;
+                    if (data.address) document.getElementById(`party${party}Address`).value = data.address;
+                    if (data.email) document.getElementById(`party${party}Email`).value = data.email;
+                    if (data.name) document.getElementById(`party${party}Signatory`).value = data.name;
+                    if (data.title) document.getElementById(`party${party}Title`).value = data.title;
+                    updateGoverningLawOptions();
+                } catch (e) { alert('Failed to parse card'); }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ═══════ Governing Law ═══════
+        function getGoverningLaw() {
+            const sel = document.getElementById('governingLaw');
+            if (sel.value === 'custom') {
+                return document.getElementById('governingLawCustom').value.trim();
+            }
+            if (sel.value) return sel.value;
+            // Auto-detect from addresses
+            const addrA = document.getElementById('partyAAddress').value;
+            const addrB = document.getElementById('partyBAddress').value;
+            const combined = (addrA + ' ' + addrB).toLowerCase();
+
+            const jurisdictions = {
+                'Delaware, USA': ['delaware', 'de ', 'wilmington'],
+                'England and Wales': ['england', 'wales', 'london', 'united kingdom', ', uk', 'manchester', 'birmingham'],
+                'Scotland': ['scotland', 'edinburgh', 'glasgow'],
+                'State of New York, USA': ['new york', 'ny '],
+                'State of California, USA': ['california', 'ca ', 'san francisco', 'los angeles'],
+                'UAE Federal Law': ['dubai', 'abu dhabi', 'uae', 'emirates', 'sharjah'],
+                'DIFC Law': ['difc'],
+                'ADGM Law': ['adgm'],
+                'Republic of Estonia': ['estonia', 'tallinn', 'tartu'],
+                'Republic of Lithuania': ['lithuania', 'vilnius', 'kaunas'],
+                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw', 'warszawa'],
+                'Czech Republic': ['czech', 'prague', 'praha', 'brno'],
+                'Kingdom of Spain': ['spain', 'madrid', 'barcelona'],
+                'Hungary': ['hungary', 'budapest'],
+                'Germany': ['germany', 'berlin', 'munich', 'frankfurt', 'münchen'],
+                'France': ['france', 'paris'],
+                'Republic of Ireland': ['ireland', 'dublin'],
+                'The Netherlands': ['netherlands', 'amsterdam', 'rotterdam'],
+                'Switzerland': ['switzerland', 'zurich', 'geneva', 'zürich'],
+                'Singapore': ['singapore'],
+                'Hong Kong': ['hong kong'],
+                'Republic of El Salvador': ['el salvador', 'san salvador'],
+            };
+
+            for (const [law, keywords] of Object.entries(jurisdictions)) {
+                for (const kw of keywords) {
+                    if (combined.includes(kw)) return law;
+                }
+            }
+            return '';
+        }
+
+        function detectJurisdictionFromAddress(address) {
+            if (!address) return null;
+            const addr = address.toLowerCase();
+            const map = {
+                'England and Wales': ['england', 'wales', 'london', 'united kingdom', ', uk', 'manchester', 'birmingham'],
+                'Scotland': ['scotland', 'edinburgh', 'glasgow'],
+                'Delaware, USA': ['delaware', 'wilmington'],
+                'State of New York, USA': ['new york'],
+                'State of California, USA': ['california', 'san francisco', 'los angeles'],
+                'Republic of Estonia': ['estonia', 'tallinn', 'tartu'],
+                'Republic of Lithuania': ['lithuania', 'vilnius', 'kaunas'],
+                'Republic of Poland': ['poland', 'warsaw', 'kraków', 'krakow', 'wroclaw', 'warszawa'],
+                'Czech Republic': ['czech', 'prague', 'praha', 'brno'],
+                'Kingdom of Spain': ['spain', 'madrid', 'barcelona'],
+                'Hungary': ['hungary', 'budapest'],
+                'Germany': ['germany', 'berlin', 'munich', 'frankfurt', 'münchen'],
+                'France': ['france', 'paris'],
+                'Republic of Ireland': ['ireland', 'dublin'],
+                'The Netherlands': ['netherlands', 'amsterdam', 'rotterdam'],
+                'Switzerland': ['switzerland', 'zurich', 'geneva', 'zürich'],
+                'UAE Federal Law': ['dubai', 'abu dhabi', 'uae', 'emirates', 'sharjah'],
+                'DIFC Law': ['difc'],
+                'ADGM Law': ['adgm'],
+                'Singapore': ['singapore'],
+                'Hong Kong': ['hong kong'],
+                'Republic of El Salvador': ['el salvador', 'san salvador'],
+            };
+            for (const [law, keywords] of Object.entries(map)) {
+                for (const kw of keywords) {
+                    if (addr.includes(kw)) return law;
+                }
+            }
+            return null;
+        }
+
+        function toggleCustomGoverningLaw() {
+            const sel = document.getElementById('governingLaw');
+            const customInput = document.getElementById('governingLawCustom');
+            customInput.classList.toggle('hidden', sel.value !== 'custom');
+        }
+
+        function updateGoverningLawOptions() {
+            const sel = document.getElementById('governingLaw');
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Auto-detect from addresses</option>';
+
+            // Detect jurisdictions from party addresses
+            const addrA = document.getElementById('partyAAddress').value;
+            const addrB = document.getElementById('partyBAddress').value;
+            const jurA = detectJurisdictionFromAddress(addrA);
+            const jurB = detectJurisdictionFromAddress(addrB);
+
+            const added = new Set();
+            if (jurA) {
+                const o = document.createElement('option');
+                o.value = jurA;
+                o.textContent = jurA + ' (Party A)';
+                sel.appendChild(o);
+                added.add(jurA);
+            }
+            if (jurB && !added.has(jurB)) {
+                const o = document.createElement('option');
+                o.value = jurB;
+                o.textContent = jurB + ' (Party B)';
+                sel.appendChild(o);
+            }
+
+            // Custom option
+            const customOpt = document.createElement('option');
+            customOpt.value = 'custom';
+            customOpt.textContent = 'Custom (type your own)...';
+            sel.appendChild(customOpt);
+
+            // Restore previous selection if still valid
+            if (current) {
+                const exists = Array.from(sel.options).some(o => o.value === current);
+                if (exists) sel.value = current;
+                else sel.value = '';
+            }
+            toggleCustomGoverningLaw();
+        }
+
+        // ═══════ Step Navigation ═══════
+        function goToStep2() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('footerCTA').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function goToStep3() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('footerCTA').classList.add('hidden');
+            document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function backToStep1() {
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            if (generatedNDAText) document.getElementById('footerCTA').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function backToResults() {
+            document.getElementById('step3').classList.add('hidden');
+            if (generatedNDAText2) {
+                document.getElementById('step2').classList.remove('hidden');
+            } else {
+                document.getElementById('step1').classList.remove('hidden');
+                document.getElementById('footerCTA').classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateBadge(step) {
+            for (let i = 1; i <= 3; i++) {
+                const badge = document.getElementById(`step${i}-badge`);
+                if (i < step) {
+                    badge.className = 'step-badge done';
+                    badge.querySelector('.step-num').textContent = '✓';
+                } else if (i === step) {
+                    badge.className = 'step-badge active';
+                    badge.querySelector('.step-num').textContent = i === 1 ? '1' : '+';
+                } else {
+                    badge.className = 'step-badge inactive';
+                    badge.querySelector('.step-num').textContent = '+';
+                }
+            }
+        }
+
+        function toggleArbFields() {
+            const val = document.getElementById('disputeMethod').value;
+            const arbFields = document.getElementById('arbFields');
+            arbFields.classList.toggle('hidden', val === 'Courts');
+            if (val !== 'Courts') {
+                onArbInstitutionChange();
+            }
+        }
+
+        const ARB_INSTITUTIONS = {
+            ICC: {
+                name: 'International Chamber of Commerce (ICC)',
+                defaultSeat: 'Paris, France',
+                modelClause: (seat, lang, govLaw) =>
+                    `All disputes arising out of or in connection with this Agreement shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce by a sole arbitrator appointed in accordance with the said Rules. The seat of arbitration shall be ${seat}. The language of the arbitration shall be ${lang}. The arbitral proceedings and the award shall be kept confidential. The award shall be final and binding upon the Parties, who hereby waive any right to any form of recourse insofar as such waiver can validly be made. The prevailing Party shall be entitled to recover its reasonable legal fees and costs from the other Party.`
+            },
+            LCIA: {
+                name: 'London Court of International Arbitration (LCIA)',
+                defaultSeat: 'London, England',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration under the LCIA Rules, which Rules are deemed to be incorporated by reference into this clause. The number of arbitrators shall be one. The seat, or legal place, of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. The governing law of this Agreement shall be the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            AAA_ICDR: {
+                name: 'International Centre for Dispute Resolution (ICDR)',
+                defaultSeat: 'New York, USA',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any controversy or claim arising out of or relating to this Agreement, or the breach thereof, shall be determined by arbitration administered by the International Centre for Dispute Resolution in accordance with its International Arbitration Rules. The number of arbitrators shall be one. The place of arbitration shall be ${seat}. The arbitration shall be held, and the award shall be rendered, in ${lang}. The award rendered by the arbitrator shall be final and binding upon the Parties, and judgment on the award may be entered in any court having jurisdiction thereof. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable attorneys\' fees and costs.`
+            },
+            SIAC: {
+                name: 'Singapore International Arbitration Centre (SIAC)',
+                defaultSeat: 'Singapore',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration administered by the Singapore International Arbitration Centre ("SIAC") in accordance with the Arbitration Rules of the Singapore International Arbitration Centre ("SIAC Rules") for the time being in force, which rules are deemed to be incorporated by reference in this clause. The seat of the arbitration shall be ${seat}. The Tribunal shall consist of one arbitrator. The language of the arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            SCC: {
+                name: 'Arbitration Institute of the Stockholm Chamber of Commerce (SCC)',
+                defaultSeat: 'Stockholm, Sweden',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute, controversy or claim arising out of or in connection with this Agreement, or the breach, termination or invalidity thereof, shall be finally settled by arbitration in accordance with the Arbitration Rules of the Arbitration Institute of the Stockholm Chamber of Commerce. The arbitral tribunal shall be composed of a sole arbitrator. The seat of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. This Agreement shall be governed by the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            },
+            DIAC: {
+                name: 'Dubai International Arbitration Centre (DIAC)',
+                defaultSeat: 'Dubai, UAE',
+                modelClause: (seat, lang, govLaw) =>
+                    `Any dispute arising out of the formation, performance, interpretation, nullification, termination or invalidation of this Agreement or arising therefrom or related thereto in any manner whatsoever, shall be settled by arbitration in accordance with the Arbitration Rules of the Dubai International Arbitration Centre ("DIAC Rules"), by a sole arbitrator appointed in compliance with the DIAC Rules. The seat of arbitration shall be ${seat}. The language of arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+            }
+        };
+
+        function onArbInstitutionChange() {
+            const key = document.getElementById('arbRules').value;
+            const inst = ARB_INSTITUTIONS[key];
+            if (!inst) return;
+
+            // Auto-fill seat if empty or still a default
+            const seatInput = document.getElementById('arbLocation');
+            const allDefaults = Object.values(ARB_INSTITUTIONS).map(i => i.defaultSeat);
+            if (!seatInput.value || allDefaults.includes(seatInput.value)) {
+                seatInput.value = inst.defaultSeat;
+            }
+
+            // Update clause preview
+            updateArbClausePreview();
+        }
+
+        function updateArbClausePreview() {
+            const key = document.getElementById('arbRules').value;
+            const inst = ARB_INSTITUTIONS[key];
+            if (!inst) return;
+
+            const seat = document.getElementById('arbLocation').value || inst.defaultSeat;
+            const lang = document.getElementById('arbLanguage').value || 'English';
+            const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
+            const clause = inst.modelClause(seat, lang, govLaw);
+
+            document.getElementById('arbClauseText').textContent = clause;
+            document.getElementById('arbClausePreview').style.display = 'block';
+        }
+
+        // Update preview when seat or language changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const arbLoc = document.getElementById('arbLocation');
+            const arbLang = document.getElementById('arbLanguage');
+            if (arbLoc) arbLoc.addEventListener('input', updateArbClausePreview);
+            if (arbLang) arbLang.addEventListener('change', updateArbClausePreview);
+        });
+
+        // ═══════ NDA Generation ═══════
+        function buildPrompt1() {
+            const pA = {
+                name: document.getElementById('partyAName').value || '[Party A Name]',
+                type: document.getElementById('partyAType').value,
+                companyNumber: document.getElementById('partyACompanyNumber').value,
+                address: document.getElementById('partyAAddress').value || '[Party A Address]',
+                email: document.getElementById('partyAEmail').value,
+                signatory: document.getElementById('partyASignatory').value,
+                title: document.getElementById('partyATitle').value
+            };
+            const pB = {
+                name: document.getElementById('partyBName').value || '[Party B Name]',
+                type: document.getElementById('partyBType').value,
+                companyNumber: document.getElementById('partyBCompanyNumber').value,
+                address: document.getElementById('partyBAddress').value || '[Party B Address]',
+                email: document.getElementById('partyBEmail').value,
+                role: document.getElementById('partyBRole').value,
+                signatory: document.getElementById('partyBSignatory').value,
+                title: document.getElementById('partyBTitle').value
+            };
+
+            const confInfo = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ') || 'business information';
+            let formattedDate = '[Date]';
+            const dateVal = document.getElementById('agreementDate').value;
+            if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            return `You are a senior international corporate lawyer at a top-tier law firm with 20+ years of experience drafting NDAs for Fortune 500 companies, technology firms, and cross-border transactions. Draft a comprehensive, professionally structured Non-Disclosure Agreement.
+
+PARTY A (Disclosing Party):
+- Full Legal Name: ${pA.name}
+- Entity Type: ${pA.type}${pA.companyNumber ? `, Registration Number: ${pA.companyNumber}` : ''}
+- Registered Address: ${pA.address}
+- Email: ${pA.email || 'N/A'}${pA.signatory ? `\n- Signatory: ${pA.signatory}` : ''}${pA.title ? `\n- Signatory Title: ${pA.title}` : ''}
+
+PARTY B (Receiving Party):
+- Full Legal Name: ${pB.name}
+- Entity Type: ${pB.type}${pB.companyNumber ? `, Registration Number: ${pB.companyNumber}` : ''}
+- Registered Address: ${pB.address}
+- Email: ${pB.email || 'N/A'}${pB.signatory ? `\n- Signatory: ${pB.signatory}` : ''}${pB.title ? `\n- Signatory Title: ${pB.title}` : ''}
+- Role: ${pB.role}
+- Bind employees/contractors: ${document.getElementById('bindOthers').value}
+
+PURPOSE: ${getPurpose()}
+CONFIDENTIAL INFORMATION INCLUDES: ${confInfo}
+NDA TYPE: ${document.getElementById('ndaType').value}
+CONFIDENTIALITY PERIOD: ${document.getElementById('confPeriod').value} years
+GOVERNING LAW: ${getGoverningLaw() || '[To be determined]'}
+EFFECTIVE DATE: ${formattedDate}
+
+═══ DOCUMENT STRUCTURE — FOLLOW THIS EXACT FORMAT ═══
+
+# ${document.getElementById('ndaType').value === 'Mutual' ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT
+
+Start with: "Effective date: **${formattedDate}**"
+
+Then the introductory paragraph identifying the parties:
+"This ${document.getElementById('ndaType').value === 'Mutual' ? 'Mutual ' : ''}Non-Disclosure Agreement (the **"Agreement"**) is entered into by and between:"
+
+Identify Party A with full legal name in bold, entity type, registered address, then "and" then Party B the same way. Define each as a **"Party"** and collectively the **"Parties"**.
+
+Then WHEREAS recitals:
+- First WHEREAS: explain that each Party may disclose confidential and proprietary information to evaluate or pursue the Purpose
+- Define **"Project"** and **"Purpose"**
+- Second WHEREAS: define **"Disclosing Party"** and **"Receiving Party"**
+- "NOW, THEREFORE, in consideration of the mutual covenants contained herein, the Parties agree as follows:"
+
+═══ REQUIRED SECTIONS (use this exact numbering style) ═══
+
+## 1. Subject of Agreement.
+Use sub-clauses 1.1., 1.2. Explain parties wish to protect confidential information. Define **"Unlawful Disclosure"**.
+
+## 2. Scope of Confidential Information.
+2.1. Define **"Confidential Information"** broadly — any non-public information in written, electronic, oral, tangible, or intangible form.
+2.2. Provide a DETAILED enumerated bullet list of what constitutes Confidential Information based on: ${confInfo}. Include at minimum 8-10 specific bullet items covering: legal structure/ownership, operations/trade secrets/algorithms, business plans/financials, client/customer information, investor information, other projects and contacts, business development plans, employee/contractor information, IP and licenses, security systems, any information marked "Confidential", and any other project-related information.
+
+## 3. Confidentiality Obligations.
+Bullet list of obligations: keep secret, not exploit except for Purpose, not disclose directly or indirectly, not copy or record except as strictly necessary, establish adequate security measures.
+
+## 4. Permitted Disclosure.
+Allow disclosure to personnel/contractors/affiliates when directly required for the Purpose, with conditions: inform of confidential nature first, procure compliance equivalent to this Agreement including written agreement, Receiving Party liable for their actions.
+
+## 5. Return or Destruction of Confidential Information.
+If requested by Disclosing Party — destroy/return all documents, erase from systems, erase from third-party storage where practicable, certify compliance in writing.
+
+## 6. Reservation of Rights.
+Disclosing Party reserves all rights. No license granted by disclosure.
+
+## 7. Non-Solicitation.
+7.1. For ${document.getElementById('confPeriod').value} year(s) from Effective Date, neither Party shall solicit employees/contractors of the other.
+7.2. Liquidated damages clause: USD $50,000 per person solicited in violation.
+
+## 8. Responsibility and Remedies.
+8.1. Rights under this Agreement are in addition to rights provided by law.
+8.2. Violation may cause irreparable harm entitling injunctive relief, specific performance, and compensation of all direct damages and expenses.
+
+## 9. Term and Termination.
+9.1. Termination governed by this Agreement and applicable law.
+9.2. Written notice required if either Party decides not to continue.
+9.3. Obligations survive termination for ${document.getElementById('confPeriod').value} year(s) from termination date.
+
+## 10. Dispute Resolution.
+10.1. First resolve through negotiations.
+10.2. If ${getGoverningLaw() || 'not specified'} — provide appropriate dispute resolution. Include specifics about the arbitration body, seat, language, confidentiality of proceedings, and that the prevailing party is entitled to legal fees.
+
+## 11. Miscellaneous.
+11.1. **Assignment.** No assignment without consent.
+11.2. **Entire Agreement.** Supersedes all previous agreements.
+11.3. **Amendments.** Written and signed only.
+11.4. **Waiver.** No failure to exercise shall constitute waiver.
+11.5. **Severance.** Invalid provisions modified to minimum extent or deleted.
+11.6. **Counterparts.** May be executed in counterparts; electronic delivery effective.
+11.7. **Governing Law.** ${getGoverningLaw() || '[Jurisdiction]'}.
+11.8. **Effective Date.** Entered into on the date stated at the beginning.
+
+End with "Signatures follow" and a signature block table:
+
+| ${pA.name} | ${pB.name} |
+|---|---|
+| ______________________ | ______________________ |
+| Full name: ${pA.signatory || '_______________'} | Full name: ${pB.signatory || '_______________'} |
+| Title: ${pA.title || '_______________'} | Title: ${pB.title || '_______________'} |
+| Email: ${pA.email || '_______________'} | Email: ${pB.email || '_______________'} |
+
+═══ LANGUAGE AND STYLE RULES ═══
+- Professional legal English — clear, precise, enforceable
+- Bold ALL defined terms when first introduced: **"Agreement"**, **"Confidential Information"**, **"Purpose"**, **"Project"**, **"Disclosing Party"**, **"Receiving Party"**, **"Unlawful Disclosure"**
+- Use "shall" for obligations, "may" for permissions
+- Every section and sub-section must be substantive — no placeholder text
+- CRITICAL: Every sentence MUST end with a period. Every clause, sub-clause, and paragraph must be properly punctuated with a period at the end. Do NOT omit periods. Check every single sentence ends with appropriate punctuation (period, colon where needed).
+- Length: 2500-3500 words. This must be a thorough, enforceable agreement
+- Do NOT include any commentary, explanations, or text outside the agreement itself
+- Start directly with the title heading. No preamble.`;
+        }
+
+        function buildPrompt2() {
+            const v = id => document.getElementById(id).value;
+            return `You are a senior international corporate lawyer. Enhance the following NDA with additional protections. Output the COMPLETE updated NDA maintaining the exact same formatting, section numbering, defined terms in bold, and professional quality.
+
+EXISTING NDA:
+${generatedNDAText}
+
+═══ ENHANCEMENTS TO ADD OR STRENGTHEN ═══
+
+1. **Residual Knowledge** (add as new Section 3A or integrate into Section 3):
+   ${v('residualKnowledge') === 'Restricted' ? 'RESTRICTED — The Receiving Party shall not use any residual knowledge (information retained in unaided memory) for competitive purposes or to develop competing products/services. This is a strict restriction.' : 'PERMITTED — Standard residual knowledge clause: nothing in this Agreement shall prevent the Receiving Party from using general knowledge, skills, and experience retained in unaided memory, provided it does not intentionally memorize Confidential Information for later use.'}
+
+2. **Return of Materials** (strengthen Section 5):
+   Materials must be returned or destroyed within ${v('returnDays')} days of written request.
+   Written certification of destruction required: ${v('writtenCert')}.
+
+3. **Non-Solicitation** (strengthen Section 7):
+   Prohibition on soliciting: ${v('prohibitSoliciting')}
+   Duration: ${v('solicitDuration')} months from Effective Date
+   Include liquidated damages clause: USD $50,000 per employee/contractor solicited or hired in violation.
+
+4. **Professional Advisors** (add to Section 4 - Permitted Disclosure):
+   ${v('allowAdvisors') === 'Yes' ? 'Allow disclosure to professional advisors (lawyers, accountants, financial advisors) who are bound by professional duties of confidentiality or have signed equivalent confidentiality agreements.' : 'No disclosure to professional advisors without prior written consent of the Disclosing Party.'}
+
+5. **Compelled Disclosure** (add as Section 4A or integrate):
+   ${v('notifyCompelled') === 'Yes' ? 'If legally compelled to disclose, the Receiving Party must: (a) provide prompt prior written notice to the Disclosing Party, (b) cooperate with efforts to resist or narrow the disclosure, (c) disclose only the minimum information legally required, and (d) use reasonable efforts to obtain confidential treatment.' : 'Standard legal disclosure exception — disclosure permitted when required by law, regulation, or court order.'}
+
+6. **Dispute Resolution** (rewrite Section 10):
+   Method: ${v('disputeMethod')}
+   ${v('disputeMethod') !== 'Courts' ? (() => {
+       const key = v('arbRules');
+       const inst = ARB_INSTITUTIONS[key];
+       const seat = v('arbLocation') || (inst ? inst.defaultSeat : '[To be specified]');
+       const lang = document.getElementById('arbLanguage').value || 'English';
+       const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
+       const clauseText = inst ? inst.modelClause(seat, lang, govLaw) : '';
+       return `Institution: ${inst ? inst.name : key}
+   Seat/Place: ${seat}
+   Language: ${lang}
+
+   USE THIS EXACT MODEL CLAUSE as the basis for Section 10 (you may adapt formatting to fit section/sub-section numbering style, but preserve ALL substantive terms verbatim):
+
+   "${clauseText}"
+
+   ${v('disputeMethod') === 'Mediation then Arbitration' ? 'ADD a mediation step BEFORE arbitration: The Parties shall first attempt to resolve any dispute through good-faith negotiations for a period of thirty (30) days. If the dispute is not resolved, the Parties shall attempt mediation for a further thirty (30) days before commencing arbitration.' : ''}`;
+   })() : `Courts of the jurisdiction of the governing law shall have exclusive jurisdiction. The Parties irrevocably submit to the exclusive jurisdiction of the courts of ${getGoverningLaw() || '[governing law jurisdiction]'}.`}
+
+═══ RULES ═══
+- Output the COMPLETE enhanced NDA from title to signature block
+- Maintain all existing sections and add/strengthen as specified above
+- Keep all defined terms in bold
+- Keep the same section numbering style (## 1., ## 2., etc.)
+- Maintain the signature block table at the end
+- CRITICAL: Every sentence MUST end with a period. Every clause, sub-clause, and paragraph must be properly punctuated. Do NOT omit periods.
+- Do NOT include commentary — start directly with the NDA title
+- Length should be 3000-4000 words`;
+        }
+
+        async function safeJson(res) {
+            const text = await res.text();
+            try { return JSON.parse(text); }
+            catch (e) {
+                if (text.trim().startsWith('<')) throw new Error('Server returned an error page — the function may have timed out. Please try again.');
+                throw new Error('Invalid response from server');
+            }
+        }
+
+        // Non-streaming fallback: calls the old generate-nda function
+        async function fallbackGenerate(prompt, contentEl) {
+            if (contentEl) contentEl.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Generating (non-streaming)...</p>';
+            const res = await fetch('/.netlify/functions/generate-nda', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            const data = await safeJson(res);
+            if (!res.ok) throw new Error(data.error || 'Generation failed');
+            return data.result;
+        }
+
+        // Streaming: calls V2 function, renders text in real-time, returns full text
+        async function streamGenerate(prompt, contentEl, resultEl, loadingEl) {
+            if (resultEl) resultEl.classList.remove('hidden');
+            if (contentEl) contentEl.innerHTML = '<p style="color:var(--text-muted);font-style:italic;">Generating...</p>';
+
+            let res;
+            try {
+                res = await fetch('/api/generate-nda-stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+            } catch (fetchErr) {
+                // Network error — fall back
+                console.warn('Streaming fetch failed, falling back:', fetchErr);
+                const result = await fallbackGenerate(prompt, contentEl);
+                if (contentEl) contentEl.innerHTML = formatNDA(result);
+                if (loadingEl) loadingEl.classList.add('hidden');
+                return result;
+            }
+
+            // If response is JSON (error response) or HTML (Netlify error page)
+            const ct = res.headers.get('content-type') || '';
+
+            if (ct.includes('application/json')) {
+                // JSON error from our function
+                let data;
+                try { data = await res.json(); } catch(e) { data = {}; }
+                throw new Error(data.error || 'Generation failed');
+            }
+
+            if (!ct.includes('text/event-stream')) {
+                // Not SSE — probably HTML error page or 404. Fall back to regular function.
+                console.warn('Streaming endpoint returned non-SSE (' + ct + '), status:', res.status, '— falling back');
+                const result = await fallbackGenerate(prompt, contentEl);
+                if (contentEl) contentEl.innerHTML = formatNDA(result);
+                if (loadingEl) loadingEl.classList.add('hidden');
+                return result;
+            }
+
+            if (!res.ok) {
+                console.warn('Streaming endpoint failed with status', res.status, '— falling back');
+                const result = await fallbackGenerate(prompt, contentEl);
+                if (contentEl) contentEl.innerHTML = formatNDA(result);
+                if (loadingEl) loadingEl.classList.add('hidden');
+                return result;
+            }
+
+            // Read SSE stream
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+            let buffer = '';
+            let renderTimer = null;
+
+            function scheduleRender() {
+                if (renderTimer) return;
+                renderTimer = setTimeout(() => {
+                    renderTimer = null;
+                    if (contentEl) contentEl.innerHTML = formatNDA(fullText + '▊');
+                }, 100);
+            }
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const data = line.slice(6).trim();
+                        if (data === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.error) throw new Error(parsed.error);
+                            if (parsed.text) {
+                                fullText += parsed.text;
+                                scheduleRender();
+                            }
+                        } catch (e) {
+                            if (e.message && !e.message.includes('JSON')) throw e;
+                        }
+                    }
+                }
+            } catch (streamErr) {
+                console.error('Stream read error:', streamErr);
+                // If we got some text, use it; otherwise re-throw
+                if (!fullText) throw streamErr;
+            }
+
+            // Final render without cursor
+            if (renderTimer) clearTimeout(renderTimer);
+            if (contentEl) contentEl.innerHTML = formatNDA(fullText);
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (!fullText) throw new Error('No text was generated. Please try again.');
+            return fullText;
+        }
+
+        async function generateNDA() {
+            const prompt = buildPrompt1();
+            document.getElementById('generateBtn1').disabled = true;
+            document.getElementById('loadingState1').classList.remove('hidden');
+            document.getElementById('result1').classList.add('hidden');
+
+            try {
+                const contentEl = document.getElementById('ndaContent1');
+                const resultEl = document.getElementById('result1');
+                const loadingEl = document.getElementById('loadingState1');
+
+                generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                document.getElementById('footerCTA').classList.remove('hidden');
+                updateBadge(1);
+
+                savePartyData('A');
+                savePartyData('B');
+                saveToHistory('A', document.getElementById('partyAName').value, document.getElementById('partyAAddress').value, document.getElementById('partyAEmail').value, document.getElementById('partyAType').value, document.getElementById('partyACompanyNumber').value, document.getElementById('partyASignatory').value, document.getElementById('partyATitle').value);
+                saveToHistory('B', document.getElementById('partyBName').value, document.getElementById('partyBAddress').value, document.getElementById('partyBEmail').value, document.getElementById('partyBType').value, document.getElementById('partyBCompanyNumber').value, document.getElementById('partyBSignatory').value, document.getElementById('partyBTitle').value);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState1').classList.add('hidden');
+                document.getElementById('generateBtn1').disabled = false;
+            }
+        }
+
+        async function generateEnhancedNDA() {
+            const prompt = buildPrompt2();
+            document.getElementById('generateBtn2').disabled = true;
+            document.getElementById('loadingState2').classList.remove('hidden');
+            document.getElementById('result2').classList.add('hidden');
+
+            try {
+                const contentEl = document.getElementById('ndaContent2');
+                const resultEl = document.getElementById('result2');
+                const loadingEl = document.getElementById('loadingState2');
+
+                generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                updateBadge(2);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState2').classList.add('hidden');
+                document.getElementById('generateBtn2').disabled = false;
+            }
+        }
+
+        async function generateSummary() {
+            const nda = generatedNDAText2 || generatedNDAText;
+            const prompt = `You are a friendly legal communicator. Create a clear, professional plain-English summary of this NDA for the receiving party.
+
+${nda}
+
+REQUIREMENTS:
+- Use a friendly but professional tone
+- Structure with clear headings: "What is this agreement?", "What you're agreeing to", "What counts as confidential", "How long it lasts", "Your rights", "Key obligations"
+- Explain each section simply without legal jargon
+- Mention any specific protections or obligations (non-solicitation, return of materials, etc.)
+- End with: "**This summary is provided for convenience only and does not constitute legal advice. The NDA itself is the binding document.**"
+- Use markdown formatting for readability`;
+
+            document.getElementById('generateBtn3').disabled = true;
+            document.getElementById('loadingState3').classList.remove('hidden');
+            document.getElementById('result3').classList.add('hidden');
+
+            try {
+                const contentEl = document.getElementById('summaryContent');
+                const resultEl = document.getElementById('result3');
+                const loadingEl = document.getElementById('loadingState3');
+
+                generatedSummaryText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                updateBadge(3);
+            } catch (e) { alert('Error: ' + e.message); }
+            finally {
+                document.getElementById('loadingState3').classList.add('hidden');
+                document.getElementById('generateBtn3').disabled = false;
+            }
+        }
+
+        function formatNDA(text) {
+            marked.setOptions({ breaks: true, gfm: true });
+            return marked.parse(text);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Brief visual feedback
+                const btn = event.target;
+                const orig = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = orig, 1500);
+            });
+        }
+
+        function downloadPDF(elementId, filename) {
+            const element = document.getElementById(elementId);
+            // Temporarily remove scroll constraints so html2pdf captures full content
+            const origMaxH = element.style.maxHeight;
+            const origOverflow = element.style.overflow;
+            element.style.maxHeight = 'none';
+            element.style.overflow = 'visible';
+
+            const opt = {
+                margin: [20, 18, 20, 18],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'] }
+            };
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore scroll constraints
+                element.style.maxHeight = origMaxH;
+                element.style.overflow = origOverflow;
+            }).catch(() => {
+                element.style.maxHeight = origMaxH;
+                element.style.overflow = origOverflow;
+            });
+        }
+
+        // ═══════ Init ═══════
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('agreementDate').value = new Date().toISOString().split('T')[0];
+            loadPartyData('A');
+            loadPartyData('B');
+            populateHistoryDropdowns();
+            updateGoverningLawOptions();
+            document.getElementById('partyAAddress').addEventListener('input', updateGoverningLawOptions);
+            document.getElementById('partyBAddress').addEventListener('input', updateGoverningLawOptions);
+
+            // Close dropdowns on outside click
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.autocomplete-wrap')) {
+                    document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.add('hidden'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
