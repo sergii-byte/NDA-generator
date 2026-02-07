@@ -655,6 +655,11 @@
                 <span class="step-num">+</span>
                 <span class="step-label">Summary</span>
             </div>
+            <span class="step-arrow">›</span>
+            <div id="step4-badge" class="step-badge inactive">
+                <span class="step-num">+</span>
+                <span class="step-label">Send</span>
+            </div>
         </div>
 
         <!-- ═══════ STEP 1: Flash NDA ═══════ -->
@@ -882,13 +887,14 @@
                     <label>Purpose of Disclosure</label>
                     <select id="purposeSelect" onchange="toggleCustomPurpose()">
                         <option value="To evaluate and pursue a potential business collaboration between the Parties.">Business collaboration</option>
-                        <option value="To evaluate a potential investment opportunity between the Parties.">Investment evaluation</option>
-                        <option value="To discuss and negotiate the terms of a potential software development engagement between the Parties.">Software development engagement</option>
-                        <option value="To evaluate and negotiate a potential technology licensing arrangement between the Parties.">Technology licensing</option>
-                        <option value="To explore a potential merger, acquisition, or strategic partnership between the Parties.">M&A / Strategic partnership</option>
-                        <option value="To discuss and evaluate a potential joint venture between the Parties.">Joint venture</option>
-                        <option value="To evaluate the provision of consulting or advisory services between the Parties.">Consulting / Advisory services</option>
-                        <option value="To evaluate and negotiate a potential vendor or supplier engagement between the Parties.">Vendor / Supplier engagement</option>
+                        <option value="To evaluate a potential investment opportunity, including the review of financial, operational, and corporate information.">Investment / Due diligence</option>
+                        <option value="To explore and negotiate a potential merger, acquisition, or sale of business assets between the Parties.">M&A / Acquisition</option>
+                        <option value="To discuss and negotiate the terms of a potential software development or technology services engagement.">Software / Tech services</option>
+                        <option value="To evaluate and negotiate the provision of consulting, advisory, or professional services.">Consulting / Advisory</option>
+                        <option value="To evaluate and negotiate a potential vendor, supplier, or outsourcing engagement.">Vendor / Supplier</option>
+                        <option value="To engage an independent contractor for the provision of services requiring access to confidential business information.">Contractor engagement</option>
+                        <option value="To discuss and evaluate a potential joint venture, strategic alliance, or co-development arrangement.">Joint venture / Partnership</option>
+                        <option value="To evaluate and negotiate a potential technology licensing, white-label, or reseller arrangement.">Licensing / White-label</option>
                         <option value="custom">Custom (write your own)...</option>
                     </select>
                     <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
@@ -919,10 +925,10 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Bind employees/contractors?</label>
+                        <label>Extend obligations to staff?</label>
                         <select id="bindOthers">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
+                            <option value="Yes">Yes — bind employees, contractors, advisors</option>
+                            <option value="No">No — directors and officers only</option>
                         </select>
                     </div>
                 </div>
@@ -1131,8 +1137,21 @@
                         </select>
                     </div>
                     <div class="form-group" id="breachAmountGroup" style="display:none;">
-                        <label id="breachAmountLabel">Amount (USD)</label>
-                        <input type="text" id="breachAmount" placeholder="e.g. 50,000">
+                        <label id="breachAmountLabel">Amount</label>
+                        <div style="display:flex;gap:8px;">
+                            <select id="breachCurrency" style="flex:0 0 90px;" onchange="toggleBreachCurrency()">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="CHF">CHF</option>
+                                <option value="AED">AED</option>
+                                <option value="PLN">PLN</option>
+                                <option value="CZK">CZK</option>
+                                <option value="custom">Other</option>
+                            </select>
+                            <input type="text" id="breachCurrencyCustom" class="hidden" style="flex:0 0 70px;" placeholder="e.g. SGD">
+                            <input type="text" id="breachAmount" style="flex:1;" placeholder="e.g. 50,000">
+                        </div>
                     </div>
                 </div>
                 <div id="breachWarning" class="hidden" style="font-size:0.78rem;color:var(--accent);padding:4px 0 8px;">
@@ -1169,16 +1188,25 @@
                             <input type="text" id="arbLocation" placeholder="Auto-filled or enter manually">
                         </div>
                     </div>
-                    <div class="form-group" style="margin-top: 4px;">
-                        <label>Arbitration Language</label>
-                        <select id="arbLanguage">
-                            <option value="English">English</option>
-                            <option value="French">French</option>
-                            <option value="German">German</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="Arabic">Arabic</option>
-                            <option value="Russian">Russian</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Number of Arbitrators</label>
+                            <select id="arbCount" onchange="updateArbClausePreview()">
+                                <option value="1" selected>Sole arbitrator (default)</option>
+                                <option value="3">Three arbitrators</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Arbitration Language</label>
+                            <select id="arbLanguage">
+                                <option value="English">English</option>
+                                <option value="French">French</option>
+                                <option value="German">German</option>
+                                <option value="Spanish">Spanish</option>
+                                <option value="Arabic">Arabic</option>
+                                <option value="Russian">Russian</option>
+                            </select>
+                        </div>
                     </div>
                     <div id="arbClausePreview" style="margin-top: 10px; padding: 14px 16px; background: var(--bg-alt); border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.8rem; line-height: 1.65; color: var(--text-secondary); font-family: Georgia, 'Times New Roman', serif; display: none;">
                         <div style="font-family: var(--font-body); font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
@@ -1264,10 +1292,61 @@
                     </div>
                 </div>
 
-                <button class="btn-secondary" style="margin-top:16px;" onclick="backToStep1()">
+                <button class="btn-primary" style="margin-top:16px;" onclick="goToStep4()">
+                    Compose Cover Email →
+                </button>
+                <button class="btn-secondary" style="margin-top:8px;" onclick="backToStep1()">
                     ← Create Another NDA
                 </button>
             </div>
+        </div>
+
+        <!-- ═══════ STEP 4: Cover Email ═══════ -->
+        <div id="step4" class="hidden space-y">
+            <button class="btn-back" onclick="backToStep3()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                Back
+            </button>
+
+            <div class="info-banner">
+                <strong>Step 4:</strong> Copy this cover email to send your NDA professionally. All fields are pre-filled from your form.
+            </div>
+
+            <div class="card">
+                <div class="card-title">Cover Email</div>
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Subject</label>
+                    <input type="text" id="emailSubject" style="margin-top:4px;" />
+                </div>
+                <div>
+                    <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Email Body</label>
+                    <textarea id="emailBody" style="margin-top:4px;min-height:280px;line-height:1.7;font-family:var(--font-body);"></textarea>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button class="btn-primary" onclick="copyEmailText()" style="flex:1;">
+                        Copy Email
+                    </button>
+                    <button class="btn-secondary" onclick="openInMailClient()" style="flex:0 0 auto;">
+                        Open in Mail
+                    </button>
+                </div>
+                <div id="emailCopied" class="hidden" style="text-align:center;padding:8px;color:var(--green);font-size:0.85rem;font-weight:600;">
+                    ✓ Copied to clipboard
+                </div>
+            </div>
+
+            <div class="cta-banner">
+                <h4>🎉 Your NDA package is complete</h4>
+                <p>Need a polished Word document or want a lawyer to review your NDA?</p>
+                <div class="cta-links">
+                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
+                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                </div>
+            </div>
+
+            <button class="btn-secondary" style="margin-top:8px;" onclick="backToStep1()">
+                ← Create Another NDA
+            </button>
         </div>
 
         <!-- CTA (hidden until NDA generated) -->
@@ -1865,20 +1944,38 @@
         function goToStep3() {
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
             document.getElementById('step3').classList.remove('hidden');
             document.getElementById('footerCTA').classList.add('hidden');
             document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        function goToStep4() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
+            document.getElementById('footerCTA').classList.add('hidden');
+            buildEmailTemplate();
+            updateBadge(4);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function backToStep3() {
+            document.getElementById('step4').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         function backToStep1() {
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
             document.getElementById('step1').classList.remove('hidden');
             if (generatedNDAText) document.getElementById('footerCTA').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function backToResults() {
             document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
             if (generatedNDAText2) {
                 document.getElementById('step2').classList.remove('hidden');
             } else {
@@ -1888,8 +1985,60 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function buildEmailTemplate() {
+            const recipientName = document.getElementById('partyBSignatory').value || '[Name]';
+            const senderName = document.getElementById('partyASignatory').value || '[Your Name]';
+            const senderTitle = document.getElementById('partyATitle').value;
+            const partyAName = document.getElementById('partyAName').value || '[Your Company]';
+            const partyBName = document.getElementById('partyBName').value || '[Their Company]';
+            const purpose = getPurpose();
+            const confPeriod = document.getElementById('confPeriod').value;
+
+            // Build a short purpose phrase for the subject
+            const purposeShort = document.getElementById('purposeSelect').value === 'custom'
+                ? 'Our Discussion'
+                : document.getElementById('purposeSelect').options[document.getElementById('purposeSelect').selectedIndex].text;
+
+            const subject = `NDA for ${purposeShort} — ${partyAName} / ${partyBName}`;
+
+            const body = `Dear ${recipientName},
+
+Looking forward to our conversation regarding ${purpose.charAt(0).toLowerCase() + purpose.slice(1).replace(/\.$/, '')}. 
+
+Before we proceed with sharing any confidential information, I have attached a Non-Disclosure Agreement for your review. The agreement is straightforward — it provides standard ${confPeriod}-year confidentiality protections on what we share, with standard exclusions for publicly available information and materials already in your possession.
+
+${generatedSummaryText ? 'I have also attached a plain-English summary so you can see exactly what the agreement covers without having to parse legal language.\n\n' : ''}Please review the attached at your convenience. If you have any questions or would like to suggest any amendments, I am happy to discuss.
+
+Once you are comfortable with the terms, please countersign and return a copy at your earliest convenience so we can move forward.
+
+Best regards,
+${senderName}${senderTitle ? '\n' + senderTitle : ''}
+${partyAName}`;
+
+            document.getElementById('emailSubject').value = subject;
+            document.getElementById('emailBody').value = body;
+        }
+
+        function copyEmailText() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const full = `Subject: ${subject}\n\n${body}`;
+            navigator.clipboard.writeText(full).then(() => {
+                const msg = document.getElementById('emailCopied');
+                msg.classList.remove('hidden');
+                setTimeout(() => msg.classList.add('hidden'), 2000);
+            });
+        }
+
+        function openInMailClient() {
+            const to = document.getElementById('partyBEmail').value || '';
+            const subject = encodeURIComponent(document.getElementById('emailSubject').value);
+            const body = encodeURIComponent(document.getElementById('emailBody').value);
+            window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
+        }
+
         function updateBadge(step) {
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const badge = document.getElementById(`step${i}-badge`);
                 if (i < step) {
                     badge.className = 'step-badge done';
@@ -1918,8 +2067,16 @@
             const val = document.getElementById('breachRemedy').value;
             const show = val !== 'Damages';
             document.getElementById('breachAmountGroup').style.display = show ? '' : 'none';
-            document.getElementById('breachAmountLabel').textContent = val === 'Penalty' ? 'Penalty Amount (USD)' : 'Liquidated Damages Amount (USD)';
+            document.getElementById('breachAmountLabel').textContent = val === 'Penalty' ? 'Penalty Amount' : 'Liquidated Damages Amount';
             document.getElementById('breachWarning').classList.toggle('hidden', val !== 'Penalty');
+        }
+        function toggleBreachCurrency() {
+            const sel = document.getElementById('breachCurrency');
+            document.getElementById('breachCurrencyCustom').classList.toggle('hidden', sel.value !== 'custom');
+        }
+        function getBreachCurrency() {
+            const sel = document.getElementById('breachCurrency').value;
+            return sel === 'custom' ? (document.getElementById('breachCurrencyCustom').value || 'USD') : sel;
         }
 
         function toggleArbFields() {
@@ -1935,38 +2092,38 @@
             ICC: {
                 name: 'International Chamber of Commerce (ICC)',
                 defaultSeat: 'Paris, France',
-                modelClause: (seat, lang, govLaw) =>
-                    `All disputes arising out of or in connection with this Agreement shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce by a sole arbitrator appointed in accordance with the said Rules. The seat of arbitration shall be ${seat}. The language of the arbitration shall be ${lang}. The arbitral proceedings and the award shall be kept confidential. The award shall be final and binding upon the Parties, who hereby waive any right to any form of recourse insofar as such waiver can validly be made. The prevailing Party shall be entitled to recover its reasonable legal fees and costs from the other Party.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `All disputes arising out of or in connection with this Agreement shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce by ${numArb === '3' ? 'three arbitrators' : 'a sole arbitrator'} appointed in accordance with the said Rules. The seat of arbitration shall be ${seat}. The language of the arbitration shall be ${lang}. The arbitral proceedings and the award shall be kept confidential. The award shall be final and binding upon the Parties, who hereby waive any right to any form of recourse insofar as such waiver can validly be made. The prevailing Party shall be entitled to recover its reasonable legal fees and costs from the other Party.`
             },
             LCIA: {
                 name: 'London Court of International Arbitration (LCIA)',
                 defaultSeat: 'London, England',
-                modelClause: (seat, lang, govLaw) =>
-                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration under the LCIA Rules, which Rules are deemed to be incorporated by reference into this clause. The number of arbitrators shall be one. The seat, or legal place, of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. The governing law of this Agreement shall be the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration under the LCIA Rules, which Rules are deemed to be incorporated by reference into this clause. The number of arbitrators shall be ${numArb === '3' ? 'three' : 'one'}. The seat, or legal place, of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. The governing law of this Agreement shall be the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
             },
             AAA_ICDR: {
                 name: 'International Centre for Dispute Resolution (ICDR)',
                 defaultSeat: 'New York, USA',
-                modelClause: (seat, lang, govLaw) =>
-                    `Any controversy or claim arising out of or relating to this Agreement, or the breach thereof, shall be determined by arbitration administered by the International Centre for Dispute Resolution in accordance with its International Arbitration Rules. The number of arbitrators shall be one. The place of arbitration shall be ${seat}. The arbitration shall be held, and the award shall be rendered, in ${lang}. The award rendered by the arbitrator shall be final and binding upon the Parties, and judgment on the award may be entered in any court having jurisdiction thereof. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable attorneys\' fees and costs.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `Any controversy or claim arising out of or relating to this Agreement, or the breach thereof, shall be determined by arbitration administered by the International Centre for Dispute Resolution in accordance with its International Arbitration Rules. The number of arbitrators shall be ${numArb === '3' ? 'three' : 'one'}. The place of arbitration shall be ${seat}. The arbitration shall be held, and the award shall be rendered, in ${lang}. The award rendered by the arbitrator${numArb === '3' ? 's' : ''} shall be final and binding upon the Parties, and judgment on the award may be entered in any court having jurisdiction thereof. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable attorneys' fees and costs.`
             },
             SIAC: {
                 name: 'Singapore International Arbitration Centre (SIAC)',
                 defaultSeat: 'Singapore',
-                modelClause: (seat, lang, govLaw) =>
-                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration administered by the Singapore International Arbitration Centre ("SIAC") in accordance with the Arbitration Rules of the Singapore International Arbitration Centre ("SIAC Rules") for the time being in force, which rules are deemed to be incorporated by reference in this clause. The seat of the arbitration shall be ${seat}. The Tribunal shall consist of one arbitrator. The language of the arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `Any dispute arising out of or in connection with this Agreement, including any question regarding its existence, validity or termination, shall be referred to and finally resolved by arbitration administered by the Singapore International Arbitration Centre ("SIAC") in accordance with the Arbitration Rules of the Singapore International Arbitration Centre ("SIAC Rules") for the time being in force, which rules are deemed to be incorporated by reference in this clause. The seat of the arbitration shall be ${seat}. The Tribunal shall consist of ${numArb === '3' ? 'three arbitrators' : 'one arbitrator'}. The language of the arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
             },
             SCC: {
                 name: 'Arbitration Institute of the Stockholm Chamber of Commerce (SCC)',
                 defaultSeat: 'Stockholm, Sweden',
-                modelClause: (seat, lang, govLaw) =>
-                    `Any dispute, controversy or claim arising out of or in connection with this Agreement, or the breach, termination or invalidity thereof, shall be finally settled by arbitration in accordance with the Arbitration Rules of the Arbitration Institute of the Stockholm Chamber of Commerce. The arbitral tribunal shall be composed of a sole arbitrator. The seat of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. This Agreement shall be governed by the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `Any dispute, controversy or claim arising out of or in connection with this Agreement, or the breach, termination or invalidity thereof, shall be finally settled by arbitration in accordance with the Arbitration Rules of the Arbitration Institute of the Stockholm Chamber of Commerce. The arbitral tribunal shall be composed of ${numArb === '3' ? 'three arbitrators' : 'a sole arbitrator'}. The seat of arbitration shall be ${seat}. The language to be used in the arbitral proceedings shall be ${lang}. This Agreement shall be governed by the substantive law of ${govLaw || '[governing law jurisdiction]'}. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
             },
             DIAC: {
                 name: 'Dubai International Arbitration Centre (DIAC)',
                 defaultSeat: 'Dubai, UAE',
-                modelClause: (seat, lang, govLaw) =>
-                    `Any dispute arising out of the formation, performance, interpretation, nullification, termination or invalidation of this Agreement or arising therefrom or related thereto in any manner whatsoever, shall be settled by arbitration in accordance with the Arbitration Rules of the Dubai International Arbitration Centre ("DIAC Rules"), by a sole arbitrator appointed in compliance with the DIAC Rules. The seat of arbitration shall be ${seat}. The language of arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
+                modelClause: (seat, lang, govLaw, numArb) =>
+                    `Any dispute arising out of the formation, performance, interpretation, nullification, termination or invalidation of this Agreement or arising therefrom or related thereto in any manner whatsoever, shall be settled by arbitration in accordance with the Arbitration Rules of the Dubai International Arbitration Centre ("DIAC Rules"), by ${numArb === '3' ? 'three arbitrators' : 'a sole arbitrator'} appointed in compliance with the DIAC Rules. The seat of arbitration shall be ${seat}. The language of arbitration shall be ${lang}. The award shall be final and binding upon the Parties. The arbitral proceedings and the award shall be kept confidential. The prevailing Party shall be entitled to recover its reasonable legal fees and costs.`
             }
         };
 
@@ -1994,7 +2151,8 @@
             const seat = document.getElementById('arbLocation').value || inst.defaultSeat;
             const lang = document.getElementById('arbLanguage').value || 'English';
             const govLaw = getGoverningLaw() || '[governing law jurisdiction]';
-            const clause = inst.modelClause(seat, lang, govLaw);
+            const numArb = document.getElementById('arbCount').value || '1';
+            const clause = inst.modelClause(seat, lang, govLaw, numArb);
 
             document.getElementById('arbClauseText').textContent = clause;
             document.getElementById('arbClausePreview').style.display = 'block';
@@ -2340,10 +2498,11 @@ FORMATTING:
             // ── 8. Compensation for Breach ──
             const remedy = v('breachRemedy');
             const amount = document.getElementById('breachAmount').value;
+            const currency = getBreachCurrency();
             if (remedy !== 'Damages') {
                 enhancements.push(`${n}. **Compensation for Breach** — strengthen the Remedies section:
-   ${remedy === 'Liquidated' ? `Add a liquidated damages clause: In addition to any other remedies available under this Agreement or applicable law, the Parties agree that in the event of a breach of the confidentiality obligations, the breaching Party shall pay to the non-breaching Party liquidated damages in the amount of USD ${amount || '[amount to be specified]'} per breach, which the Parties acknowledge and agree represents a genuine pre-estimate of the loss that would be suffered and is not intended as a penalty.
-   - IMPORTANT: This must be framed as a "genuine pre-estimate of loss" (not a penalty) to be enforceable in common law jurisdictions (UK, USA, Singapore, Hong Kong, Australia).` : `Add a contractual penalty clause: In addition to any other remedies available under this Agreement or applicable law, the breaching Party shall pay to the non-breaching Party a contractual penalty in the amount of USD ${amount || '[amount to be specified]'} per breach.
+   ${remedy === 'Liquidated' ? `Add a liquidated damages clause: In addition to any other remedies available under this Agreement or applicable law, the Parties agree that in the event of a breach of the confidentiality obligations, the breaching Party shall pay to the non-breaching Party liquidated damages in the amount of ${currency} ${amount || '[amount to be specified]'} per breach, which the Parties acknowledge and agree represents a genuine pre-estimate of the loss that would be suffered and is not intended as a penalty.
+   - IMPORTANT: This must be framed as a "genuine pre-estimate of loss" (not a penalty) to be enforceable in common law jurisdictions (UK, USA, Singapore, Hong Kong, Australia).` : `Add a contractual penalty clause: In addition to any other remedies available under this Agreement or applicable law, the breaching Party shall pay to the non-breaching Party a contractual penalty in the amount of ${currency} ${amount || '[amount to be specified]'} per breach.
    - Include a note: "The Parties acknowledge that this contractual penalty is enforceable under the governing law of this Agreement."
    - IMPORTANT WARNING: Contractual penalties are enforceable in civil law jurisdictions (EU member states, Latin America, UAE, CIS countries) but are generally UNENFORCEABLE in common law jurisdictions (UK, USA, Singapore, Hong Kong, Australia). If the governing law is a common law jurisdiction, reframe this as liquidated damages instead.`}
    - The remedies clause must state that liquidated damages/penalties are IN ADDITION TO (not in substitution for) injunctive relief, specific performance, and actual damages.`);
@@ -2356,7 +2515,7 @@ FORMATTING:
                 const inst = ARB_INSTITUTIONS[key];
                 const seat = v('arbLocation') || (inst ? inst.defaultSeat : '[To be specified]');
                 const lang = document.getElementById('arbLanguage').value || 'English';
-                const clauseText = inst ? inst.modelClause(seat, lang, govLaw) : '';
+                const clauseText = inst ? inst.modelClause(seat, lang, govLaw, v('arbCount') || '1') : '';
                 return `Replace with arbitration:
    Institution: ${inst ? inst.name : key}
    Seat/Place: ${seat}
