@@ -865,8 +865,8 @@
                             <input type="text" id="partyBTitle" autocomplete="off" placeholder="e.g. CEO, Director, Managing Partner">
                         </div>
                     </div>
-                    <div class="form-group" style="border-left:3px solid var(--accent);padding-left:14px;">
-                        <label>Counterparty Role <span style="font-size:0.7rem;background:var(--accent);color:white;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;vertical-align:middle;">important</span></label>
+                    <div class="form-group">
+                        <label>Counterparty Role</label>
                         <select id="partyBRole" onchange="toggleCustomRole()">
                             <option value="Contractor">Contractor</option>
                             <option value="Employee">Employee</option>
@@ -878,6 +878,7 @@
                             <option value="custom">Write your own...</option>
                         </select>
                         <input type="text" id="partyBRoleCustom" class="hidden" style="margin-top:6px;" autocomplete="off" placeholder="e.g. Franchisee, Licensor, Co-founder">
+                        <p style="margin:6px 0 0;font-size:0.72rem;color:var(--accent);">Affects NDA obligations — choose the role that best describes Party B's relationship to you</p>
                     </div>
                 </div>
             </div>
