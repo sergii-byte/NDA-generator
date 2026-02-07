@@ -627,10 +627,10 @@
     <header>
         <div class="header-inner">
             <div class="logo-area">
-                <a href="https://sblc.com.ua" target="_blank">
+                <div>
                     <h1>Flash NDA Generator</h1>
                     <p>Generate enforceable NDAs in 30 seconds</p>
-                </a>
+                </div>
             </div>
             <a href="https://sblc.com.ua" target="_blank">
                 <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC Law Firm">
@@ -865,15 +865,19 @@
                             <input type="text" id="partyBTitle" autocomplete="off" placeholder="e.g. CEO, Director, Managing Partner">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Counterparty Role</label>
-                        <select id="partyBRole">
+                    <div class="form-group" style="border-left:3px solid var(--accent);padding-left:14px;">
+                        <label>Counterparty Role <span style="font-size:0.7rem;background:var(--accent);color:white;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;vertical-align:middle;">important</span></label>
+                        <select id="partyBRole" onchange="toggleCustomRole()">
                             <option value="Contractor">Contractor</option>
+                            <option value="Employee">Employee</option>
                             <option value="Investor">Investor</option>
                             <option value="Partner">Partner</option>
-                            <option value="Employee">Employee</option>
                             <option value="Vendor">Vendor</option>
+                            <option value="Client">Client</option>
+                            <option value="Advisor">Advisor</option>
+                            <option value="custom">Write your own...</option>
                         </select>
+                        <input type="text" id="partyBRoleCustom" class="hidden" style="margin-top:6px;" autocomplete="off" placeholder="e.g. Franchisee, Licensor, Co-founder">
                     </div>
                 </div>
             </div>
@@ -889,13 +893,13 @@
                         <option value="To evaluate and pursue a potential business collaboration between the Parties.">Business collaboration</option>
                         <option value="To evaluate a potential investment opportunity, including the review of financial, operational, and corporate information.">Investment / Due diligence</option>
                         <option value="To explore and negotiate a potential merger, acquisition, or sale of business assets between the Parties.">M&A / Acquisition</option>
+                        <option value="To discuss and evaluate a potential joint venture, strategic alliance, or co-development arrangement.">Joint venture / Partnership</option>
+                        <option value="To evaluate and negotiate a potential technology licensing, white-label, or reseller arrangement.">Licensing / White-label</option>
                         <option value="To discuss and negotiate the terms of a potential software development or technology services engagement.">Software / Tech services</option>
                         <option value="To evaluate and negotiate the provision of consulting, advisory, or professional services.">Consulting / Advisory</option>
                         <option value="To evaluate and negotiate a potential vendor, supplier, or outsourcing engagement.">Vendor / Supplier</option>
-                        <option value="To engage an independent contractor for the provision of services requiring access to confidential business information.">Contractor engagement</option>
-                        <option value="To discuss and evaluate a potential joint venture, strategic alliance, or co-development arrangement.">Joint venture / Partnership</option>
-                        <option value="To evaluate and negotiate a potential technology licensing, white-label, or reseller arrangement.">Licensing / White-label</option>
-                        <option value="custom">Custom (write your own)...</option>
+                        <option value="To engage an independent contractor or employee for the provision of services or employment requiring access to confidential business information.">Contractor / Employee engagement</option>
+                        <option value="custom">Write your own...</option>
                     </select>
                     <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
                 </div>
@@ -924,14 +928,8 @@
                             <option value="5">5 years</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Extend obligations to staff?</label>
-                        <select id="bindOthers">
-                            <option value="Yes">Yes — bind employees, contractors, advisors</option>
-                            <option value="No">No — directors and officers only</option>
-                        </select>
-                    </div>
                 </div>
+                <input type="hidden" id="bindOthers" value="Yes">
 
                 <div class="form-group">
                     <label>Governing Law</label>
@@ -953,6 +951,7 @@
                         <label class="checkbox-card"><input type="checkbox" class="confInfo" value="intellectual property"> <span>Intellectual property</span></label>
                         <label class="checkbox-card"><input type="checkbox" class="confInfo" value="personnel information"> <span>Personnel information</span></label>
                     </div>
+                    <input type="text" id="confInfoCustom" style="margin-top:8px;" autocomplete="off" placeholder="Add your own categories (e.g. medical records, proprietary formulas)...">
                 </div>
             </div>
 
@@ -981,6 +980,13 @@
                         </div>
                     </div>
                     <div id="ndaContent1" class="generated-nda"></div>
+                    <div class="nda-output-header" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;">
+                        <span></span>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedNDAText)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('ndaContent1', 'NDA.pdf')">PDF</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1236,6 +1242,13 @@
                         </div>
                     </div>
                     <div id="ndaContent2" class="generated-nda"></div>
+                    <div class="nda-output-header" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;">
+                        <span></span>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedNDAText2)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('ndaContent2', 'NDA_Enhanced.pdf')">PDF</button>
+                        </div>
+                    </div>
                 </div>
 
                 <button class="btn-primary" style="margin-top:16px;" onclick="goToStep3()">
@@ -1281,14 +1294,21 @@
                         </div>
                     </div>
                     <div id="summaryContent" class="summary-content"></div>
+                    <div class="nda-output-header" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;">
+                        <span></span>
+                        <div class="nda-output-actions">
+                            <button class="btn-secondary" onclick="copyText(generatedSummaryText)">Copy</button>
+                            <button class="btn-secondary" onclick="downloadPDF('summaryContent', 'NDA_Summary.pdf')">PDF</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="cta-banner">
                     <h4>🎉 Your NDA package is complete</h4>
                     <p>Need a polished Word document or want a lawyer to review your NDA?</p>
                     <div class="cta-links">
-                        <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                        <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                        <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
+                        <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
                     </div>
                 </div>
 
@@ -1339,8 +1359,8 @@
                 <h4>🎉 Your NDA package is complete</h4>
                 <p>Need a polished Word document or want a lawyer to review your NDA?</p>
                 <div class="cta-links">
-                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                    <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
+                    <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
                 </div>
             </div>
 
@@ -1355,8 +1375,8 @@
                 <h4>Want a polished Word document?</h4>
                 <p>Get a professionally formatted .docx ready for signing, or have a lawyer review your NDA.</p>
                 <div class="cta-links">
-                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Word%20Document%20Request" class="cta-primary">Word Document — $10</a>
-                    <a href="mailto:hello@sblc.com.ua?subject=Flash%20NDA%20—%20Legal%20Audit%20Request" class="cta-secondary">Legal Audit — $100</a>
+                    <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
+                    <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
                 </div>
             </div>
         </div>
@@ -1451,6 +1471,25 @@
             } else {
                 custom.classList.add('hidden');
             }
+        }
+
+        function toggleCustomRole() {
+            const sel = document.getElementById('partyBRole');
+            const custom = document.getElementById('partyBRoleCustom');
+            if (sel.value === 'custom') {
+                custom.classList.remove('hidden');
+                custom.focus();
+            } else {
+                custom.classList.add('hidden');
+            }
+        }
+
+        function getPartyBRole() {
+            const sel = document.getElementById('partyBRole');
+            if (sel.value === 'custom') {
+                return document.getElementById('partyBRoleCustom').value || 'Counterparty';
+            }
+            return sel.value;
         }
 
         function getPurpose() {
@@ -2236,14 +2275,16 @@ ${partyAName}`;
                 companyNumber: document.getElementById('partyBCompanyNumber').value,
                 address: document.getElementById('partyBAddress').value || '[Party B Address]',
                 email: document.getElementById('partyBEmail').value,
-                role: document.getElementById('partyBRole').value,
+                role: getPartyBRole(),
                 signatory: document.getElementById('partyBSignatory').value,
                 title: document.getElementById('partyBTitle').value
             };
             pA.type = detectEntityType(pA.name, document.getElementById('partyAType').value);
             pB.type = detectEntityType(pB.name, document.getElementById('partyBType').value);
 
-            const confInfo = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ') || 'business information';
+            const confInfoChecked = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ');
+            const confInfoCustom = document.getElementById('confInfoCustom').value.trim();
+            const confInfo = [confInfoChecked, confInfoCustom].filter(Boolean).join(', ') || 'business information';
             let formattedDate = '[Date]';
             const dateVal = document.getElementById('agreementDate').value;
             if (dateVal) formattedDate = new Date(dateVal).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
