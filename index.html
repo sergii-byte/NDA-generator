@@ -1328,44 +1328,15 @@
         }
 
         // ═══════ Company Search ═══════
-        // Client-side Estonia search (browser bypasses Cloudflare)
-        // + Server-side UK, Czech, OpenCorporates via Netlify function
-        async function searchEstoniaClient(query) {
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 5000);
-                const res = await fetch(`https://ariregister.rik.ee/est/api/autocomplete?q=${encodeURIComponent(query)}`, {
-                    signal: controller.signal,
-                });
-                clearTimeout(timeout);
-                if (!res.ok) return [];
-                const ct = res.headers.get('content-type') || '';
-                if (ct.includes('text/html')) return [];
-                const text = await res.text();
-                if (!text.trim().startsWith('[')) return [];
-                const data = JSON.parse(text);
-                if (!Array.isArray(data)) return [];
-                const statusMap = { 'R': 'Registered', 'Registrisse kantud': 'Registered', 'K': 'Deleted', 'L': 'In liquidation' };
-                return data.map(c => {
-                    let address = c.legal_address || null;
-                    if (address && c.zip_code) address = `${address}, ${c.zip_code}`;
-                    if (address && !address.toLowerCase().includes('estonia')) address = `${address}, Estonia`;
-                    const regCode = String(c.reg_code || '');
-                    return {
-                        source: 'Estonia e-Business Register',
-                        name: c.name || c.nimi,
-                        jurisdiction: 'EE',
-                        address,
-                        status: statusMap[c.status] || c.status || 'Active',
-                        companyNumber: regCode,
-                        companyType: null,
-                        url: `https://ariregister.rik.ee/eng/company/${regCode}`,
-                    };
-                }).filter(r => r.name && r.companyNumber);
-            } catch (e) {
-                return []; // CORS blocked or timeout — silent fail
-            }
-        }
+        // Server-side: UK Companies House, Czech ARES, OpenCorporates
+        // Manual links: Estonia, Lithuania, Poland (no free server API available)
+        const REGISTER_LINKS = [
+            { name: 'Estonia 🇪🇪', url: 'https://ariregister.rik.ee/eng/company_search' },
+            { name: 'Lithuania 🇱🇹', url: 'https://www.registrucentras.lt/jar/p_en/' },
+            { name: 'Poland 🇵🇱', url: 'https://wyszukiwarka-krs.ms.gov.pl/' },
+            { name: 'Singapore 🇸🇬', url: 'https://www.acra.gov.sg/how-to-guides/before-you-start/check-company-name' },
+            { name: 'USA 🇺🇸', url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany' },
+        ];
 
         function searchCompany(party, query) {
             const dropdown = document.getElementById(`dropdown${party}`);
@@ -1377,37 +1348,16 @@
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    // Run server search + client-side Estonia in parallel
-                    const [serverRes, eeResults] = await Promise.all([
-                        fetch('/.netlify/functions/search-company', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ query })
-                        }).then(r => safeJson(r)).catch(() => ({ results: [] })),
-                        searchEstoniaClient(query),
-                    ]);
-
-                    // Merge: server results + client-side Estonia, deduplicate
-                    const serverResults = (serverRes.results || []);
-                    const allResults = [...serverResults];
-                    const seenKeys = new Set(serverResults.map(r => `${r.companyNumber}-${(r.jurisdiction||'').toLowerCase()}`));
-                    eeResults.forEach(r => {
-                        const key = `${r.companyNumber}-ee`;
-                        if (!seenKeys.has(key)) {
-                            seenKeys.add(key);
-                            allResults.push(r);
-                        }
+                    const res = await fetch('/.netlify/functions/search-company', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query })
                     });
+                    const data = await safeJson(res);
+                    const results = data.results || [];
 
-                    // Sort: direct registers first
-                    allResults.sort((a, b) => {
-                        const aScore = a.source?.includes('OpenCorporates') ? 1 : 0;
-                        const bScore = b.source?.includes('OpenCorporates') ? 1 : 0;
-                        return aScore - bScore;
-                    });
-
-                    if (allResults.length > 0) {
-                        dropdown.innerHTML = allResults.map(r => `
+                    if (results.length > 0) {
+                        dropdown.innerHTML = results.map(r => `
                             <div class="autocomplete-item" onclick='selectCompany("${party}", ${JSON.stringify(r).replace(/'/g, "&#39;")})'>
                                 <div class="ac-name">${escapeHtml(r.name)}</div>
                                 <div class="ac-meta">
@@ -1423,8 +1373,15 @@
                     } else {
                         dropdown.innerHTML = '<div class="ac-loading">No results found</div>';
                     }
-                    if (serverRes.warning) {
-                        dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(serverRes.warning)}</div>`;
+
+                    // Always show manual register links at bottom
+                    const linksHtml = REGISTER_LINKS.map(r =>
+                        `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:0.8rem;white-space:nowrap;">${r.name}</a>`
+                    ).join(' · ');
+                    dropdown.innerHTML += `<div style="padding:8px 12px;border-top:1px solid var(--border);font-size:0.78rem;color:var(--text-muted);">Search manually: ${linksHtml}</div>`;
+
+                    if (data.warning) {
+                        dropdown.innerHTML += `<div class="ac-loading" style="font-size:0.75rem;color:var(--text-muted);">${escapeHtml(data.warning)}</div>`;
                     }
                 } catch (e) {
                     dropdown.innerHTML = '<div class="ac-loading">Search error. Try again.</div>';
