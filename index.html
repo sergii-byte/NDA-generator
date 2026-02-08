@@ -245,11 +245,200 @@
             color: var(--text-muted);
             letter-spacing: 0;
         }
+
+        /* ─── Checklist ─── */
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.82rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            margin-bottom: 0;
+        }
+        .checklist-item:hover { background: var(--bg-warm); }
+        .checklist-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            accent-color: var(--green);
+            cursor: pointer;
+        }
+        .checklist-item:has(input:checked) span {
+            color: var(--text-muted);
+            text-decoration: line-through;
+            text-decoration-color: var(--border);
+        }
+        .checklist-item strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .checklist-item:has(input:checked) strong {
+            color: var(--text-muted);
+        }
+
+        /* ─── NDA Strength Meter ─── */
+        .strength-meter {
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            margin-top: 16px;
+        }
+        .strength-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .strength-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .strength-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 6px;
+        }
+        .strength-bar-bg {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-light);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .strength-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease, background 0.4s ease;
+        }
+        .strength-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+        .strength-breakdown {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .strength-tag {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .strength-tag.active {
+            background: var(--green-soft);
+            color: var(--green);
+        }
+        .strength-tag.inactive {
+            background: var(--bg-warm);
+            color: var(--text-muted);
+        }
+
+        .confidence-section {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-light);
+        }
+        .confidence-note {
+            font-size: 0.75rem;
+            line-height: 1.45;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .confidence-note a {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* ─── AI Disclaimer ─── */
+        .ai-disclaimer {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            background: #FFF8F0;
+            border: 1px solid #F0DCC8;
+            color: #8B6914;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            margin-top: 16px;
+        }
+        .ai-disclaimer strong { color: #7A5A0A; }
+        .ai-disclaimer a.disclaimer-cta {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
         .field-hint {
             font-size: 0.72rem;
             color: var(--text-muted);
             line-height: 1.35;
             margin-top: 4px;
+        }
+        /* Collapsible hint with ⓘ toggle */
+        .hint-wrap {
+            margin-top: 5px;
+        }
+        .hint-wrap summary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-warm);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            list-style: none;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .hint-wrap summary::-webkit-details-marker { display: none; }
+        .hint-wrap summary:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .hint-wrap[open] summary {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .hint-wrap .field-hint {
+            margin-top: 6px;
+            animation: hintFade 0.15s ease;
+        }
+        @keyframes hintFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         label {
             display: block;
@@ -943,7 +1132,7 @@
                             <option value="custom">Write your own...</option>
                         </select>
                         <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
-                        <p class="field-hint">Defines the scope of permitted use. Confidential information may only be used in connection with this stated purpose — anything outside it is a breach.</p>
+                        <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">The purpose clause is the legal boundary of your NDA. Confidential information may <strong>only</strong> be used in connection with this stated purpose — any use outside it (e.g. sharing with a competitor, using for an unrelated project) is a breach. Choose the option that most closely matches your deal. If your situation is unusual, use "Write your own" to describe the specific transaction. A well-drafted purpose also helps courts determine the NDA's enforceability if challenged.</p></details>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -952,12 +1141,12 @@
                                 <option value="Mutual">Mutual (both parties)</option>
                                 <option value="Unilateral">Unilateral (one-way)</option>
                             </select>
-                            <p class="field-hint">Mutual — both parties disclose and receive. Unilateral — only Party A discloses, Party B receives.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint"><strong>Mutual</strong> — both parties disclose and receive confidential information, and both are bound by the same obligations. This is the most common type for partnerships, JVs, and business collaborations. <strong>Unilateral</strong> — only Party A discloses, Party B receives and is bound. Typical for investor due diligence, contractor engagements, or when only one side shares sensitive data. When in doubt, choose Mutual — it's more balanced and easier to negotiate.</p></details>
                         </div>
                         <div class="form-group">
                             <label>Effective Date</label>
                             <input type="date" id="agreementDate">
-                            <p class="field-hint">When the NDA takes effect. Can be backdated to cover discussions that already took place.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">The date when NDA obligations begin. If parties have already exchanged confidential information before signing, you can <strong>backdate</strong> the effective date to cover those prior discussions — this is standard practice and perfectly legal. If left blank, defaults to today's date. For future deals where no information has been shared yet, use today or the expected signing date.</p></details>
                         </div>
                     </div>
                     <div class="form-row">
@@ -969,7 +1158,7 @@
                                 <option value="3">3 years</option>
                                 <option value="5">5 years</option>
                             </select>
-                            <p class="field-hint">How long confidentiality obligations survive after the NDA ends. 2 years is standard; 5 years for trade secrets or IP-heavy deals.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">How long confidentiality obligations survive after the NDA terminates or expires. <strong>1 year</strong> — short-term collaborations, low-sensitivity info. <strong>2 years</strong> — industry standard for most commercial deals. <strong>3 years</strong> — recommended for technology, IP licensing, and M&A. <strong>5 years</strong> — trade secrets, source code, proprietary algorithms. Note: some jurisdictions allow perpetual protection for trade secrets regardless of the stated period, but a defined term is safer for enforcement.</p></details>
                         </div>
                         <div class="form-group">
                             <label>Governing Law</label>
@@ -977,14 +1166,14 @@
                                 <option value="partyA">Party A jurisdiction (default)</option>
                             </select>
                             <input type="text" id="governingLawCustom" class="hidden" style="margin-top:8px;" placeholder="e.g. Laws of the Republic of Singapore" />
-                            <p class="field-hint">Which country's laws apply to interpret and enforce the NDA. Defaults to Party A's jurisdiction of incorporation.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Determines which country's laws govern the interpretation and enforcement of this NDA. Defaults to Party A's jurisdiction of incorporation. In cross-border deals, the disclosing party typically insists on their home jurisdiction. Consider choosing a jurisdiction with strong contract enforcement and a well-developed commercial law system (e.g. England &amp; Wales, New York, Singapore, Germany). Avoid neutral jurisdictions where neither party operates — it adds cost and unpredictability.</p></details>
                         </div>
                     </div>
                     <input type="hidden" id="bindOthers" value="Yes">
                     <hr class="form-divider">
                     <div class="form-group">
                         <label>Confidential Information Includes</label>
-                        <p class="field-hint" style="margin-top:-2px;margin-bottom:6px;">Select the categories relevant to your deal. The NDA will define "Confidential Information" to cover these areas specifically, plus a catch-all for any information marked as confidential.</p>
+                        <details class="hint-wrap" style="margin-top:-2px;margin-bottom:6px;"><summary>ⓘ</summary><p class="field-hint">These categories define what counts as "Confidential Information" in your NDA. The more specific you are, the stronger your protection in case of a dispute — courts favour clearly defined scope over vague catch-alls. Select all that apply, and use the custom field to add deal-specific categories (e.g. "patient data", "proprietary formulas", "satellite imagery"). The NDA will also include a general catch-all covering any information expressly marked as confidential.</p></details>
                         <div class="checkbox-grid">
                             <label class="checkbox-card"><input type="checkbox" class="confInfo" value="business plans and strategies" checked> <span>Business plans & strategies</span></label>
                             <label class="checkbox-card"><input type="checkbox" class="confInfo" value="financial information" checked> <span>Financial information</span></label>
@@ -1034,9 +1223,44 @@
                     </div>
                 </div>
 
+                <!-- Strength Meter -->
+                <div id="strengthMeter1" class="strength-meter">
+                    <div class="strength-header">
+                        <span class="strength-title">NDA Protection Level</span>
+                        <span id="strengthLabel1" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg">
+                        <div id="strengthBar1" class="strength-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <div class="strength-scale">
+                        <span>Basic</span>
+                        <span>Standard</span>
+                        <span>Strong</span>
+                        <span>Aggressive</span>
+                    </div>
+                    <div id="strengthBreakdown1" class="strength-breakdown"></div>
+
+                    <div class="confidence-section">
+                        <div class="strength-header">
+                            <span class="strength-title">Legal Confidence</span>
+                            <span id="confLabel1" class="strength-label">—</span>
+                        </div>
+                        <div class="strength-bar-bg">
+                            <div id="confBar1" class="strength-bar-fill" style="width:0%;"></div>
+                        </div>
+                        <div class="confidence-note" id="confNote1"></div>
+                    </div>
+                </div>
+
+                <!-- AI Disclaimer -->
+                <div class="ai-disclaimer">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that don't reflect the latest law in your jurisdiction. This NDA is a starting point, not a finished legal instrument. For binding agreements involving significant value, IP, or regulatory risk, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">get a Legal Audit ($100)</a> from a qualified lawyer before signing.</p>
+                </div>
+
                 <div style="display:flex;gap:12px;margin-top:16px;">
                     <button class="btn-primary" style="flex:1;" onclick="goToStep2()">
-                        Add Enhanced Protections →
+                        Customize NDA →
                     </button>
                     <button class="btn-secondary" onclick="goToStep3()" style="padding:14px 20px;">
                         Skip to Summary
@@ -1067,7 +1291,7 @@
                                 <option value="Permitted">Permitted (standard)</option>
                                 <option value="Restricted">Restricted (strict)</option>
                             </select>
-                            <p class="field-hint">Whether a party may use general knowledge retained in memory after the NDA ends. "Restricted" is common in tech/IP-heavy deals.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Residual knowledge is the information a person naturally retains in their memory after working with confidential data — without notes or copies. <strong>Permitted (standard)</strong> — the receiving party may use general skills and know-how retained in unaided memory. This is the market default and fair for most deals. <strong>Restricted</strong> — even mental impressions are covered by confidentiality obligations. Used in highly sensitive IP/tech deals (e.g. source code reviews, algorithm disclosures). Hard to enforce in practice, but creates a stronger deterrent.</p></details>
                         </div>
                         <div class="form-group">
                             <label>Return Materials Within</label>
@@ -1076,7 +1300,7 @@
                                 <option value="14" selected>14 days</option>
                                 <option value="30">30 days</option>
                             </select>
-                            <p class="field-hint">Deadline for the Receiving Party to return or destroy all confidential materials upon request or NDA termination.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Sets the deadline for the Receiving Party to return or permanently destroy all confidential materials upon written request or NDA termination. This includes physical documents, digital files, copies, notes, and extracts. <strong>10 days</strong> — aggressive, suitable for high-sensitivity deals. <strong>14 days</strong> — standard commercial practice. <strong>30 days</strong> — allows time for companies with complex IT systems or distributed teams. The NDA will typically allow retention of copies required by law or regulatory obligations.</p></details>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1086,7 +1310,7 @@
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
-                            <p class="field-hint">Requires a signed officer's certificate confirming all copies were destroyed. Standard in M&A and investment due diligence.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Requires the Receiving Party to provide a signed officer's certificate confirming that all confidential materials have been destroyed or returned. This creates personal accountability — an officer who signs a false certificate faces potential liability. <strong>When to use:</strong> M&A due diligence, investment rounds, any deal involving access to financial records or trade secrets. Most VCs and PE funds expect this as standard. If set to "No", the return obligation still exists but without formal written confirmation.</p></details>
                         </div>
                         <div class="form-group">
                             <label>Restrict Professional Advisors</label>
@@ -1094,7 +1318,7 @@
                                 <option value="No">No — permitted (default from NDA)</option>
                                 <option value="Yes">Yes — require prior written consent</option>
                             </select>
-                            <p class="field-hint">Controls whether external lawyers, accountants, and consultants can access confidential information without prior consent.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Controls whether the Receiving Party can share confidential information with their external professional advisors (lawyers, accountants, tax consultants, auditors) without prior written consent. <strong>No (default)</strong> — advisors can access information under their own professional duty of confidentiality. This is standard and practical. <strong>Yes</strong> — requires the Disclosing Party's written consent before any advisor sees the data. Use this for ultra-sensitive disclosures where you need to control exactly who accesses the information (e.g. hostile takeover defence, pre-IPO data rooms).</p></details>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1104,7 +1328,7 @@
                                 <option value="Yes">Yes — prohibit</option>
                                 <option value="No">No</option>
                             </select>
-                            <p class="field-hint">Prevents uploading confidential data to public AI tools (ChatGPT, Gemini, etc.). Increasingly standard since 2023.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">Prohibits the Receiving Party from uploading, inputting, or processing confidential information through publicly available AI or large language model services (ChatGPT, Gemini, Claude, Copilot, etc.) where data may be used for model training or stored on third-party servers. This clause has become increasingly standard since 2023 after high-profile incidents of employees leaking proprietary code and data through AI tools. <strong>Recommended for all NDAs</strong> involving source code, trade secrets, financial data, or any information you wouldn't want in a training dataset.</p></details>
                         </div>
                         <div class="form-group">
                             <label>Notify Before Legal Disclosure</label>
@@ -1112,13 +1336,13 @@
                                 <option value="Yes">Yes (unless prohibited by court order)</option>
                                 <option value="No">No</option>
                             </select>
-                            <p class="field-hint">Obliges a party to notify the other before disclosing information under a court order or subpoena, giving time to seek a protective order.</p>
+                            <details class="hint-wrap"><summary>ⓘ</summary><p class="field-hint">When a party receives a court order, subpoena, or regulatory demand to disclose confidential information, this clause requires them to notify the other party first — giving time to seek a protective order or other legal remedy. The notification obligation applies unless the court order itself prohibits it (e.g. certain SEC investigations, criminal warrants). <strong>Yes (recommended)</strong> — standard protective measure in virtually all commercial NDAs. <strong>No</strong> — only appropriate when regulatory requirements make notification impractical or prohibited.</p></details>
                         </div>
                     </div>
 
                     <hr class="form-divider">
-                    <label class="form-section-label">Non-Solicitation</label>
-                    <p class="field-hint" style="margin-top:-2px;">Prevents parties from poaching each other's employees, contractors, or clients during and after the NDA. Common in consulting, outsourcing, and partnership deals where teams interact directly.</p>
+                    <label class="form-section-label">Non-Solicitation <span>(use sparingly)</span></label>
+                    <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">Prevents parties from directly or indirectly recruiting, hiring, or soliciting each other's employees, contractors, or clients for a defined period. <strong>When to use:</strong> consulting engagements, outsourcing deals, JVs, and any situation where teams from both sides work closely together and personal relationships form. Without this clause, a counterparty could use NDA-protected access to identify and poach your best people. <strong>Enforceability:</strong> generally enforceable in most jurisdictions if the duration and scope are reasonable (12–24 months). The "carve-out for public job postings" option excludes responses to general job advertisements — this makes the clause more balanced and enforceable.</p></details>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Solicitation</label>
@@ -1149,14 +1373,14 @@
                             <label>Carve-out for Public Job Postings</label>
                             <select id="solicitCarveout">
                                 <option value="Yes">Yes — general ads excluded</option>
-                                <option value="No">No — all solicitation prohibited</option>
+                                <option value="No">No — all solicitation prohibited (not recommended — may be unenforceable)</option>
                             </select>
                         </div>
                     </div>
 
                     <hr class="form-divider">
                     <label class="form-section-label">Non-Compete <span>(use sparingly)</span></label>
-                    <p class="field-hint" style="margin-top:-2px;">Restricts a party from engaging in competing business activities. Heavily regulated or void in many jurisdictions (California, EU). Best limited to M&A, JV, or high-value IP deals with narrow scope and short duration.</p>
+                    <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">Restricts a party from engaging in competing business activities for a defined period and within a defined geographic or industry scope. <strong>⚠ Use with extreme caution.</strong> Non-competes in NDAs are unusual and often challenged. They are <strong>void or heavily restricted</strong> in California, Colorado, Minnesota, Oklahoma (USA), and increasingly across the EU under competition law. <strong>When it works:</strong> M&A transactions, joint ventures, or high-value IP deals where the receiving party gains enough insight to replicate the disclosing party's business. <strong>Best practice:</strong> keep duration short (6–12 months), scope narrow (specific industry + geography), and ensure there is adequate consideration. Overly broad non-competes are frequently struck down by courts.</p></details>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Compete</label>
@@ -1187,7 +1411,7 @@
 
                     <hr class="form-divider">
                     <label class="form-section-label">Compensation for Breach</label>
-                    <p class="field-hint" style="margin-top:-2px;">Sets the monetary consequence for NDA violations. "Actual damages" requires proving loss in court. "Liquidated damages" (common law) or "Penalty" (civil law) fix an amount upfront — stronger deterrent but must be reasonable to be enforceable.</p>
+                    <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">Defines the financial consequence for NDA violations. <strong>Actual Damages</strong> — the default in most jurisdictions. The injured party must prove the actual loss suffered, which can be difficult for confidentiality breaches. <strong>Liquidated Damages (common law)</strong> — a pre-agreed fixed amount payable upon breach. Must represent a genuine pre-estimate of loss to be enforceable in England, USA, Singapore, Australia, and other common law jurisdictions. <strong>Contractual Penalty (civil law)</strong> — similar concept but explicitly punitive. Valid in Germany, France, Poland, Czech Republic, UAE, and most civil law systems. <strong>⚠ Important:</strong> penalty clauses are void in common law jurisdictions — if your governing law is English or US law, use liquidated damages instead. A well-calibrated amount (proportional to deal value) strengthens deterrence without risking unenforceability.</p></details>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Remedy Type</label>
@@ -1221,7 +1445,7 @@
 
                     <hr class="form-divider">
                     <label class="form-section-label">Dispute Resolution</label>
-                    <p class="field-hint" style="margin-top:-2px;">Courts are the default. Arbitration is preferred for cross-border deals — faster, confidential, and enforceable in 170+ countries under the New York Convention. "Mediation then Arbitration" adds a mandatory negotiation step first.</p>
+                    <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">How disputes under this NDA will be resolved. <strong>Courts (default)</strong> — litigation in the courts of the governing law jurisdiction. Simple, familiar, but public and potentially slow. Best for domestic deals. <strong>Arbitration</strong> — private, binding, and enforceable in 170+ countries under the New York Convention. Preferred for cross-border deals where enforcing a foreign court judgment would be difficult or impossible. Choose an institution (ICC, LCIA, SIAC, etc.) that matches your deal's geography and value. <strong>Mediation then Arbitration</strong> — adds a mandatory good-faith negotiation step (typically 30 days) before arbitration begins. Saves time and cost if parties can settle early. Recommended for long-term commercial relationships where preserving the relationship matters.</p></details>
                     <div class="form-group">
                         <label>Dispute Resolution Method</label>
                         <select id="disputeMethod" onchange="toggleArbFields()">
@@ -1306,6 +1530,41 @@
                     </div>
                 </div>
 
+                <!-- Strength Meter -->
+                <div id="strengthMeter2" class="strength-meter">
+                    <div class="strength-header">
+                        <span class="strength-title">NDA Protection Level</span>
+                        <span id="strengthLabel2" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg">
+                        <div id="strengthBar2" class="strength-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <div class="strength-scale">
+                        <span>Basic</span>
+                        <span>Standard</span>
+                        <span>Strong</span>
+                        <span>Aggressive</span>
+                    </div>
+                    <div id="strengthBreakdown2" class="strength-breakdown"></div>
+
+                    <div class="confidence-section">
+                        <div class="strength-header">
+                            <span class="strength-title">Legal Confidence</span>
+                            <span id="confLabel2" class="strength-label">—</span>
+                        </div>
+                        <div class="strength-bar-bg">
+                            <div id="confBar2" class="strength-bar-fill" style="width:0%;"></div>
+                        </div>
+                        <div class="confidence-note" id="confNote2"></div>
+                    </div>
+                </div>
+
+                <!-- AI Disclaimer -->
+                <div class="ai-disclaimer">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that don't reflect the latest law in your jurisdiction. This NDA is a starting point, not a finished legal instrument. For binding agreements involving significant value, IP, or regulatory risk, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">get a Legal Audit ($100)</a> from a qualified lawyer before signing.</p>
+                </div>
+
                 <button class="btn-primary" style="margin-top:16px;" onclick="goToStep3()">
                     Generate Plain-English Summary →
                 </button>
@@ -1384,29 +1643,85 @@
             </button>
 
             <div class="info-banner">
-                <strong>Step 4:</strong> Copy this cover email to send your NDA professionally. All fields are pre-filled from your form.
+                <strong>Step 4:</strong> Review the checklist, then copy the pre-filled cover email to send your NDA professionally.
             </div>
 
+            <!-- Pre-Send Checklist -->
+            <div class="card">
+                <div class="card-title">Pre-Send Checklist</div>
+                <div class="form-fields">
+                    <div class="checklist" id="preSendChecklist">
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Party details verified</strong> — legal names, registration numbers, and addresses match official records</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Signatory authority</strong> — each signatory is authorised to bind their company (director, CEO, or holder of a power of attorney)</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Purpose matches the deal</strong> — the stated purpose accurately describes what you're sharing information for</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>NDA type is correct</strong> — Mutual if both sides share, Unilateral if only you disclose</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Confidentiality period is appropriate</strong> — 2 years standard, 3–5 for trade secrets and IP</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Governing law is intentional</strong> — matches the jurisdiction where you'd want to enforce the NDA</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Confidential info categories cover your data</strong> — all sensitive material types are checked or added in the custom field</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Enhanced clauses reviewed</strong> — if you added non-solicitation, non-compete, or penalties, confirm they're proportionate and enforceable in the governing jurisdiction</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Both signature blocks are complete</strong> — signatory names, titles, and company details filled in</span></label>
+                        <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Ready to send</strong> — NDA attached as PDF, cover email reviewed, counterparty contact details confirmed</span></label>
+                    </div>
+                    <div id="checklistProgress" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
+                        <div style="flex:1;height:6px;border-radius:3px;background:var(--border-light);overflow:hidden;">
+                            <div id="checklistBar" style="height:100%;width:0%;border-radius:3px;background:var(--accent);transition:width 0.3s ease;"></div>
+                        </div>
+                        <span id="checklistCount" style="font-size:0.78rem;font-weight:600;color:var(--text-muted);white-space:nowrap;">0 / 10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NDA Founders Playbook CTA -->
+            <div class="card" style="background:linear-gradient(135deg, var(--bg-warm) 0%, #FFF8F5 100%);border-color:var(--accent-ring);">
+                <div style="display:flex;gap:16px;align-items:flex-start;">
+                    <div style="flex:0 0 48px;height:48px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📘</div>
+                    <div style="flex:1;">
+                        <h4 style="font-size:1rem;font-weight:600;margin-bottom:4px;">NDA Founders Playbook</h4>
+                        <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples. Written by lawyers, designed for founders.</p>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:var(--accent);color:white;font-weight:600;font-size:0.85rem;opacity:0.5;cursor:not-allowed;">Get Playbook — $10 <span style="font-size:0.7rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                            <span style="font-size:0.72rem;color:var(--text-muted);">PDF · 40+ pages · Lifetime access</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Email -->
             <div class="card">
                 <div class="card-title">Cover Email</div>
-                <div style="margin-bottom:12px;">
-                    <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Subject</label>
-                    <input type="text" id="emailSubject" style="margin-top:4px;" />
-                </div>
-                <div>
-                    <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Email Body</label>
-                    <textarea id="emailBody" style="margin-top:4px;min-height:280px;line-height:1.7;font-family:var(--font-body);"></textarea>
-                </div>
-                <div style="display:flex;gap:8px;margin-top:12px;">
-                    <button class="btn-primary" onclick="copyEmailText()" style="flex:1;">
-                        Copy Email
-                    </button>
-                    <button class="btn-secondary" onclick="openInMailClient()" style="flex:0 0 auto;">
-                        Open in Mail
-                    </button>
-                </div>
-                <div id="emailCopied" class="hidden" style="text-align:center;padding:8px;color:var(--green);font-size:0.85rem;font-weight:600;">
-                    ✓ Copied to clipboard
+                <div class="form-fields">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Send to</label>
+                            <select id="emailRecipient" onchange="buildEmailTemplate()">
+                                <option value="B">Party B — Receiving Party</option>
+                                <option value="A">Party A — Disclosing Party</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Recipient Email</label>
+                            <input type="email" id="emailTo" autocomplete="off" placeholder="contact@company.com" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Subject</label>
+                        <input type="text" id="emailSubject" style="margin-top:4px;" />
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Email Body</label>
+                        <textarea id="emailBody" style="margin-top:4px;min-height:280px;line-height:1.7;"></textarea>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-primary" onclick="copyEmailText()" style="flex:1;">
+                            Copy Email
+                        </button>
+                        <button class="btn-secondary" onclick="openInMailClient()" style="flex:0 0 auto;">
+                            Open in Mail
+                        </button>
+                    </div>
+                    <div id="emailCopied" class="hidden" style="text-align:center;padding:8px;color:var(--green);font-size:0.85rem;font-weight:600;">
+                        ✓ Copied to clipboard
+                    </div>
                 </div>
             </div>
 
@@ -2083,20 +2398,36 @@
         }
 
         function buildEmailTemplate() {
-            const recipientName = document.getElementById('partyBSignatory').value || '[Name]';
-            const senderName = document.getElementById('partyASignatory').value || '[Your Name]';
-            const senderTitle = document.getElementById('partyATitle').value;
-            const partyAName = document.getElementById('partyAName').value || '[Your Company]';
-            const partyBName = document.getElementById('partyBName').value || '[Their Company]';
+            const sendTo = document.getElementById('emailRecipient').value;
+
+            // Determine sender/recipient based on dropdown
+            let recipientName, recipientEmail, senderName, senderTitle, senderCompany, recipientCompany;
+            if (sendTo === 'B') {
+                recipientName = document.getElementById('partyBSignatory').value || '[Name]';
+                recipientEmail = document.getElementById('partyBEmail').value || '';
+                recipientCompany = document.getElementById('partyBName').value || '[Their Company]';
+                senderName = document.getElementById('partyASignatory').value || '[Your Name]';
+                senderTitle = document.getElementById('partyATitle').value;
+                senderCompany = document.getElementById('partyAName').value || '[Your Company]';
+            } else {
+                recipientName = document.getElementById('partyASignatory').value || '[Name]';
+                recipientEmail = document.getElementById('partyAEmail').value || '';
+                recipientCompany = document.getElementById('partyAName').value || '[Their Company]';
+                senderName = document.getElementById('partyBSignatory').value || '[Your Name]';
+                senderTitle = document.getElementById('partyBTitle').value;
+                senderCompany = document.getElementById('partyBName').value || '[Your Company]';
+            }
+
+            document.getElementById('emailTo').value = recipientEmail;
+
             const purpose = getPurpose();
             const confPeriod = document.getElementById('confPeriod').value;
 
-            // Build a short purpose phrase for the subject
             const purposeShort = document.getElementById('purposeSelect').value === 'custom'
                 ? 'Our Discussion'
                 : document.getElementById('purposeSelect').options[document.getElementById('purposeSelect').selectedIndex].text;
 
-            const subject = `NDA for ${purposeShort} — ${partyAName} / ${partyBName}`;
+            const subject = `NDA for ${purposeShort} — ${senderCompany} / ${recipientCompany}`;
 
             const body = `Dear ${recipientName},
 
@@ -2110,10 +2441,161 @@ Once you are comfortable with the terms, please countersign and return a copy at
 
 Best regards,
 ${senderName}${senderTitle ? '\n' + senderTitle : ''}
-${partyAName}`;
+${senderCompany}`;
 
             document.getElementById('emailSubject').value = subject;
             document.getElementById('emailBody').value = body;
+        }
+
+        function calculateNDAStrength(enhanced) {
+            let score = 0;
+            const tags = [];
+
+            // ── Base NDA scoring ──
+            // NDA Type
+            const ndaType = document.getElementById('ndaType').value;
+            if (ndaType === 'Mutual') { score += 8; tags.push({name:'Mutual NDA', on:true}); }
+            else { score += 4; tags.push({name:'Unilateral', on:true}); }
+
+            // Confidentiality Period
+            const period = parseInt(document.getElementById('confPeriod').value);
+            if (period >= 5) { score += 15; }
+            else if (period >= 3) { score += 12; }
+            else if (period >= 2) { score += 8; }
+            else { score += 4; }
+            tags.push({name: period + 'yr term', on: true});
+
+            // Confidential Info categories
+            const confChecked = document.querySelectorAll('.confInfo:checked').length;
+            score += Math.min(confChecked * 2, 12);
+            if (confChecked >= 5) tags.push({name: confChecked + ' info categories', on: true});
+
+            // Custom confidential info
+            if (document.getElementById('confInfoCustom').value.trim()) {
+                score += 3;
+                tags.push({name:'Custom categories', on:true});
+            }
+
+            // Base always includes: standard exclusions, authorised recipients, governing law
+            score += 8;
+
+            // ── Enhanced NDA scoring ──
+            if (enhanced) {
+                // Residual Knowledge
+                const residual = document.getElementById('residualKnowledge').value;
+                if (residual === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
+                else { tags.push({name:'Residual permitted', on:false}); }
+
+                // Return period
+                const returnD = parseInt(document.getElementById('returnDays').value);
+                if (returnD <= 10) { score += 5; } else if (returnD <= 14) { score += 3; } else { score += 1; }
+
+                // Written certification
+                if (document.getElementById('writtenCert').value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
+                else { tags.push({name:'No destruction cert', on:false}); }
+
+                // Restrict advisors
+                if (document.getElementById('restrictAdvisors').value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
+                else { tags.push({name:'Advisors permitted', on:false}); }
+
+                // LLM prohibition
+                if (document.getElementById('prohibitLLM').value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
+                else { tags.push({name:'No AI clause', on:false}); }
+
+                // Compelled disclosure notice
+                if (document.getElementById('notifyCompelled').value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+
+                // Non-solicitation
+                if (document.getElementById('prohibitSoliciting').value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
+                else { tags.push({name:'No non-solicit', on:false}); }
+
+                // Non-compete
+                if (document.getElementById('nonCompete').value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
+                else { tags.push({name:'No non-compete', on:false}); }
+
+                // Breach remedy
+                const remedy = document.getElementById('breachRemedy').value;
+                if (remedy === 'Liquidated' || remedy === 'Penalty') { score += 10; tags.push({name: remedy === 'Liquidated' ? 'Liquidated damages' : 'Contractual penalty', on:true}); }
+                else { tags.push({name:'Actual damages only', on:false}); }
+
+                // Dispute resolution
+                const dispute = document.getElementById('disputeMethod').value;
+                if (dispute.includes('Arbitration')) { score += 6; tags.push({name:'Arbitration', on:true}); }
+                if (dispute.includes('Mediation')) { score += 2; tags.push({name:'Mediation step', on:true}); }
+            }
+
+            // Clamp to 100
+            score = Math.min(score, 100);
+
+            // Determine level
+            let level, color;
+            if (score >= 80) { level = 'Aggressive'; color = '#C0392B'; }
+            else if (score >= 55) { level = 'Strong'; color = '#27AE60'; }
+            else if (score >= 30) { level = 'Standard'; color = '#D4970A'; }
+            else { level = 'Basic'; color = '#9A9490'; }
+
+            return { score, level, color, tags };
+        }
+
+        function renderStrengthMeter(num, enhanced) {
+            const { score, level, color, tags } = calculateNDAStrength(enhanced);
+            const bar = document.getElementById('strengthBar' + num);
+            const label = document.getElementById('strengthLabel' + num);
+            const breakdown = document.getElementById('strengthBreakdown' + num);
+
+            bar.style.width = score + '%';
+            bar.style.background = color;
+
+            label.textContent = level + ' · ' + score + '/100';
+            label.style.background = color + '18';
+            label.style.color = color;
+
+            breakdown.innerHTML = tags.map(t =>
+                `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
+            ).join('');
+
+            // ── Legal Confidence meter ──
+            // AI draft caps at 60%, enhanced adds up to 15%, but never 100% without lawyer
+            let conf = 35; // base AI-generated draft
+            if (enhanced) conf += 15; // customized clauses = more intentional
+            const period = parseInt(document.getElementById('confPeriod').value);
+            if (period >= 3) conf += 5;
+            const confChecked = document.querySelectorAll('.confInfo:checked').length;
+            if (confChecked >= 5) conf += 5;
+            conf = Math.min(conf, 60); // hard cap without lawyer review
+
+            const confBar = document.getElementById('confBar' + num);
+            const confLabel = document.getElementById('confLabel' + num);
+            const confNote = document.getElementById('confNote' + num);
+
+            let confColor, confText;
+            if (conf >= 50) { confColor = '#D4970A'; confText = 'Moderate'; }
+            else if (conf >= 35) { confColor = '#D4970A'; confText = 'Low–Moderate'; }
+            else { confColor = '#9A9490'; confText = 'Low'; }
+
+            confBar.style.width = conf + '%';
+            confBar.style.background = confColor;
+            confLabel.textContent = confText + ' · ' + conf + '%';
+            confLabel.style.background = confColor + '18';
+            confLabel.style.color = confColor;
+
+            confNote.innerHTML = 'AI-generated NDAs are capped at <strong>60%</strong> legal confidence. To reach <strong style="color:var(--green);">100%</strong>, <a href="#" onclick="event.preventDefault();" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA for enforceability, jurisdictional compliance, and missing protections.';
+        }
+
+        function updateChecklistProgress() {
+            const checks = document.querySelectorAll('#preSendChecklist input[type="checkbox"]');
+            const checked = document.querySelectorAll('#preSendChecklist input[type="checkbox"]:checked');
+            const total = checks.length;
+            const done = checked.length;
+            document.getElementById('checklistBar').style.width = (done / total * 100) + '%';
+            document.getElementById('checklistCount').textContent = done + ' / ' + total;
+            if (done === total) {
+                document.getElementById('checklistBar').style.background = 'var(--green)';
+                document.getElementById('checklistCount').style.color = 'var(--green)';
+            } else {
+                document.getElementById('checklistBar').style.background = 'var(--accent)';
+                document.getElementById('checklistCount').style.color = 'var(--text-muted)';
+            }
         }
 
         function copyEmailText() {
@@ -2128,7 +2610,7 @@ ${partyAName}`;
         }
 
         function openInMailClient() {
-            const to = document.getElementById('partyBEmail').value || '';
+            const to = document.getElementById('emailTo').value || '';
             const subject = encodeURIComponent(document.getElementById('emailSubject').value);
             const body = encodeURIComponent(document.getElementById('emailBody').value);
             window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
@@ -2812,6 +3294,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState1');
 
                 generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                renderStrengthMeter(1, false);
                 document.getElementById('footerCTA').classList.remove('hidden');
                 updateBadge(1);
 
@@ -2838,6 +3321,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState2');
 
                 generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                renderStrengthMeter(2, true);
                 updateBadge(2);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
