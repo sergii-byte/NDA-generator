@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash NDA Generator | SBLC Business Lawyers</title>
+    <title>Flash NDA Drafter | SBLC Business Lawyers</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #F9F6F1;
@@ -36,7 +36,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
@@ -61,10 +61,10 @@
             gap: 16px;
         }
         .logo-area h1 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: 1.35rem;
-            font-weight: 400;
-            letter-spacing: -0.01em;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
             color: var(--text);
         }
         .logo-area p {
@@ -172,9 +172,10 @@
             .parties-row .card .form-row { grid-template-columns: 1fr; }
         }
         .card-title {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: 1.15rem;
-            font-weight: 400;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
             color: var(--text);
             margin-bottom: 16px;
             padding-bottom: 12px;
@@ -184,7 +185,7 @@
             gap: 10px;
         }
         .card-title .badge {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -244,6 +245,12 @@
             color: var(--text-muted);
             letter-spacing: 0;
         }
+        .field-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+            margin-top: 4px;
+        }
         label {
             display: block;
             font-size: 0.82rem;
@@ -256,7 +263,7 @@
             padding: 10px 14px;
             border: 1px solid var(--border);
             border-radius: 10px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
             color: var(--text);
             background: var(--card);
@@ -415,7 +422,7 @@
             padding: 14px 24px;
             border: none;
             border-radius: var(--radius);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
@@ -434,7 +441,7 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             background: var(--card);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 0.82rem;
             font-weight: 500;
             color: var(--text-secondary);
@@ -452,7 +459,7 @@
             cursor: pointer;
             background: none;
             border: none;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             transition: color 0.2s;
             margin-bottom: 16px;
         }
@@ -475,9 +482,9 @@
             margin-bottom: 16px;
         }
         .nda-output-header h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-weight: 400;
-            font-size: 1.05rem;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -577,8 +584,8 @@
             color: var(--text);
         }
         .summary-content h1, .summary-content h2, .summary-content h3 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-weight: 400;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-weight: 600;
             margin: 1.2em 0 0.5em 0;
         }
         .summary-content h1 { font-size: 1.3rem; }
@@ -632,9 +639,9 @@
             text-align: center;
         }
         .cta-banner h4 {
-            font-family: 'Instrument Serif', Georgia, serif;
-            font-size: 1.1rem;
-            font-weight: 400;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
             margin-bottom: 8px;
         }
         .cta-banner p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; }
@@ -662,8 +669,8 @@
         <div class="header-inner">
             <div class="logo-area">
                 <div>
-                    <h1>Flash NDA Generator</h1>
-                    <p>Generate enforceable NDAs in 30 seconds</p>
+                    <h1>⚡ Flash NDA Drafter</h1>
+                    <p>Create NDAs in 30 seconds. Easy.</p>
                 </div>
             </div>
             <a href="https://sblc.com.ua" target="_blank">
@@ -677,12 +684,12 @@
         <div class="stepper">
             <div id="step1-badge" class="step-badge active">
                 <span class="step-num">1</span>
-                <span class="step-label">Flash NDA</span>
+                <span class="step-label">Draft NDA</span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step2-badge" class="step-badge inactive">
                 <span class="step-num">+</span>
-                <span class="step-label">Enhanced</span>
+                <span class="step-label">Customize NDA</span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step3-badge" class="step-badge inactive">
@@ -692,7 +699,7 @@
             <span class="step-arrow">›</span>
             <div id="step4-badge" class="step-badge inactive">
                 <span class="step-num">+</span>
-                <span class="step-label">Send</span>
+                <span class="step-label">Compose Email</span>
             </div>
         </div>
 
@@ -897,6 +904,7 @@
                             <input type="text" id="partyBTitle" autocomplete="off" placeholder="e.g. CEO, Director, Managing Partner">
                         </div>
                     </div>
+                    <hr class="form-divider">
                     <div class="form-group">
                         <label>Counterparty Role</label>
                         <select id="partyBRole" onchange="toggleCustomRole()">
@@ -910,7 +918,6 @@
                             <option value="custom">Write your own...</option>
                         </select>
                         <input type="text" id="partyBRoleCustom" class="hidden" style="margin-top:6px;" autocomplete="off" placeholder="e.g. Franchisee, Licensor, Co-founder">
-                        <p style="margin:6px 0 0;font-size:0.72rem;color:var(--accent);line-height:1.3;">Affects NDA obligations — choose the role that best describes Party B's relationship to you</p>
                     </div>
                 </div>
             </div>
@@ -936,6 +943,7 @@
                             <option value="custom">Write your own...</option>
                         </select>
                         <textarea id="purposeCustom" class="hidden" style="margin-top:8px;" placeholder="Describe the purpose of disclosure..."></textarea>
+                        <p class="field-hint">Defines the scope of permitted use. Confidential information may only be used in connection with this stated purpose — anything outside it is a breach.</p>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -944,10 +952,12 @@
                                 <option value="Mutual">Mutual (both parties)</option>
                                 <option value="Unilateral">Unilateral (one-way)</option>
                             </select>
+                            <p class="field-hint">Mutual — both parties disclose and receive. Unilateral — only Party A discloses, Party B receives.</p>
                         </div>
                         <div class="form-group">
                             <label>Effective Date</label>
                             <input type="date" id="agreementDate">
+                            <p class="field-hint">When the NDA takes effect. Can be backdated to cover discussions that already took place.</p>
                         </div>
                     </div>
                     <div class="form-row">
@@ -959,6 +969,7 @@
                                 <option value="3">3 years</option>
                                 <option value="5">5 years</option>
                             </select>
+                            <p class="field-hint">How long confidentiality obligations survive after the NDA ends. 2 years is standard; 5 years for trade secrets or IP-heavy deals.</p>
                         </div>
                         <div class="form-group">
                             <label>Governing Law</label>
@@ -966,12 +977,14 @@
                                 <option value="partyA">Party A jurisdiction (default)</option>
                             </select>
                             <input type="text" id="governingLawCustom" class="hidden" style="margin-top:8px;" placeholder="e.g. Laws of the Republic of Singapore" />
+                            <p class="field-hint">Which country's laws apply to interpret and enforce the NDA. Defaults to Party A's jurisdiction of incorporation.</p>
                         </div>
                     </div>
                     <input type="hidden" id="bindOthers" value="Yes">
                     <hr class="form-divider">
                     <div class="form-group">
                         <label>Confidential Information Includes</label>
+                        <p class="field-hint" style="margin-top:-2px;margin-bottom:6px;">Select the categories relevant to your deal. The NDA will define "Confidential Information" to cover these areas specifically, plus a catch-all for any information marked as confidential.</p>
                         <div class="checkbox-grid">
                             <label class="checkbox-card"><input type="checkbox" class="confInfo" value="business plans and strategies" checked> <span>Business plans & strategies</span></label>
                             <label class="checkbox-card"><input type="checkbox" class="confInfo" value="financial information" checked> <span>Financial information</span></label>
@@ -1036,15 +1049,15 @@
         <div id="step2" class="hidden space-y">
             <button class="btn-back" onclick="backToStep1()">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
-                Back to Flash NDA
+                Back to Draft NDA
             </button>
 
             <div class="info-banner">
-                <strong>Step 2:</strong> Add advanced protections — compensation for breach, non-solicitation, non-compete, arbitration, and more.
+                <strong>Step 2:</strong> Customize your NDA with advanced protections — compensation for breach, non-solicitation, non-compete, arbitration, and more.
             </div>
 
             <div class="card">
-                <div class="card-title">Enhanced Protections</div>
+                <div class="card-title">Customize NDA</div>
 
                 <div class="form-fields">
                     <div class="form-row">
@@ -1054,6 +1067,7 @@
                                 <option value="Permitted">Permitted (standard)</option>
                                 <option value="Restricted">Restricted (strict)</option>
                             </select>
+                            <p class="field-hint">Whether a party may use general knowledge retained in memory after the NDA ends. "Restricted" is common in tech/IP-heavy deals.</p>
                         </div>
                         <div class="form-group">
                             <label>Return Materials Within</label>
@@ -1062,6 +1076,7 @@
                                 <option value="14" selected>14 days</option>
                                 <option value="30">30 days</option>
                             </select>
+                            <p class="field-hint">Deadline for the Receiving Party to return or destroy all confidential materials upon request or NDA termination.</p>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1071,6 +1086,7 @@
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
+                            <p class="field-hint">Requires a signed officer's certificate confirming all copies were destroyed. Standard in M&A and investment due diligence.</p>
                         </div>
                         <div class="form-group">
                             <label>Restrict Professional Advisors</label>
@@ -1078,6 +1094,7 @@
                                 <option value="No">No — permitted (default from NDA)</option>
                                 <option value="Yes">Yes — require prior written consent</option>
                             </select>
+                            <p class="field-hint">Controls whether external lawyers, accountants, and consultants can access confidential information without prior consent.</p>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1087,6 +1104,7 @@
                                 <option value="Yes">Yes — prohibit</option>
                                 <option value="No">No</option>
                             </select>
+                            <p class="field-hint">Prevents uploading confidential data to public AI tools (ChatGPT, Gemini, etc.). Increasingly standard since 2023.</p>
                         </div>
                         <div class="form-group">
                             <label>Notify Before Legal Disclosure</label>
@@ -1094,11 +1112,13 @@
                                 <option value="Yes">Yes (unless prohibited by court order)</option>
                                 <option value="No">No</option>
                             </select>
+                            <p class="field-hint">Obliges a party to notify the other before disclosing information under a court order or subpoena, giving time to seek a protective order.</p>
                         </div>
                     </div>
 
                     <hr class="form-divider">
                     <label class="form-section-label">Non-Solicitation</label>
+                    <p class="field-hint" style="margin-top:-2px;">Prevents parties from poaching each other's employees, contractors, or clients during and after the NDA. Common in consulting, outsourcing, and partnership deals where teams interact directly.</p>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Solicitation</label>
@@ -1136,6 +1156,7 @@
 
                     <hr class="form-divider">
                     <label class="form-section-label">Non-Compete <span>(use sparingly)</span></label>
+                    <p class="field-hint" style="margin-top:-2px;">Restricts a party from engaging in competing business activities. Heavily regulated or void in many jurisdictions (California, EU). Best limited to M&A, JV, or high-value IP deals with narrow scope and short duration.</p>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Compete</label>
@@ -1166,6 +1187,7 @@
 
                     <hr class="form-divider">
                     <label class="form-section-label">Compensation for Breach</label>
+                    <p class="field-hint" style="margin-top:-2px;">Sets the monetary consequence for NDA violations. "Actual damages" requires proving loss in court. "Liquidated damages" (common law) or "Penalty" (civil law) fix an amount upfront — stronger deterrent but must be reasonable to be enforceable.</p>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Remedy Type</label>
@@ -1199,6 +1221,7 @@
 
                     <hr class="form-divider">
                     <label class="form-section-label">Dispute Resolution</label>
+                    <p class="field-hint" style="margin-top:-2px;">Courts are the default. Arbitration is preferred for cross-border deals — faster, confidential, and enforceable in 170+ countries under the New York Convention. "Mediation then Arbitration" adds a mandatory negotiation step first.</p>
                     <div class="form-group">
                         <label>Dispute Resolution Method</label>
                         <select id="disputeMethod" onchange="toggleArbFields()">
@@ -1246,7 +1269,7 @@
                             </div>
                         </div>
                         <div id="arbClausePreview" style="padding: 14px 16px; background: var(--bg-warm); border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.8rem; line-height: 1.65; color: var(--text-secondary); font-family: Georgia, 'Times New Roman', serif; display: none;">
-                            <div style="font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
+                            <div style="font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
                             <div id="arbClauseText"></div>
                         </div>
                     </div>
@@ -1416,7 +1439,10 @@
 
     <footer>
         <div class="footer-inner">
-            <p>© 2025 SBLC Law Firm. All rights reserved.</p>
+            <div>
+                <p style="font-weight:600;color:var(--text);font-size:0.85rem;">⚡ Flash NDA Drafter</p>
+                <p style="margin-top:2px;">AI-powered drafter, built by lawyers</p>
+            </div>
             <div style="display:flex;gap:16px;">
                 <a href="mailto:hello@sblc.com.ua">hello@sblc.com.ua</a>
                 <a href="https://sblc.com.ua" target="_blank">sblc.com.ua</a>
