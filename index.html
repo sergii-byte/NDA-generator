@@ -8,7 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #F9F6F1;
@@ -37,11 +38,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+        }
+        /* Claude-like typography: serif for generated NDA content */
+        .generated-nda {
+            font-family: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+            font-size: 0.92rem;
+            line-height: 1.7;
         }
 
         /* ─── Header ─── */
@@ -55,65 +62,51 @@
         .header-inner {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 16px 24px 8px;
+            padding: 14px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
         }
         .logo-area h1 {
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.03em;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
             color: var(--text);
-        }
-        .logo-area p {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            margin-top: 3px;
-            font-weight: 400;
         }
         .logo-area a { text-decoration: none; color: inherit; }
         header img { height: 22px; opacity: 0.7; transition: opacity 0.2s; }
         header img:hover { opacity: 1; }
-        .header-sub {
+        .header-hero {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 0 24px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
+            padding: 0 24px 14px;
+            text-align: center;
         }
-        .header-audience {
-            font-size: 0.72rem;
+        .header-hero-sub {
+            font-size: 0.78rem;
             color: var(--text-muted);
-            font-style: italic;
+            margin-bottom: 10px;
+            line-height: 1.5;
         }
         .trust-badges {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         .trust-badge {
             font-size: 0.65rem;
             font-weight: 500;
             color: var(--text-secondary);
             background: var(--bg-warm);
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 100px;
             border: 1px solid var(--border-light);
             white-space: nowrap;
         }
         .trust-badge a { color: var(--accent); text-decoration: none; font-weight: 600; }
         .trust-badge a:hover { text-decoration: underline; }
-        .trust-badge-sep {
-            color: var(--border);
-            font-size: 0.7rem;
-            user-select: none;
-        }
 
         /* ─── Main ─── */
         main {
@@ -234,10 +227,11 @@
             color: white;
             font-size: 0.68rem;
             font-weight: 400;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 8px;
-            width: 200px;
-            line-height: 1.45;
+            width: max-content;
+            max-width: 220px;
+            line-height: 1.5;
             opacity: 0; visibility: hidden;
             transition: all 0.15s ease;
             z-index: 200;
@@ -245,6 +239,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             text-transform: none;
             letter-spacing: 0;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .step-tip::before {
             content: '';
@@ -269,9 +266,20 @@
             .step-label { display: none !important; }
             .stepper { flex-wrap: wrap; justify-content: center; }
         }
-        @media (max-width: 640px) { .step-arrow { display: none; } }
         @media (max-width: 640px) {
+            .step-arrow { display: none; }
             .product-cards-grid { grid-template-columns: 1fr !important; }
+            .header-inner { padding: 12px 16px; }
+            .header-hero { padding: 0 16px 12px; }
+            .header-hero-sub { font-size: 0.72rem; }
+            main { padding: 20px 16px; }
+            .card { padding: 18px 16px; }
+            .legal-disclaimer-bar { margin: 16px auto; padding: 12px 16px; }
+        }
+        /* iPad / tablet */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            main { padding: 24px 20px; }
+            .header-hero-sub { font-size: 0.76rem; }
         }
 
         /* ─── Cards ─── */
@@ -315,7 +323,6 @@
             .parties-row .card .form-row { grid-template-columns: 1fr; }
         }
         .card-title {
-            font-family: 'Inter', -apple-system, sans-serif;
             font-size: 1.05rem;
             font-weight: 600;
             letter-spacing: -0.01em;
@@ -430,6 +437,19 @@
         .checklist-item:has(input:checked) strong {
             color: var(--text-muted);
         }
+        .checklist-item--playbook {
+            background: linear-gradient(135deg, var(--accent-soft), #FFF7ED);
+            border: 1px solid var(--accent-ring);
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+        .playbook-cta {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .playbook-cta:hover { color: var(--accent-hover); }
 
         /* ─── NDA Strength Meter ─── */
         .strength-meter {
@@ -1145,27 +1165,17 @@
             margin-top: 24px;
         }
         .legal-disclaimer-bar {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 18px 28px;
+            max-width: 600px;
+            margin: 24px auto;
+            padding: 16px 24px;
             text-align: center;
-            border-radius: var(--radius);
-            background: var(--card);
-            border: 1px solid var(--border-light);
-            box-shadow: var(--shadow-sm);
         }
         .legal-disclaimer-bar p {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             line-height: 1.6;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            text-align: left;
+            color: var(--text-muted);
         }
-        .legal-disclaimer-bar strong { color: var(--text); font-weight: 600; }
+        .legal-disclaimer-bar strong { color: var(--text-secondary); font-weight: 600; }
         .footer-inner {
             max-width: 1100px;
             margin: 0 auto;
@@ -1305,24 +1315,19 @@
     <header>
         <div class="header-inner">
             <div class="logo-area">
-                <div>
-                    <h1>⚡ Flash NDA Drafter</h1>
-                    <p>Designed by lawyers. From draft to sharing. Easy.</p>
-                </div>
+                <h1>Flash NDA Drafter</h1>
             </div>
             <a href="https://sblc.com.ua" target="_blank">
                 <img src="https://framerusercontent.com/images/LkOVePWb0KiTp4xC1AZiukuRY9M.svg" alt="SBLC Law Firm">
             </a>
         </div>
-        <div class="header-sub">
-            <span class="header-audience">For founders, startups, businesses, and service providers who need legally sound and customizable NDAs.</span>
-            <span class="trust-badges">
-                <span class="trust-badge">⚖️ Lawyer-Prompted AI</span>
-                <span class="trust-badge-sep">·</span>
-                <span class="trust-badge">⏱ Draft in 30 seconds</span>
-                <span class="trust-badge-sep">·</span>
-                <span class="trust-badge">🛡️ Real Lawyer Review · 24h</span>
-            </span>
+        <div class="header-hero">
+            <p class="header-hero-sub">For founders, partners, startups, businesses, and service providers who need legally sound and customizable NDAs fast.</p>
+            <div class="trust-badges">
+                <span class="trust-badge">Lawyer-Prompted AI</span>
+                <span class="trust-badge">Draft in 30 seconds</span>
+                <span class="trust-badge">Real Lawyer Review · 24h</span>
+            </div>
         </div>
     </header>
 
@@ -2146,6 +2151,7 @@
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Enhanced clauses reviewed</strong> — if you added non-solicitation, non-compete, or penalties, confirm they're proportionate and enforceable in the governing jurisdiction</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Both signature blocks are complete</strong> — signatory names, titles, and company details filled in</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Ready to send</strong> — NDA attached as PDF, cover email reviewed, counterparty contact details confirmed</span></label>
+                        <label class="checklist-item checklist-item--playbook"><input type="checkbox" id="playbookCheck" onchange="updateChecklistProgress()"><span><strong>I implemented tips from the <a href="#" onclick="event.preventDefault();event.stopPropagation();" class="playbook-cta">NDA Playbook in the AI Era</a></strong> — applying the Playbook's guidance adds <strong style="color:var(--green);">+15 points</strong> to your Legal Enforceability Score</span></label>
                     </div>
                     <div id="checklistProgress" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
                         <div style="flex:1;height:6px;border-radius:3px;background:var(--border-light);overflow:hidden;">
@@ -2215,6 +2221,28 @@
                         Order Legal Review — Coming Soon
                     </button>
                     <p style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:8px;">We're finalizing the process. Leave your email to be notified when it's available.</p>
+                </div>
+            </div>
+
+            <!-- Score Bars on Lawyer Review -->
+            <div id="step4Scores" class="strength-meter" style="display:none;">
+                <div class="strength-header">
+                    <span class="strength-title">NDA Strictness Score</span>
+                    <span id="step4StrLabel" class="strength-label">—</span>
+                </div>
+                <div class="strength-bar-bg">
+                    <div id="step4StrBar" class="strength-bar-fill" style="width:0%;"></div>
+                </div>
+                <div class="confidence-section">
+                    <div class="strength-header">
+                        <span class="strength-title">Legal Enforceability Score</span>
+                        <span id="step4ConfLabel" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg" style="position:relative;">
+                        <div id="step4ConfRemain" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;background:rgba(61,154,95,0.15);"></div>
+                        <div id="step4ConfBar" class="strength-bar-fill" style="width:0%;position:relative;z-index:1;"></div>
+                    </div>
+                    <div class="confidence-note" id="step4ConfNote">Order a Legal Review to reach <strong style="color:var(--green);">100%</strong> — you're almost there.</div>
                 </div>
             </div>
 
@@ -2367,10 +2395,8 @@
     </section>
 
     <!-- Legal Disclaimer -->
-    <div style="padding:20px 24px;">
-        <div class="legal-disclaimer-bar">
-            <p><svg style="width:16px;height:16px;flex-shrink:0;margin-top:1px;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</span></p>
-        </div>
+    <div class="legal-disclaimer-bar">
+        <p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p>
     </div>
 
     <footer>
@@ -2391,6 +2417,7 @@
         let generatedNDAText2 = '';
         let generatedSummaryText = '';
         let checklistBonus = 0;
+        let playbookBonus = 0;
         let searchTimeout = null;
 
         // ═══════ Save/Load Party Data ═══════
@@ -3138,22 +3165,20 @@ ${senderCompany}`;
             ).join('');
 
             // ── NDA Enforceability Score ──
-            const conf = 50 + checklistBonus;
+            const conf = 50 + checklistBonus + playbookBonus;
 
             const confBar = document.getElementById('confBar' + num);
             const confLabel = document.getElementById('confLabel' + num);
             const confNote = document.getElementById('confNote' + num);
 
-            const confColor = checklistBonus > 0 ? '#3D9A5F' : '#D4970A';
+            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
             confLabel.textContent = conf + '%';
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
 
-            confNote.innerHTML = checklistBonus > 0
-                ? `Checklist complete — <strong>+5%</strong> applied. Get our <strong>"NDA Playbook"</strong> to reach <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
-                : `AI-generated NDAs start at <strong>50%</strong>. Our <strong>"NDA Playbook"</strong> can raise it to <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
+            confNote.innerHTML = `AI-generated NDAs start at <strong>50%</strong>. Complete the checklist (+5%) and apply the <strong>NDA Playbook</strong> (+15%) to boost your score. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
         }
 
         function updateDocsPanel() {
@@ -3183,18 +3208,22 @@ ${senderCompany}`;
             const done = checked.length;
             document.getElementById('checklistBar').style.width = (done / total * 100) + '%';
             document.getElementById('checklistCount').textContent = done + ' / ' + total;
+            // Playbook bonus
+            playbookBonus = document.getElementById('playbookCheck').checked ? 15 : 0;
+            // Checklist completion bonus (all items except playbook)
+            const nonPlaybookChecks = document.querySelectorAll('#preSendChecklist input[type="checkbox"]:not(#playbookCheck)');
+            const nonPlaybookDone = document.querySelectorAll('#preSendChecklist input[type="checkbox"]:checked:not(#playbookCheck)');
+            checklistBonus = (nonPlaybookDone.length === nonPlaybookChecks.length) ? 5 : 0;
             if (done === total) {
                 document.getElementById('checklistBar').style.background = 'var(--green)';
                 document.getElementById('checklistCount').style.color = 'var(--green)';
-                checklistBonus = 5;
             } else {
                 document.getElementById('checklistBar').style.background = 'var(--accent)';
                 document.getElementById('checklistCount').style.color = 'var(--text-muted)';
-                checklistBonus = 0;
             }
-            // Re-render enforceability scores on both meters if they exist
             updateEnforceabilityDisplay(1);
             updateEnforceabilityDisplay(2);
+            updateStep4Scores();
         }
 
         function updateEnforceabilityDisplay(num) {
@@ -3202,16 +3231,43 @@ ${senderCompany}`;
             const confLabel = document.getElementById('confLabel' + num);
             const confNote = document.getElementById('confNote' + num);
             if (!confBar || confBar.style.width === '0%') return;
-            const conf = 50 + checklistBonus;
-            const confColor = checklistBonus > 0 ? '#3D9A5F' : '#D4970A';
+            const conf = 50 + checklistBonus + playbookBonus;
+            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
             confLabel.textContent = conf + '%';
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
-            confNote.innerHTML = checklistBonus > 0
-                ? `Checklist complete — <strong>+5%</strong> applied. Get our <strong>"NDA Playbook"</strong> to reach <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
-                : `AI-generated NDAs start at <strong>50%</strong>. Our <strong>"NDA Playbook"</strong> can raise it to <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
+            let parts = [];
+            if (checklistBonus > 0) parts.push('Checklist +5%');
+            if (playbookBonus > 0) parts.push('Playbook +15%');
+            confNote.innerHTML = conf > 50
+                ? `${parts.join(', ')} applied — score: <strong>${conf}%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
+                : `AI-generated NDAs start at <strong>50%</strong>. Complete the checklist (+5%) and apply the <strong>NDA Playbook</strong> (+15%) to boost your score. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
+        }
+
+        function updateStep4Scores() {
+            if (!generatedNDAText) return;
+            const panel = document.getElementById('step4Scores');
+            panel.style.display = '';
+            // Copy strictness from whichever NDA exists
+            const srcNum = generatedNDAText2 ? 2 : 1;
+            const srcStrBar = document.getElementById('strengthBar' + srcNum);
+            const srcStrLabel = document.getElementById('strengthLabel' + srcNum);
+            document.getElementById('step4StrBar').style.width = srcStrBar.style.width;
+            document.getElementById('step4StrBar').style.background = srcStrBar.style.background;
+            document.getElementById('step4StrLabel').textContent = srcStrLabel.textContent;
+            document.getElementById('step4StrLabel').style.background = srcStrLabel.style.background;
+            document.getElementById('step4StrLabel').style.color = srcStrLabel.style.color;
+            // Enforceability with pale green remainder
+            const conf = 50 + checklistBonus + playbookBonus;
+            const confColor = '#3D9A5F';
+            document.getElementById('step4ConfBar').style.width = conf + '%';
+            document.getElementById('step4ConfBar').style.background = confColor;
+            document.getElementById('step4ConfLabel').textContent = conf + '% → 100%';
+            document.getElementById('step4ConfLabel').style.background = confColor + '18';
+            document.getElementById('step4ConfLabel').style.color = confColor;
+            document.getElementById('step4ConfNote').innerHTML = `Your current score: <strong>${conf}%</strong>. Order a Legal Review to reach <strong style="color:var(--green);">100%</strong> — you're one step away.`;
         }
 
         function copyEmailText() {
@@ -3262,6 +3318,7 @@ ${senderCompany}`;
             } else {
                 showTestimonials(false);
             }
+            if (step === 4) updateStep4Scores();
             if (step === 5) document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
             if (step === 6) { buildEmailTemplate(); updateDocsPanel(); }
             updateBadge(step);
