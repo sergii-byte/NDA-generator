@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flash NDA Drafter | SBLC Business Lawyers</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2L6 18h8l-2 12 12-16h-8l2-12z' fill='%23D97757'/%3E%3C/svg%3E">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -218,18 +219,10 @@
             color: var(--text-muted);
             border: 1px solid var(--border-light);
         }
-        .step-num {
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 700;
-        }
-        .step-badge.active .step-num { background: rgba(255,255,255,0.25); color: white; }
-        .step-badge.done .step-num { background: var(--green); color: white; }
-        .step-badge.inactive .step-num { background: var(--border); color: var(--text-muted); }
+        .step-icon { width: 18px; height: 18px; flex-shrink: 0; stroke-width: 2; }
+        .step-badge.active .step-icon { stroke: white; }
+        .step-badge.done .step-icon { stroke: var(--green); }
+        .step-badge.inactive .step-icon { stroke: var(--text-muted); }
         .step-arrow { color: var(--border); font-size: 0.85rem; flex-shrink: 0; }
         .step-label-tip { position: relative; }
         .step-tip {
@@ -525,6 +518,31 @@
             justify-content: space-between;
             font-size: 0.68rem;
             color: var(--text-muted);
+        }
+        .strength-recommended-range {
+            position: relative;
+            height: 14px;
+            margin-top: 2px;
+        }
+        .strength-recommended-bar {
+            position: absolute;
+            left: 40%;
+            right: 20%;
+            top: 2px;
+            height: 4px;
+            border-radius: 4px;
+            background: var(--green);
+            opacity: 0.3;
+        }
+        .strength-recommended-label {
+            position: absolute;
+            left: 40%;
+            right: 20%;
+            top: 7px;
+            text-align: center;
+            font-size: 0.58rem;
+            font-weight: 600;
+            color: var(--green);
         }
         .strength-breakdown {
             margin-top: 12px;
@@ -1127,22 +1145,27 @@
             margin-top: 24px;
         }
         .legal-disclaimer-bar {
-            max-width: 1100px;
+            max-width: 700px;
             margin: 0 auto;
-            padding: 16px 24px;
+            padding: 18px 28px;
             text-align: center;
-            border-top: 1px solid var(--border-light);
-            border-bottom: 1px solid var(--border-light);
-            background: var(--bg-warm);
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
         }
         .legal-disclaimer-bar p {
-            font-size: 0.72rem;
-            line-height: 1.55;
+            font-size: 0.75rem;
+            line-height: 1.6;
             color: var(--text-secondary);
-            max-width: 620px;
+            max-width: 600px;
             margin: 0 auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            text-align: left;
         }
-        .legal-disclaimer-bar strong { color: var(--text); }
+        .legal-disclaimer-bar strong { color: var(--text); font-weight: 600; }
         .footer-inner {
             max-width: 1100px;
             margin: 0 auto;
@@ -1292,7 +1315,7 @@
             </a>
         </div>
         <div class="header-sub">
-            <span class="header-audience">For founders, startups, and service providers who need legally sound and customizable NDAs.</span>
+            <span class="header-audience">For founders, startups, businesses, and service providers who need legally sound and customizable NDAs.</span>
             <span class="trust-badges">
                 <span class="trust-badge">⚖️ Lawyer-Prompted AI</span>
                 <span class="trust-badge-sep">·</span>
@@ -1307,32 +1330,32 @@
         <!-- Stepper -->
         <div class="stepper">
             <div id="step1-badge" class="step-badge active" onclick="navigateStep(1)">
-                <span class="step-num">1</span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 <span class="step-label step-label-tip">Create Draft <span class="step-tip">Fill in party details and agreement terms to generate your NDA.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step2-badge" class="step-badge inactive" onclick="navigateStep(2)">
-                <span class="step-num">2</span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                 <span class="step-label step-label-tip">Advanced Clauses <span class="step-tip">Optional step for experienced users to add stricter or custom clauses.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step3-badge" class="step-badge inactive" onclick="navigateStep(3)">
-                <span class="step-num">3</span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 <span class="step-label step-label-tip">NDA Checklist <span class="step-tip">Quick checks to confirm key terms before sharing.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step4-badge" class="step-badge inactive" onclick="navigateStep(4)">
-                <span class="step-num">4</span>
-                <span class="step-label step-label-tip step-label-flex">Lawyer Review <span style="font-size:0.6rem;color:var(--green);font-weight:600;opacity:0.8;">★</span> <span class="step-tip">Real lawyer review to verify enforceability and jurisdictional compliance.</span></span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span class="step-label step-label-tip">Lawyer Review <span class="step-tip">Real lawyer review to verify enforceability and jurisdictional compliance.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step5-badge" class="step-badge inactive" onclick="navigateStep(5)">
-                <span class="step-num">5</span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                 <span class="step-label step-label-tip">Final Summary <span class="step-tip">Plain-language explanation of your NDA for the counterparty.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step6-badge" class="step-badge inactive" onclick="navigateStep(6)">
-                <span class="step-num">6</span>
+                <svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 <span class="step-label step-label-tip">Send NDA <span class="step-tip">Pre-fill a professional cover email and send to your counterparty.</span></span>
             </div>
         </div>
@@ -1677,7 +1700,7 @@
                     <div id="ndaContent1" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
                         <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
-                        <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Audit</strong> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. For a binding agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a qualified lawyer will check your NDA within 24 hours (business days) for <strong>$100</strong>.</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
@@ -1691,7 +1714,7 @@
                 <!-- Strictness Meter -->
                 <div id="strengthMeter1" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is for the counterparty. Balanced is recommended for most deals — aggressive terms may be unenforceable or discourage signing.</span></span></span>
+                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
                         <span id="strengthLabel1" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
@@ -1700,15 +1723,19 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">Balanced<small style="font-size:0.6rem;color:var(--green);font-weight:600;">(Recommended)</small></span>
+                        <span>Balanced</span>
                         <span>Restrictive</span>
                         <span>Aggressive</span>
+                    </div>
+                    <div class="strength-recommended-range">
+                        <div class="strength-recommended-bar"></div>
+                        <span class="strength-recommended-label">Recommended range</span>
                     </div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
                         <div class="strength-header">
-                            <span class="strength-title">NDA Enforceability Score <span class="score-tip">ⓘ<span class="score-tip-text">Shows how likely your NDA is to hold up in court. AI-generated drafts cap at 50% — use the Playbook to reach 70%, or get a Legal Audit for 100%.</span></span></span>
+                            <span class="strength-title">NDA Enforceability Score <span class="score-tip">ⓘ<span class="score-tip-text">Shows how likely your NDA is to hold up in court. AI-generated drafts cap at 50% — use the Playbook to reach 70%, or get a Legal Review for 100%.</span></span></span>
                             <span id="confLabel1" class="strength-label">—</span>
                         </div>
                         <div class="strength-bar-bg">
@@ -1739,11 +1766,11 @@
                                     <span style="font-size:1.3rem;">⚖️</span>
                                     <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
                                 </div>
-                                <h4 class="product-card-title">Legal Audit by a Qualified Lawyer</h4>
+                                <h4 class="product-card-title">Legal Review by a Qualified Lawyer</h4>
                                 <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
                             </div>
                             <div>
-                                <span class="product-btn" style="background:var(--green);">Order Legal Audit — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <span class="product-btn" style="background:var(--green);">Order Legal Review — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
                                 <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
                             </div>
                         </div>
@@ -2011,7 +2038,7 @@
                     <div id="ndaContent2" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
                         <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
-                        <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Audit</strong> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. For a binding agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a qualified lawyer will check your NDA within 24 hours (business days) for <strong>$100</strong>.</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
@@ -2025,7 +2052,7 @@
                 <!-- Strictness Meter -->
                 <div id="strengthMeter2" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is for the counterparty. Balanced is recommended for most deals — aggressive terms may be unenforceable or discourage signing.</span></span></span>
+                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
                         <span id="strengthLabel2" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
@@ -2034,15 +2061,19 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">Balanced<small style="font-size:0.6rem;color:var(--green);font-weight:600;">(Recommended)</small></span>
+                        <span>Balanced</span>
                         <span>Restrictive</span>
                         <span>Aggressive</span>
+                    </div>
+                    <div class="strength-recommended-range">
+                        <div class="strength-recommended-bar"></div>
+                        <span class="strength-recommended-label">Recommended range</span>
                     </div>
                     <div id="strengthBreakdown2" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
                         <div class="strength-header">
-                            <span class="strength-title">NDA Enforceability Score <span class="score-tip">ⓘ<span class="score-tip-text">Shows how likely your NDA is to hold up in court. AI-generated drafts cap at 50% — use the Playbook to reach 70%, or get a Legal Audit for 100%.</span></span></span>
+                            <span class="strength-title">NDA Enforceability Score <span class="score-tip">ⓘ<span class="score-tip-text">Shows how likely your NDA is to hold up in court. AI-generated drafts cap at 50% — use the Playbook to reach 70%, or get a Legal Review for 100%.</span></span></span>
                             <span id="confLabel2" class="strength-label">—</span>
                         </div>
                         <div class="strength-bar-bg">
@@ -2073,11 +2104,11 @@
                                     <span style="font-size:1.3rem;">⚖️</span>
                                     <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
                                 </div>
-                                <h4 class="product-card-title">Legal Audit by a Qualified Lawyer</h4>
+                                <h4 class="product-card-title">Legal Review by a Qualified Lawyer</h4>
                                 <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
                             </div>
                             <div>
-                                <span class="product-btn" style="background:var(--green);">Order Legal Audit — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <span class="product-btn" style="background:var(--green);">Order Legal Review — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
                                 <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
                             </div>
                         </div>
@@ -2149,7 +2180,7 @@
             <div class="card" style="border-color:#C8E6D0;background:linear-gradient(135deg, #FAFEFB 0%, #F5FBF7 100%);">
                 <div style="text-align:center;padding:20px 0 10px;">
                     <span style="font-size:2.5rem;">⚖️</span>
-                    <h3 style="font-size:1.15rem;font-weight:700;margin:12px 0 6px;">Legal Audit by a Qualified Lawyer</h3>
+                    <h3 style="font-size:1.15rem;font-weight:700;margin:12px 0 6px;">Legal Review by a Qualified Lawyer</h3>
                     <span style="display:inline-block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--green);background:var(--green-soft);padding:4px 12px;border-radius:100px;">Achieve 100% Enforceability</span>
                 </div>
 
@@ -2181,7 +2212,7 @@
                     </div>
 
                     <button class="btn-primary" style="background:var(--green);opacity:0.55;cursor:not-allowed;font-size:1rem;padding:16px;" disabled>
-                        Order Legal Audit — Coming Soon
+                        Order Legal Review — Coming Soon
                     </button>
                     <p style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:8px;">We're finalizing the process. Leave your email to be notified when it's available.</p>
                 </div>
@@ -2336,8 +2367,10 @@
     </section>
 
     <!-- Legal Disclaimer -->
-    <div class="legal-disclaimer-bar">
-        <p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p>
+    <div style="padding:20px 24px;">
+        <div class="legal-disclaimer-bar">
+            <p><svg style="width:16px;height:16px;flex-shrink:0;margin-top:1px;opacity:0.5;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</span></p>
+        </div>
     </div>
 
     <footer>
@@ -2357,6 +2390,7 @@
         let generatedNDAText = '';
         let generatedNDAText2 = '';
         let generatedSummaryText = '';
+        let checklistBonus = 0;
         let searchTimeout = null;
 
         // ═══════ Save/Load Party Data ═══════
@@ -3104,21 +3138,22 @@ ${senderCompany}`;
             ).join('');
 
             // ── NDA Enforceability Score ──
-            let conf = 50; // AI-generated baseline
-            conf = Math.min(conf, 50); // hard cap without playbook or lawyer
+            const conf = 50 + checklistBonus;
 
             const confBar = document.getElementById('confBar' + num);
             const confLabel = document.getElementById('confLabel' + num);
             const confNote = document.getElementById('confNote' + num);
 
-            const confColor = '#D4970A';
+            const confColor = checklistBonus > 0 ? '#3D9A5F' : '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
             confLabel.textContent = conf + '%';
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
 
-            confNote.innerHTML = `Legal enforceability of AI-generated NDAs remains at <strong>50%</strong>. While we apply best practices in our generative prompts, AI models have inherent limitations and may produce inaccuracies. Applying the guidance from our <strong>"NDA Playbook in the AI Era"</strong> can increase the scale by up to <strong style="color:#D4670A;">70%</strong>, providing a general understanding of the enforceability gaps. Achieving <strong style="color:var(--green);">100%</strong> confidence and enforceability requires human legal expertise.`;
+            confNote.innerHTML = checklistBonus > 0
+                ? `Checklist complete — <strong>+5%</strong> applied. Get our <strong>"NDA Playbook"</strong> to reach <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
+                : `AI-generated NDAs start at <strong>50%</strong>. Our <strong>"NDA Playbook"</strong> can raise it to <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
         }
 
         function updateDocsPanel() {
@@ -3151,10 +3186,32 @@ ${senderCompany}`;
             if (done === total) {
                 document.getElementById('checklistBar').style.background = 'var(--green)';
                 document.getElementById('checklistCount').style.color = 'var(--green)';
+                checklistBonus = 5;
             } else {
                 document.getElementById('checklistBar').style.background = 'var(--accent)';
                 document.getElementById('checklistCount').style.color = 'var(--text-muted)';
+                checklistBonus = 0;
             }
+            // Re-render enforceability scores on both meters if they exist
+            updateEnforceabilityDisplay(1);
+            updateEnforceabilityDisplay(2);
+        }
+
+        function updateEnforceabilityDisplay(num) {
+            const confBar = document.getElementById('confBar' + num);
+            const confLabel = document.getElementById('confLabel' + num);
+            const confNote = document.getElementById('confNote' + num);
+            if (!confBar || confBar.style.width === '0%') return;
+            const conf = 50 + checklistBonus;
+            const confColor = checklistBonus > 0 ? '#3D9A5F' : '#D4970A';
+            confBar.style.width = conf + '%';
+            confBar.style.background = confColor;
+            confLabel.textContent = conf + '%';
+            confLabel.style.background = confColor + '18';
+            confLabel.style.color = confColor;
+            confNote.innerHTML = checklistBonus > 0
+                ? `Checklist complete — <strong>+5%</strong> applied. Get our <strong>"NDA Playbook"</strong> to reach <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
+                : `AI-generated NDAs start at <strong>50%</strong>. Our <strong>"NDA Playbook"</strong> can raise it to <strong style="color:#D4670A;">70%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
         }
 
         function copyEmailText() {
@@ -3181,13 +3238,10 @@ ${senderCompany}`;
                 if (!badge) continue;
                 if (i < step) {
                     badge.className = 'step-badge done';
-                    badge.querySelector('.step-num').textContent = '✓';
                 } else if (i === step) {
                     badge.className = 'step-badge active';
-                    badge.querySelector('.step-num').textContent = i;
                 } else {
                     badge.className = 'step-badge inactive';
-                    badge.querySelector('.step-num').textContent = i;
                 }
             }
         }
