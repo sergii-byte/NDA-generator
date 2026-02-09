@@ -121,25 +121,82 @@
             padding: 28px 24px 24px;
         }
 
+        /* ─── Party Type Toggle ─── */
+        .label-with-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+        .party-toggle {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .party-toggle input { display: none; }
+        .party-toggle-track {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 140px;
+            height: 26px;
+            border-radius: 100px;
+            background: var(--bg-warm);
+            border: 1px solid var(--border);
+            transition: background 0.2s;
+            padding: 0 6px;
+        }
+        .party-toggle-thumb {
+            position: absolute;
+            left: 2px;
+            width: 68px;
+            height: 22px;
+            border-radius: 100px;
+            background: var(--accent);
+            transition: left 0.2s ease;
+            z-index: 1;
+        }
+        .party-toggle input:checked ~ .party-toggle-track .party-toggle-thumb {
+            left: 70px;
+        }
+        .party-toggle-label-l, .party-toggle-label-r {
+            flex: 1;
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+            transition: color 0.2s;
+            line-height: 26px;
+        }
+        .party-toggle-label-l { color: #fff; }
+        .party-toggle-label-r { color: var(--text-muted); }
+        .party-toggle input:checked ~ .party-toggle-track .party-toggle-label-l { color: var(--text-muted); }
+        .party-toggle input:checked ~ .party-toggle-track .party-toggle-label-r { color: #fff; }
+
         /* ─── Stepper ─── */
         .stepper {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             margin-bottom: 28px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
         .step-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 18px;
+            gap: 6px;
+            padding: 8px 14px;
             border-radius: 100px;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 500;
             transition: all 0.2s ease;
             cursor: pointer;
+            white-space: nowrap;
         }
         .step-badge:hover {
             transform: translateY(-2px);
@@ -173,13 +230,13 @@
         .step-badge.active .step-num { background: rgba(255,255,255,0.25); color: white; }
         .step-badge.done .step-num { background: var(--green); color: white; }
         .step-badge.inactive .step-num { background: var(--border); color: var(--text-muted); }
-        .step-arrow { color: var(--border); font-size: 1rem; }
+        .step-arrow { color: var(--border); font-size: 0.85rem; flex-shrink: 0; }
         .step-label-tip { position: relative; }
         .step-tip {
             position: absolute;
-            bottom: calc(100% + 14px);
+            top: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(4px);
+            transform: translateX(-50%) translateY(-4px);
             background: var(--text);
             color: white;
             font-size: 0.68rem;
@@ -190,18 +247,35 @@
             line-height: 1.45;
             opacity: 0; visibility: hidden;
             transition: all 0.15s ease;
-            z-index: 10;
+            z-index: 200;
             pointer-events: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             text-transform: none;
             letter-spacing: 0;
+        }
+        .step-tip::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: var(--text);
         }
         .step-badge:hover .step-tip {
             opacity: 1; visibility: visible;
             transform: translateX(-50%) translateY(0);
         }
         .step-label-flex { display: flex; align-items: center; gap: 5px; }
-        @media (max-width: 800px) { .step-label { display: none !important; } }
+        @media (max-width: 900px) {
+            .stepper { gap: 4px; }
+            .step-badge { padding: 7px 10px; font-size: 0.72rem; gap: 5px; }
+            .step-arrow { font-size: 0.75rem; }
+        }
+        @media (max-width: 700px) {
+            .step-label { display: none !important; }
+            .stepper { flex-wrap: wrap; justify-content: center; }
+        }
         @media (max-width: 640px) { .step-arrow { display: none; } }
         @media (max-width: 640px) {
             .product-cards-grid { grid-template-columns: 1fr !important; }
@@ -1336,16 +1410,19 @@
                 </div>
 
                 <div class="form-fields" style="margin-top:16px;">
+                    <input type="hidden" id="partyAType" value="Company">
                     <div class="form-group">
-                        <label>Party Type</label>
-                        <select id="partyAKind" onchange="togglePartyKind('A')">
-                            <option value="company">Company / Organisation</option>
-                            <option value="individual">Individual</option>
-                        </select>
-                        <input type="hidden" id="partyAType" value="Company">
-                    </div>
-                    <div class="form-group">
-                        <label id="partyANameLabel">Company Name *</label>
+                        <div class="label-with-toggle">
+                            <label id="partyANameLabel">Company Name *</label>
+                            <label class="party-toggle" title="Switch between company and individual">
+                                <input type="checkbox" id="partyAKind" onchange="togglePartyKind('A')">
+                                <span class="party-toggle-track">
+                                    <span class="party-toggle-label-l">Company</span>
+                                    <span class="party-toggle-thumb"></span>
+                                    <span class="party-toggle-label-r">Individual</span>
+                                </span>
+                            </label>
+                        </div>
                         <input type="text" id="partyAName" autocomplete="off" placeholder="Full legal name">
                     </div>
                     <div class="form-row">
@@ -1441,16 +1518,19 @@
                 </div>
 
                 <div class="form-fields" style="margin-top:16px;">
+                    <input type="hidden" id="partyBType" value="Company">
                     <div class="form-group">
-                        <label>Party Type</label>
-                        <select id="partyBKind" onchange="togglePartyKind('B')">
-                            <option value="company">Company / Organisation</option>
-                            <option value="individual">Individual</option>
-                        </select>
-                        <input type="hidden" id="partyBType" value="Company">
-                    </div>
-                    <div class="form-group">
-                        <label id="partyBNameLabel">Company Name *</label>
+                        <div class="label-with-toggle">
+                            <label id="partyBNameLabel">Company Name *</label>
+                            <label class="party-toggle" title="Switch between company and individual">
+                                <input type="checkbox" id="partyBKind" onchange="togglePartyKind('B')">
+                                <span class="party-toggle-track">
+                                    <span class="party-toggle-label-l">Company</span>
+                                    <span class="party-toggle-thumb"></span>
+                                    <span class="party-toggle-label-r">Individual</span>
+                                </span>
+                            </label>
+                        </div>
                         <input type="text" id="partyBName" autocomplete="off" placeholder="Full legal name">
                     </div>
                     <div class="form-row">
@@ -3135,8 +3215,7 @@ ${senderCompany}`;
         }
 
         function togglePartyKind(party) {
-            const kind = document.getElementById(`party${party}Kind`).value;
-            const isIndividual = kind === 'individual';
+            const isIndividual = document.getElementById(`party${party}Kind`).checked;
             // Update hidden type field
             document.getElementById(`party${party}Type`).value = isIndividual ? 'Individual' : 'Company';
             // Update labels
@@ -3323,8 +3402,8 @@ ${senderCompany}`;
 
         // ═══════ NDA Generation ═══════
         function buildPrompt1() {
-            const partyAIsIndividual = document.getElementById('partyAKind').value === 'individual';
-            const partyBIsIndividual = document.getElementById('partyBKind').value === 'individual';
+            const partyAIsIndividual = document.getElementById('partyAKind').checked;
+            const partyBIsIndividual = document.getElementById('partyBKind').checked;
             const pA = {
                 name: document.getElementById('partyAName').value || '[Party A Name]',
                 companyNumber: partyAIsIndividual ? '' : document.getElementById('partyACompanyNumber').value,
