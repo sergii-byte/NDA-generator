@@ -110,7 +110,9 @@
         .step-badge.done {
             background: var(--green-soft);
             color: var(--green);
+            cursor: pointer;
         }
+        .step-badge.done:hover { filter: brightness(0.95); }
         .step-badge.inactive {
             background: var(--bg-warm);
             color: var(--text-muted);
@@ -393,6 +395,62 @@
             font-weight: 600;
             text-decoration: underline;
             text-underline-offset: 2px;
+        }
+
+        /* ─── Documents Panel ─── */
+        .docs-panel {
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            background: var(--card);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+        .docs-panel-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 10px;
+        }
+        .docs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--bg-warm);
+            font-size: 0.82rem;
+        }
+        .doc-item-name {
+            font-weight: 500;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .doc-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .doc-item-actions button {
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            background: var(--card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .doc-item-actions button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .field-hint {
             font-size: 0.72rem;
@@ -871,24 +929,24 @@
     <main>
         <!-- Stepper -->
         <div class="stepper">
-            <div id="step1-badge" class="step-badge active">
+            <div id="step1-badge" class="step-badge active" onclick="navigateStep(1)">
                 <span class="step-num">1</span>
                 <span class="step-label">Draft NDA</span>
             </div>
             <span class="step-arrow">›</span>
-            <div id="step2-badge" class="step-badge inactive">
+            <div id="step2-badge" class="step-badge inactive" onclick="navigateStep(2)">
                 <span class="step-num">+</span>
                 <span class="step-label">Customize NDA</span>
             </div>
             <span class="step-arrow">›</span>
-            <div id="step3-badge" class="step-badge inactive">
+            <div id="step3-badge" class="step-badge inactive" onclick="navigateStep(3)">
                 <span class="step-num">+</span>
                 <span class="step-label">Summary</span>
             </div>
             <span class="step-arrow">›</span>
-            <div id="step4-badge" class="step-badge inactive">
+            <div id="step4-badge" class="step-badge inactive" onclick="navigateStep(4)">
                 <span class="step-num">+</span>
-                <span class="step-label">Compose Email</span>
+                <span class="step-label">Checklist & Email</span>
             </div>
         </div>
 
@@ -1226,23 +1284,24 @@
                 <!-- Strength Meter -->
                 <div id="strengthMeter1" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Protection Level</span>
+                        <span class="strength-title">NDA Restriction Level</span>
                         <span id="strengthLabel1" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
                         <div id="strengthBar1" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="strength-scale">
-                        <span>Basic</span>
-                        <span>Standard</span>
-                        <span>Strong</span>
+                        <span>Weak</span>
+                        <span>Moderate</span>
+                        <span>Balanced</span>
+                        <span>Restrictive</span>
                         <span>Aggressive</span>
                     </div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
                         <div class="strength-header">
-                            <span class="strength-title">Legal Confidence</span>
+                            <span class="strength-title">NDA Enforceability Score</span>
                             <span id="confLabel1" class="strength-label">—</span>
                         </div>
                         <div class="strength-bar-bg">
@@ -1254,8 +1313,8 @@
 
                 <!-- AI Disclaimer -->
                 <div class="ai-disclaimer">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
-                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that don't reflect the latest law in your jurisdiction. This NDA is a starting point, not a finished legal instrument. For binding agreements involving significant value, IP, or regulatory risk, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">get a Legal Audit ($100)</a> from a qualified lawyer before signing.</p>
+                    <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
                 </div>
 
                 <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1533,23 +1592,24 @@
                 <!-- Strength Meter -->
                 <div id="strengthMeter2" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Protection Level</span>
+                        <span class="strength-title">NDA Restriction Level</span>
                         <span id="strengthLabel2" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
                         <div id="strengthBar2" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="strength-scale">
-                        <span>Basic</span>
-                        <span>Standard</span>
-                        <span>Strong</span>
+                        <span>Weak</span>
+                        <span>Moderate</span>
+                        <span>Balanced</span>
+                        <span>Restrictive</span>
                         <span>Aggressive</span>
                     </div>
                     <div id="strengthBreakdown2" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
                         <div class="strength-header">
-                            <span class="strength-title">Legal Confidence</span>
+                            <span class="strength-title">NDA Enforceability Score</span>
                             <span id="confLabel2" class="strength-label">—</span>
                         </div>
                         <div class="strength-bar-bg">
@@ -1561,8 +1621,8 @@
 
                 <!-- AI Disclaimer -->
                 <div class="ai-disclaimer">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
-                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that don't reflect the latest law in your jurisdiction. This NDA is a starting point, not a finished legal instrument. For binding agreements involving significant value, IP, or regulatory risk, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">get a Legal Audit ($100)</a> from a qualified lawyer before signing.</p>
+                    <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
                 </div>
 
                 <button class="btn-primary" style="margin-top:16px;" onclick="goToStep3()">
@@ -1617,17 +1677,8 @@
                     </div>
                 </div>
 
-                <div class="cta-banner">
-                    <h4>🎉 Your NDA package is complete</h4>
-                    <p>Need a polished Word document or want a lawyer to review your NDA?</p>
-                    <div class="cta-links">
-                        <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
-                        <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
-                    </div>
-                </div>
-
                 <button class="btn-primary" style="margin-top:16px;" onclick="goToStep4()">
-                    Compose Cover Email →
+                    Checklist & Email →
                 </button>
                 <button class="btn-secondary" style="margin-top:8px;" onclick="backToStep1()">
                     ← Create Another NDA
@@ -1671,21 +1722,6 @@
                 </div>
             </div>
 
-            <!-- NDA Founders Playbook CTA -->
-            <div class="card" style="background:linear-gradient(135deg, var(--bg-warm) 0%, #FFF8F5 100%);border-color:var(--accent-ring);">
-                <div style="display:flex;gap:16px;align-items:flex-start;">
-                    <div style="flex:0 0 48px;height:48px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📘</div>
-                    <div style="flex:1;">
-                        <h4 style="font-size:1rem;font-weight:600;margin-bottom:4px;">NDA Founders Playbook</h4>
-                        <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples. Written by lawyers, designed for founders.</p>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:var(--accent);color:white;font-weight:600;font-size:0.85rem;opacity:0.5;cursor:not-allowed;">Get Playbook — $10 <span style="font-size:0.7rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                            <span style="font-size:0.72rem;color:var(--text-muted);">PDF · 40+ pages · Lifetime access</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Cover Email -->
             <div class="card">
                 <div class="card-title">Cover Email</div>
@@ -1724,28 +1760,38 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="cta-banner">
-                <h4>🎉 Your NDA package is complete</h4>
-                <p>Need a polished Word document or want a lawyer to review your NDA?</p>
-                <div class="cta-links">
-                    <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
-                    <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
+        <!-- ═══════ Persistent Blocks (visible after first NDA) ═══════ -->
+        <div id="persistentBlocks" class="hidden" style="margin-top:24px;">
+
+            <!-- Documents Panel -->
+            <div id="docsPanel" class="docs-panel" style="margin-bottom:16px;">
+                <div class="docs-panel-title">📄 Your Documents</div>
+                <div id="docsList" class="docs-list"></div>
+            </div>
+
+            <!-- NDA Playbook CTA -->
+            <div class="card" style="background:linear-gradient(135deg, var(--bg-warm) 0%, #FFF8F5 100%);border-color:var(--accent-ring);margin-bottom:16px;">
+                <div style="display:flex;gap:16px;align-items:flex-start;">
+                    <div style="flex:0 0 48px;height:48px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">📘</div>
+                    <div style="flex:1;">
+                        <h4 style="font-size:1rem;font-weight:600;margin-bottom:4px;">NDA Playbook in the AI Era</h4>
+                        <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;margin-bottom:12px;">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples. Written by lawyers, designed for a broad audience seeking a better understanding of NDAs and their practical mindful use.</p>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:var(--accent);color:white;font-weight:600;font-size:0.85rem;opacity:0.5;cursor:not-allowed;">Get Playbook — $10 <span style="font-size:0.7rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                            <span style="font-size:0.72rem;color:var(--text-muted);">PDF · 40+ pages</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <button class="btn-secondary" style="margin-top:8px;" onclick="backToStep1()">
-                ← Create Another NDA
-            </button>
-        </div>
-
-        <!-- CTA (hidden until NDA generated) -->
-        <div id="footerCTA" class="hidden">
+            <!-- CTA -->
             <div class="cta-banner">
-                <h4>Want a polished Word document?</h4>
-                <p>Get a professionally formatted .docx ready for signing, or have a lawyer review your NDA.</p>
+                <h4>Ready to finalize your NDA?</h4>
+                <p>Download a Word template ready for signing, or get a professional legal review.</p>
                 <div class="cta-links">
-                    <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Document — $10 (coming soon)</span>
+                    <span class="cta-primary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Word Template — $10 (coming soon)</span>
                     <span class="cta-secondary" style="opacity:0.5;cursor:not-allowed;pointer-events:none;">Legal Audit — $100 (coming soon)</span>
                 </div>
             </div>
@@ -2350,7 +2396,7 @@
         function goToStep2() {
             document.getElementById('step1').classList.add('hidden');
             document.getElementById('step2').classList.remove('hidden');
-            document.getElementById('footerCTA').classList.add('hidden');
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function goToStep3() {
@@ -2358,7 +2404,7 @@
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step4').classList.add('hidden');
             document.getElementById('step3').classList.remove('hidden');
-            document.getElementById('footerCTA').classList.add('hidden');
+            
             document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2367,8 +2413,8 @@
             document.getElementById('step2').classList.add('hidden');
             document.getElementById('step3').classList.add('hidden');
             document.getElementById('step4').classList.remove('hidden');
-            document.getElementById('footerCTA').classList.add('hidden');
             buildEmailTemplate();
+            updateDocsPanel();
             updateBadge(4);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2382,7 +2428,7 @@
             document.getElementById('step3').classList.add('hidden');
             document.getElementById('step4').classList.add('hidden');
             document.getElementById('step1').classList.remove('hidden');
-            if (generatedNDAText) document.getElementById('footerCTA').classList.remove('hidden');
+            document.getElementById('persistentBlocks').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function backToResults() {
@@ -2392,7 +2438,7 @@
                 document.getElementById('step2').classList.remove('hidden');
             } else {
                 document.getElementById('step1').classList.remove('hidden');
-                document.getElementById('footerCTA').classList.remove('hidden');
+                document.getElementById('persistentBlocks').classList.remove('hidden');
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2476,8 +2522,9 @@ ${senderCompany}`;
                 tags.push({name:'Custom categories', on:true});
             }
 
-            // Base always includes: standard exclusions, authorised recipients, governing law
-            score += 8;
+            // Base always includes: standard exclusions, authorised recipients, governing law, return of materials
+            score += 18;
+            tags.push({name:'Standard protections', on:true});
 
             // ── Enhanced NDA scoring ──
             if (enhanced) {
@@ -2527,12 +2574,13 @@ ${senderCompany}`;
             // Clamp to 100
             score = Math.min(score, 100);
 
-            // Determine level
+            // Determine level — 5-tier scale
             let level, color;
             if (score >= 80) { level = 'Aggressive'; color = '#C0392B'; }
-            else if (score >= 55) { level = 'Strong'; color = '#27AE60'; }
-            else if (score >= 30) { level = 'Standard'; color = '#D4970A'; }
-            else { level = 'Basic'; color = '#9A9490'; }
+            else if (score >= 60) { level = 'Restrictive'; color = '#D4670A'; }
+            else if (score >= 40) { level = 'Balanced'; color = '#27AE60'; }
+            else if (score >= 20) { level = 'Moderate'; color = '#D4970A'; }
+            else { level = 'Weak'; color = '#9A9490'; }
 
             return { score, level, color, tags };
         }
@@ -2554,32 +2602,42 @@ ${senderCompany}`;
                 `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
             ).join('');
 
-            // ── Legal Confidence meter ──
-            // AI draft caps at 60%, enhanced adds up to 15%, but never 100% without lawyer
-            let conf = 35; // base AI-generated draft
-            if (enhanced) conf += 15; // customized clauses = more intentional
-            const period = parseInt(document.getElementById('confPeriod').value);
-            if (period >= 3) conf += 5;
-            const confChecked = document.querySelectorAll('.confInfo:checked').length;
-            if (confChecked >= 5) conf += 5;
-            conf = Math.min(conf, 60); // hard cap without lawyer review
+            // ── NDA Enforceability Score ──
+            let conf = 50; // AI-generated baseline
+            conf = Math.min(conf, 50); // hard cap without playbook or lawyer
 
             const confBar = document.getElementById('confBar' + num);
             const confLabel = document.getElementById('confLabel' + num);
             const confNote = document.getElementById('confNote' + num);
 
-            let confColor, confText;
-            if (conf >= 50) { confColor = '#D4970A'; confText = 'Moderate'; }
-            else if (conf >= 35) { confColor = '#D4970A'; confText = 'Low–Moderate'; }
-            else { confColor = '#9A9490'; confText = 'Low'; }
-
+            const confColor = '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
-            confLabel.textContent = confText + ' · ' + conf + '%';
+            confLabel.textContent = conf + '%';
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
 
-            confNote.innerHTML = 'AI-generated NDAs are capped at <strong>60%</strong> legal confidence. To reach <strong style="color:var(--green);">100%</strong>, <a href="#" onclick="event.preventDefault();" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA for enforceability, jurisdictional compliance, and missing protections.';
+            confNote.innerHTML = `Legal enforceability of AI-generated NDAs remains at <strong>50%</strong>. While we apply best practices in our generative prompts, large language models have inherent limitations and may produce inaccuracies.<br><br>Applying the guidance from our <strong>"NDA Playbook in the AI Era"</strong> can increase enforceability up to <strong style="color:#D4670A;">70%</strong>, giving you a general understanding of the enforceability gaps.<br><br>Achieving full confidence and enforceability requires human legal expertise. <a href="#" onclick="event.preventDefault();" style="pointer-events:none;opacity:0.7;">Order a Legal Audit</a> from a qualified lawyer to review your NDA for enforceability, jurisdictional compliance, and missing legal protections — completed within one business day.`;
+        }
+
+        function updateDocsPanel() {
+            const list = document.getElementById('docsList');
+            let html = '';
+            if (generatedNDAText) {
+                html += `<div class="doc-item"><span class="doc-item-name">📝 NDA Draft</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText)">Copy</button><button onclick="downloadPDF('ndaContent1','NDA.pdf')">PDF</button></div></div>`;
+            }
+            if (generatedNDAText2) {
+                html += `<div class="doc-item"><span class="doc-item-name">📝 Customized NDA</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText2)">Copy</button><button onclick="downloadPDF('ndaContent2','NDA_Customized.pdf')">PDF</button></div></div>`;
+            }
+            if (generatedSummaryText) {
+                html += `<div class="doc-item"><span class="doc-item-name">📋 Plain-English Summary</span><div class="doc-item-actions"><button onclick="copyText(generatedSummaryText)">Copy</button><button onclick="downloadPDF('summaryContent','NDA_Summary.pdf')">PDF</button></div></div>`;
+            }
+            const subj = document.getElementById('emailSubject');
+            const body = document.getElementById('emailBody');
+            if (subj && subj.value) {
+                html += `<div class="doc-item"><span class="doc-item-name">✉️ Cover Email</span><div class="doc-item-actions"><button onclick="copyEmailText()">Copy</button></div></div>`;
+            }
+            list.innerHTML = html || '<div style="font-size:0.82rem;color:var(--text-muted);padding:4px 0;">No documents generated yet.</div>';
         }
 
         function updateChecklistProgress() {
@@ -2630,6 +2688,20 @@ ${senderCompany}`;
                     badge.querySelector('.step-num').textContent = '+';
                 }
             }
+        }
+
+        function navigateStep(step) {
+            // Only allow navigation if first NDA has been generated
+            if (!generatedNDAText) return;
+            // Hide all steps
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('step' + i).classList.add('hidden');
+            }
+            
+            document.getElementById('step' + step).classList.remove('hidden');
+            // Rebuild email if going to step 4
+            if (step === 4) buildEmailTemplate();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function toggleSolicitFields() {
@@ -3295,7 +3367,8 @@ FORMATTING:
 
                 generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
                 renderStrengthMeter(1, false);
-                document.getElementById('footerCTA').classList.remove('hidden');
+                document.getElementById('persistentBlocks').classList.remove('hidden');
+                updateDocsPanel();
                 updateBadge(1);
 
                 savePartyData('A');
@@ -3322,6 +3395,7 @@ FORMATTING:
 
                 generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
                 renderStrengthMeter(2, true);
+                updateDocsPanel();
                 updateBadge(2);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
@@ -3340,6 +3414,7 @@ REQUIREMENTS:
 - Use a friendly but professional tone
 - Structure with clear headings: "What is this agreement?", "What you're agreeing to", "What counts as confidential", "How long it lasts", "Your rights", "Key obligations"
 - Explain each section simply without legal jargon
+- When describing confidential information categories, list the specific categories selected (e.g. "business plans, financial data, technical trade secrets, customer lists") rather than saying information is defined "broadly" or "very broadly" — be specific about what is covered
 - Mention any specific protections or obligations (non-solicitation, return of materials, etc.)
 - End with: "**This summary is provided for convenience only and does not constitute legal advice. The NDA itself is the binding document.**"
 - Use markdown formatting for readability`;
@@ -3354,6 +3429,7 @@ REQUIREMENTS:
                 const loadingEl = document.getElementById('loadingState3');
 
                 generatedSummaryText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                updateDocsPanel();
                 updateBadge(3);
             } catch (e) { alert('Error: ' + e.message); }
             finally {
