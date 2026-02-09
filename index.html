@@ -200,7 +200,8 @@
             opacity: 1; visibility: visible;
             transform: translateX(-50%) translateY(0);
         }
-        @media (max-width: 800px) { .step-label { display: none; } }
+        .step-label-flex { display: flex; align-items: center; gap: 5px; }
+        @media (max-width: 800px) { .step-label { display: none !important; } }
         @media (max-width: 640px) { .step-arrow { display: none; } }
         @media (max-width: 640px) {
             .product-cards-grid { grid-template-columns: 1fr !important; }
@@ -1233,7 +1234,7 @@
         <div class="stepper">
             <div id="step1-badge" class="step-badge active" onclick="navigateStep(1)">
                 <span class="step-num">1</span>
-                <span class="step-label">Create Draft</span>
+                <span class="step-label step-label-tip">Create Draft <span class="step-tip">Fill in party details and agreement terms to generate your NDA.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step2-badge" class="step-badge inactive" onclick="navigateStep(2)">
@@ -1248,7 +1249,7 @@
             <span class="step-arrow">›</span>
             <div id="step4-badge" class="step-badge inactive" onclick="navigateStep(4)">
                 <span class="step-num">4</span>
-                <span class="step-label step-label-tip" style="display:flex;align-items:center;gap:5px;">Lawyer Review <span style="font-size:0.6rem;color:var(--green);font-weight:600;opacity:0.8;">★</span> <span class="step-tip">Real lawyer review to verify enforceability and jurisdictional compliance.</span></span>
+                <span class="step-label step-label-tip step-label-flex">Lawyer Review <span style="font-size:0.6rem;color:var(--green);font-weight:600;opacity:0.8;">★</span> <span class="step-tip">Real lawyer review to verify enforceability and jurisdictional compliance.</span></span>
             </div>
             <span class="step-arrow">›</span>
             <div id="step5-badge" class="step-badge inactive" onclick="navigateStep(5)">
@@ -1258,7 +1259,7 @@
             <span class="step-arrow">›</span>
             <div id="step6-badge" class="step-badge inactive" onclick="navigateStep(6)">
                 <span class="step-num">6</span>
-                <span class="step-label">Send NDA</span>
+                <span class="step-label step-label-tip">Send NDA <span class="step-tip">Pre-fill a professional cover email and send to your counterparty.</span></span>
             </div>
         </div>
 
@@ -1336,12 +1337,19 @@
 
                 <div class="form-fields" style="margin-top:16px;">
                     <div class="form-group">
-                        <label>Company Name *</label>
-                        <input type="text" id="partyAName" autocomplete="off" placeholder="Full legal name">
+                        <label>Party Type</label>
+                        <select id="partyAKind" onchange="togglePartyKind('A')">
+                            <option value="company">Company / Organisation</option>
+                            <option value="individual">Individual</option>
+                        </select>
                         <input type="hidden" id="partyAType" value="Company">
                     </div>
+                    <div class="form-group">
+                        <label id="partyANameLabel">Company Name *</label>
+                        <input type="text" id="partyAName" autocomplete="off" placeholder="Full legal name">
+                    </div>
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" id="partyACompanyNumberGroup">
                             <label>Company Number</label>
                             <input type="text" id="partyACompanyNumber" autocomplete="off" placeholder="Registration number">
                         </div>
@@ -1351,11 +1359,11 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Registered Address *</label>
+                        <label id="partyAAddressLabel">Registered Address *</label>
                         <input type="text" id="partyAAddress" autocomplete="off" placeholder="Full registered address">
                     </div>
-                    <hr class="form-divider">
-                    <div class="form-row">
+                    <hr class="form-divider" id="partyASignatoryDivider">
+                    <div class="form-row" id="partyASignatoryRow">
                         <div class="form-group">
                             <label>Signatory Name</label>
                             <input type="text" id="partyASignatory" autocomplete="off" placeholder="Full name of signatory">
@@ -1434,12 +1442,19 @@
 
                 <div class="form-fields" style="margin-top:16px;">
                     <div class="form-group">
-                        <label>Company Name *</label>
-                        <input type="text" id="partyBName" autocomplete="off" placeholder="Full legal name">
+                        <label>Party Type</label>
+                        <select id="partyBKind" onchange="togglePartyKind('B')">
+                            <option value="company">Company / Organisation</option>
+                            <option value="individual">Individual</option>
+                        </select>
                         <input type="hidden" id="partyBType" value="Company">
                     </div>
+                    <div class="form-group">
+                        <label id="partyBNameLabel">Company Name *</label>
+                        <input type="text" id="partyBName" autocomplete="off" placeholder="Full legal name">
+                    </div>
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" id="partyBCompanyNumberGroup">
                             <label>Company Number</label>
                             <input type="text" id="partyBCompanyNumber" autocomplete="off" placeholder="Registration number">
                         </div>
@@ -1449,11 +1464,11 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Registered Address *</label>
+                        <label id="partyBAddressLabel">Registered Address *</label>
                         <input type="text" id="partyBAddress" autocomplete="off" placeholder="Full registered address">
                     </div>
-                    <hr class="form-divider">
-                    <div class="form-row">
+                    <hr class="form-divider" id="partyBSignatoryDivider">
+                    <div class="form-row" id="partyBSignatoryRow">
                         <div class="form-group">
                             <label>Signatory Name</label>
                             <input type="text" id="partyBSignatory" autocomplete="off" placeholder="Full name of signatory">
@@ -2455,7 +2470,7 @@
 
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         }
 
         // ═══════ Website / Email / Card Parsing ═══════
@@ -3119,6 +3134,25 @@ ${senderCompany}`;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function togglePartyKind(party) {
+            const kind = document.getElementById(`party${party}Kind`).value;
+            const isIndividual = kind === 'individual';
+            // Update hidden type field
+            document.getElementById(`party${party}Type`).value = isIndividual ? 'Individual' : 'Company';
+            // Update labels
+            document.getElementById(`party${party}NameLabel`).textContent = isIndividual ? 'Full Name *' : 'Company Name *';
+            document.getElementById(`party${party}AddressLabel`).textContent = isIndividual ? 'Address *' : 'Registered Address *';
+            // Update placeholders
+            document.getElementById(`party${party}Name`).placeholder = isIndividual ? 'Full legal name of the individual' : 'Full legal name';
+            document.getElementById(`party${party}Address`).placeholder = isIndividual ? 'Residential or correspondence address' : 'Full registered address';
+            document.getElementById(`party${party}Email`).placeholder = isIndividual ? 'personal@email.com' : 'contact@company.com';
+            // Hide/show company-specific fields
+            document.getElementById(`party${party}CompanyNumberGroup`).style.display = isIndividual ? 'none' : '';
+            // Hide/show signatory row (individuals sign for themselves)
+            document.getElementById(`party${party}SignatoryDivider`).style.display = isIndividual ? 'none' : '';
+            document.getElementById(`party${party}SignatoryRow`).style.display = isIndividual ? 'none' : '';
+        }
+
         function toggleSolicitFields() {
             const on = document.getElementById('prohibitSoliciting').value === 'Yes';
             document.getElementById('solicitScopeGroup').style.display = on ? '' : 'none';
@@ -3289,25 +3323,29 @@ ${senderCompany}`;
 
         // ═══════ NDA Generation ═══════
         function buildPrompt1() {
+            const partyAIsIndividual = document.getElementById('partyAKind').value === 'individual';
+            const partyBIsIndividual = document.getElementById('partyBKind').value === 'individual';
             const pA = {
                 name: document.getElementById('partyAName').value || '[Party A Name]',
-                companyNumber: document.getElementById('partyACompanyNumber').value,
+                companyNumber: partyAIsIndividual ? '' : document.getElementById('partyACompanyNumber').value,
                 address: document.getElementById('partyAAddress').value || '[Party A Address]',
                 email: document.getElementById('partyAEmail').value,
-                signatory: document.getElementById('partyASignatory').value,
-                title: document.getElementById('partyATitle').value
+                signatory: partyAIsIndividual ? '' : document.getElementById('partyASignatory').value,
+                title: partyAIsIndividual ? '' : document.getElementById('partyATitle').value,
+                isIndividual: partyAIsIndividual
             };
             const pB = {
                 name: document.getElementById('partyBName').value || '[Party B Name]',
-                companyNumber: document.getElementById('partyBCompanyNumber').value,
+                companyNumber: partyBIsIndividual ? '' : document.getElementById('partyBCompanyNumber').value,
                 address: document.getElementById('partyBAddress').value || '[Party B Address]',
                 email: document.getElementById('partyBEmail').value,
                 role: getPartyBRole(),
-                signatory: document.getElementById('partyBSignatory').value,
-                title: document.getElementById('partyBTitle').value
+                signatory: partyBIsIndividual ? '' : document.getElementById('partyBSignatory').value,
+                title: partyBIsIndividual ? '' : document.getElementById('partyBTitle').value,
+                isIndividual: partyBIsIndividual
             };
-            pA.type = detectEntityType(pA.name, document.getElementById('partyAType').value);
-            pB.type = detectEntityType(pB.name, document.getElementById('partyBType').value);
+            pA.type = partyAIsIndividual ? 'individual (natural person)' : detectEntityType(pA.name, document.getElementById('partyAType').value);
+            pB.type = partyBIsIndividual ? 'individual (natural person)' : detectEntityType(pB.name, document.getElementById('partyBType').value);
 
             const confInfoChecked = Array.from(document.querySelectorAll('.confInfo:checked')).map(cb => cb.value).join(', ');
             const confInfoCustom = document.getElementById('confInfoCustom').value.trim();
@@ -3327,13 +3365,13 @@ ${senderCompany}`;
 PARTY A:
 - Full Legal Name: ${pA.name}
 - Entity Type: ${pA.type || '(determine from company name and jurisdiction)'}${pA.companyNumber ? `\n- Registration/Company Number: ${pA.companyNumber}` : ''}
-- Registered Address: ${pA.address}
+- ${pA.isIndividual ? 'Address' : 'Registered Address'}: ${pA.address}
 - Email: ${pA.email || '[Email]'}${pA.signatory ? `\n- Authorised Signatory: ${pA.signatory}` : ''}${pA.title ? `\n- Title/Position: ${pA.title}` : ''}
 
 PARTY B:
 - Full Legal Name: ${pB.name}
 - Entity Type: ${pB.type || '(determine from company name and jurisdiction)'}${pB.companyNumber ? `\n- Registration/Company Number: ${pB.companyNumber}` : ''}
-- Registered Address: ${pB.address}
+- ${pB.isIndividual ? 'Address' : 'Registered Address'}: ${pB.address}
 - Email: ${pB.email || '[Email]'}${pB.signatory ? `\n- Authorised Signatory: ${pB.signatory}` : ''}${pB.title ? `\n- Title/Position: ${pB.title}` : ''}
 
 ═══ KEY PARAMETERS ═══
@@ -3355,7 +3393,7 @@ CONFIDENTIAL INFORMATION CATEGORIES: ${confInfo}
 Opening paragraph:
 "This ${isMutual ? 'Mutual ' : ''}Non-Disclosure Agreement (hereinafter the **"Agreement"**) is entered into as of the Effective Date by and between:"
 
-Identify each Party with: bold legal name, entity type (e.g., "a private limited company incorporated under the laws of [jurisdiction]"), registration number if provided, registered address. Then: "hereinafter referred to as **"Party A"**" / **"Party B"**, each individually a **"Party"** and collectively the **"Parties"**.
+Identify each Party with: bold legal name, entity type (for a company: "a private limited company incorporated under the laws of [jurisdiction]", registration number if provided, registered address; for an individual: "an individual residing at [address]"), registered address or residential address. Then: "hereinafter referred to as **"Party A"**" / **"Party B"**, each individually a **"Party"** and collectively the **"Parties"**.
 
 WHEREAS recitals:
 1. ${isMutual ? 'WHEREAS, each Party possesses certain confidential and proprietary information, and the Parties wish to explore and evaluate a potential business relationship' : 'WHEREAS, Party A possesses certain confidential and proprietary information and wishes to disclose such information to Party B'} for the following purpose: ${getPurpose()} (hereinafter the **"Purpose"**).
@@ -3453,8 +3491,8 @@ ${bindOthers === 'Yes' ? '3.2. Prior to granting any Authorised Recipient access
 | **${pA.name}** | **${pB.name}** |
 |---|---|
 | Signature: ______________________ | Signature: ______________________ |
-| Name: ${pA.signatory || '_______________'} | Name: ${pB.signatory || '_______________'} |
-| Title: ${pA.title || '_______________'} | Title: ${pB.title || '_______________'} |
+| Name: ${pA.isIndividual ? pA.name : (pA.signatory || '_______________')} | Name: ${pB.isIndividual ? pB.name : (pB.signatory || '_______________')} |
+${pA.isIndividual && pB.isIndividual ? '' : `| Title: ${pA.isIndividual ? 'N/A (individual)' : (pA.title || '_______________')} | Title: ${pB.isIndividual ? 'N/A (individual)' : (pB.title || '_______________')} |`}
 | Email: ${pA.email || '_______________'} | Email: ${pB.email || '_______________'} |
 | Date: ______________________ | Date: ______________________ |
 
@@ -3858,10 +3896,10 @@ REQUIREMENTS:
             return marked.parse(text);
         }
 
-        function copyText(text) {
+        function copyText(text, btnEl) {
+            const btn = btnEl || (typeof event !== 'undefined' ? event.target : null);
             navigator.clipboard.writeText(text).then(() => {
-                // Brief visual feedback
-                const btn = event.target;
+                if (!btn) return;
                 const orig = btn.textContent;
                 btn.textContent = 'Copied!';
                 setTimeout(() => btn.textContent = orig, 1500);
