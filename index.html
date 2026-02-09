@@ -55,9 +55,6 @@
         header {
             background: var(--card);
             border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
         .header-inner {
             max-width: 1100px;
@@ -177,8 +174,14 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
             flex-wrap: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
         }
         .step-badge {
             display: flex;
@@ -539,30 +542,16 @@
             font-size: 0.68rem;
             color: var(--text-muted);
         }
-        .strength-recommended-range {
-            position: relative;
-            height: 14px;
-            margin-top: 2px;
-        }
-        .strength-recommended-bar {
-            position: absolute;
-            left: 40%;
-            right: 20%;
-            top: 2px;
-            height: 4px;
-            border-radius: 4px;
-            background: var(--green);
-            opacity: 0.3;
-        }
-        .strength-recommended-label {
-            position: absolute;
-            left: 40%;
-            right: 20%;
-            top: 7px;
-            text-align: center;
-            font-size: 0.58rem;
-            font-weight: 600;
+        .strength-scale .scale-recommended {
             color: var(--green);
+            font-weight: 600;
+            position: relative;
+        }
+        .strength-scale .scale-recommended::after {
+            content: '✓';
+            font-size: 0.5rem;
+            margin-left: 2px;
+            vertical-align: super;
         }
         .strength-breakdown {
             margin-top: 12px;
@@ -690,51 +679,59 @@
             color: var(--accent);
         }
 
-        /* ─── Product Cards ─── */
-        .product-cards-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        /* ─── CTA Steps ─── */
+        .cta-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid var(--border-light);
         }
-        .product-card {
-            border-radius: var(--radius);
-            padding: 16px;
-            border: 1px solid var(--border-light);
+        .cta-step {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            transition: box-shadow 0.15s;
         }
-        .product-card--playbook { background: linear-gradient(135deg, #FAFAF8 0%, #FFF8F5 100%); border-color: var(--accent-ring); }
-        .product-card--audit { background: linear-gradient(135deg, #F6FBF8 0%, #F0FAF4 100%); border-color: #C8E6D0; }
-        .product-badge {
-            font-size: 0.65rem;
-            font-weight: 600;
+        .cta-step:hover { box-shadow: var(--shadow-md); }
+        .cta-step--playbook { background: #FFFAF7; border-color: var(--accent-ring); }
+        .cta-step--review { background: #F8FCF9; border-color: #C8E6D0; }
+        .cta-step-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .cta-step-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
             padding: 3px 8px;
             border-radius: 5px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
-        .product-card-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 5px; line-height: 1.3; }
-        .product-card-desc { font-size: 0.74rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
-        .product-btn {
+        .cta-step-title { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+        .cta-step-desc { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; margin-top: 2px; }
+        .cta-step-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 9px 16px;
-            border-radius: 10px;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 100px;
             color: white;
-            font-weight: 600;
             font-size: 0.78rem;
-            opacity: 0.5;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
             cursor: not-allowed;
-            width: 100%;
-            justify-content: center;
+            opacity: 0.85;
         }
-        .product-meta { font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-top: 5px; }
-        @media (max-width: 640px) { .product-cards-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) {
+            .cta-step { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .cta-step-btn { align-self: stretch; text-align: center; justify-content: center; }
+        }
 
         /* ─── Scales Visualization ─── */
         .scales-viz {
@@ -1728,13 +1725,9 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span>Balanced</span>
-                        <span>Restrictive</span>
+                        <span class="scale-recommended">Balanced</span>
+                        <span class="scale-recommended">Restrictive</span>
                         <span>Aggressive</span>
-                    </div>
-                    <div class="strength-recommended-range">
-                        <div class="strength-recommended-bar"></div>
-                        <span class="strength-recommended-label">Recommended range</span>
                     </div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
 
@@ -1749,35 +1742,27 @@
                         <div class="confidence-note" id="confNote1"></div>
                     </div>
 
-                    <!-- Product Cards -->
-                    <div class="product-cards-grid">
-                        <div class="product-card product-card--playbook">
-                            <div>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                                    <span style="font-size:1.3rem;">📘</span>
-                                    <span class="product-badge" style="color:var(--accent);background:var(--accent-soft);">Increase to 70%</span>
+                    <!-- CTA: Next steps -->
+                    <div class="cta-steps">
+                        <div class="cta-step cta-step--playbook">
+                            <div class="cta-step-left">
+                                <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+20% Score</span>
+                                <div>
+                                    <h4 class="cta-step-title">NDA Playbook in the AI Era</h4>
+                                    <p class="cta-step-desc">Expert negotiation guide: which clauses to push, red flags, real-world examples. 40+ pages.</p>
                                 </div>
-                                <h4 class="product-card-title">NDA Playbook in the AI Era</h4>
-                                <p class="product-card-desc">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples.</p>
                             </div>
-                            <div>
-                                <span class="product-btn" style="background:var(--accent);">Get Playbook — $10 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                                <p class="product-meta">PDF · 40+ pages</p>
-                            </div>
+                            <span class="cta-step-btn" style="background:var(--accent);">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
-                        <div class="product-card product-card--audit">
-                            <div>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                                    <span style="font-size:1.3rem;">⚖️</span>
-                                    <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
+                        <div class="cta-step cta-step--review">
+                            <div class="cta-step-left">
+                                <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100% Score</span>
+                                <div>
+                                    <h4 class="cta-step-title">Legal Review by a Qualified Lawyer</h4>
+                                    <p class="cta-step-desc">Enforceability check, jurisdictional compliance, ready-to-sign .docx. 24h turnaround.</p>
                                 </div>
-                                <h4 class="product-card-title">Legal Review by a Qualified Lawyer</h4>
-                                <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
                             </div>
-                            <div>
-                                <span class="product-btn" style="background:var(--green);">Order Legal Review — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                                <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
-                            </div>
+                            <span class="cta-step-btn" style="background:var(--green);">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                     </div>
                 </div>
@@ -2066,13 +2051,9 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span>Balanced</span>
-                        <span>Restrictive</span>
+                        <span class="scale-recommended">Balanced</span>
+                        <span class="scale-recommended">Restrictive</span>
                         <span>Aggressive</span>
-                    </div>
-                    <div class="strength-recommended-range">
-                        <div class="strength-recommended-bar"></div>
-                        <span class="strength-recommended-label">Recommended range</span>
                     </div>
                     <div id="strengthBreakdown2" class="strength-breakdown"></div>
 
@@ -2087,35 +2068,27 @@
                         <div class="confidence-note" id="confNote2"></div>
                     </div>
 
-                    <!-- Product Cards -->
-                    <div class="product-cards-grid">
-                        <div class="product-card product-card--playbook">
-                            <div>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                                    <span style="font-size:1.3rem;">📘</span>
-                                    <span class="product-badge" style="color:var(--accent);background:var(--accent-soft);">Increase to 70%</span>
+                    <!-- CTA: Next steps -->
+                    <div class="cta-steps">
+                        <div class="cta-step cta-step--playbook">
+                            <div class="cta-step-left">
+                                <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+20% Score</span>
+                                <div>
+                                    <h4 class="cta-step-title">NDA Playbook in the AI Era</h4>
+                                    <p class="cta-step-desc">Expert negotiation guide: which clauses to push, red flags, real-world examples. 40+ pages.</p>
                                 </div>
-                                <h4 class="product-card-title">NDA Playbook in the AI Era</h4>
-                                <p class="product-card-desc">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples.</p>
                             </div>
-                            <div>
-                                <span class="product-btn" style="background:var(--accent);">Get Playbook — $10 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                                <p class="product-meta">PDF · 40+ pages</p>
-                            </div>
+                            <span class="cta-step-btn" style="background:var(--accent);">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
-                        <div class="product-card product-card--audit">
-                            <div>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                                    <span style="font-size:1.3rem;">⚖️</span>
-                                    <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
+                        <div class="cta-step cta-step--review">
+                            <div class="cta-step-left">
+                                <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100% Score</span>
+                                <div>
+                                    <h4 class="cta-step-title">Legal Review by a Qualified Lawyer</h4>
+                                    <p class="cta-step-desc">Enforceability check, jurisdictional compliance, ready-to-sign .docx. 24h turnaround.</p>
                                 </div>
-                                <h4 class="product-card-title">Legal Review by a Qualified Lawyer</h4>
-                                <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
                             </div>
-                            <div>
-                                <span class="product-btn" style="background:var(--green);">Order Legal Review — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                                <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
-                            </div>
+                            <span class="cta-step-btn" style="background:var(--green);">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                     </div>
                 </div>
@@ -2138,7 +2111,12 @@
             </div>
 
             <div class="card">
-                <div class="card-title">Pre-Send Checklist</div>
+                <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                    Pre-Send Checklist
+                    <button class="btn-secondary" style="padding:6px 14px;font-size:0.72rem;" onclick="toggleMarkAll()">
+                        <span id="markAllLabel">Mark all</span>
+                    </button>
+                </div>
                 <div class="form-fields">
                     <div class="checklist" id="preSendChecklist">
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Party details verified</strong> — legal names, registration numbers, and addresses match official records</span></label>
@@ -2157,8 +2135,29 @@
                         <div style="flex:1;height:6px;border-radius:3px;background:var(--border-light);overflow:hidden;">
                             <div id="checklistBar" style="height:100%;width:0%;border-radius:3px;background:var(--accent);transition:width 0.3s ease;"></div>
                         </div>
-                        <span id="checklistCount" style="font-size:0.78rem;font-weight:600;color:var(--text-muted);white-space:nowrap;">0 / 10</span>
+                        <span id="checklistCount" style="font-size:0.78rem;font-weight:600;color:var(--text-muted);white-space:nowrap;">0 / 11</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- Scores on checklist page -->
+            <div id="step3Scores" class="strength-meter" style="display:none;">
+                <div class="strength-header">
+                    <span class="strength-title">NDA Strictness Score</span>
+                    <span id="step3StrLabel" class="strength-label">—</span>
+                </div>
+                <div class="strength-bar-bg">
+                    <div id="step3StrBar" class="strength-bar-fill" style="width:0%;"></div>
+                </div>
+                <div class="confidence-section">
+                    <div class="strength-header">
+                        <span class="strength-title">Legal Enforceability Score</span>
+                        <span id="step3ConfLabel" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg">
+                        <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <div class="confidence-note" id="step3ConfNote"></div>
                 </div>
             </div>
 
@@ -3010,20 +3009,30 @@
 
             // Determine sender/recipient based on dropdown
             let recipientName, recipientEmail, senderName, senderTitle, senderCompany, recipientCompany;
+            const partyBIsIndiv = document.getElementById('partyBKind').checked;
+            const partyAIsIndiv = document.getElementById('partyAKind').checked;
             if (sendTo === 'B') {
-                recipientName = document.getElementById('partyBSignatory').value || '[Name]';
+                recipientName = partyBIsIndiv
+                    ? (document.getElementById('partyBName').value || '[Name]')
+                    : (document.getElementById('partyBSignatory').value || document.getElementById('partyBName').value || '[Name]');
                 recipientEmail = document.getElementById('partyBEmail').value || '';
-                recipientCompany = document.getElementById('partyBName').value || '[Their Company]';
-                senderName = document.getElementById('partyASignatory').value || '[Your Name]';
-                senderTitle = document.getElementById('partyATitle').value;
-                senderCompany = document.getElementById('partyAName').value || '[Your Company]';
+                recipientCompany = partyBIsIndiv ? '' : (document.getElementById('partyBName').value || '[Their Company]');
+                senderName = partyAIsIndiv
+                    ? (document.getElementById('partyAName').value || '[Your Name]')
+                    : (document.getElementById('partyASignatory').value || '[Your Name]');
+                senderTitle = partyAIsIndiv ? '' : document.getElementById('partyATitle').value;
+                senderCompany = partyAIsIndiv ? '' : (document.getElementById('partyAName').value || '[Your Company]');
             } else {
-                recipientName = document.getElementById('partyASignatory').value || '[Name]';
+                recipientName = partyAIsIndiv
+                    ? (document.getElementById('partyAName').value || '[Name]')
+                    : (document.getElementById('partyASignatory').value || document.getElementById('partyAName').value || '[Name]');
                 recipientEmail = document.getElementById('partyAEmail').value || '';
-                recipientCompany = document.getElementById('partyAName').value || '[Their Company]';
-                senderName = document.getElementById('partyBSignatory').value || '[Your Name]';
-                senderTitle = document.getElementById('partyBTitle').value;
-                senderCompany = document.getElementById('partyBName').value || '[Your Company]';
+                recipientCompany = partyAIsIndiv ? '' : (document.getElementById('partyAName').value || '[Their Company]');
+                senderName = partyBIsIndiv
+                    ? (document.getElementById('partyBName').value || '[Your Name]')
+                    : (document.getElementById('partyBSignatory').value || '[Your Name]');
+                senderTitle = partyBIsIndiv ? '' : document.getElementById('partyBTitle').value;
+                senderCompany = partyBIsIndiv ? '' : (document.getElementById('partyBName').value || '[Your Company]');
             }
 
             document.getElementById('emailTo').value = recipientEmail;
@@ -3035,7 +3044,9 @@
                 ? 'Our Discussion'
                 : document.getElementById('purposeSelect').options[document.getElementById('purposeSelect').selectedIndex].text;
 
-            const subject = `NDA for ${purposeShort} — ${senderCompany} / ${recipientCompany}`;
+            const subject = senderCompany && recipientCompany
+                ? `NDA for ${purposeShort} — ${senderCompany} / ${recipientCompany}`
+                : `NDA for ${purposeShort}`;
 
             const body = `Dear ${recipientName},
 
@@ -3048,8 +3059,7 @@ ${generatedSummaryText ? 'I have also attached a plain-English summary so you ca
 Once you are comfortable with the terms, please countersign and return a copy at your earliest convenience so we can move forward.
 
 Best regards,
-${senderName}${senderTitle ? '\n' + senderTitle : ''}
-${senderCompany}`;
+${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + senderCompany : ''}`;
 
             document.getElementById('emailSubject').value = subject;
             document.getElementById('emailBody').value = body;
@@ -3178,7 +3188,7 @@ ${senderCompany}`;
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
 
-            confNote.innerHTML = `AI-generated NDAs start at <strong>50%</strong>. Complete the checklist (+5%) and apply the <strong>NDA Playbook</strong> (+15%) to boost your score. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`;
+            confNote.innerHTML = `AI-generated NDAs have inherent limitations — models may produce inaccuracies or unenforceable clauses. Your baseline is <strong>50%</strong>. The NDA Checklist adds <strong>+5%</strong> by verifying key terms. The <strong>NDA Playbook</strong> adds <strong>+15%</strong> with expert negotiation guidance. A <strong style="color:var(--green);">Legal Review</strong> by a qualified lawyer brings you to <strong style="color:var(--green);">100%</strong>.`;
         }
 
         function updateDocsPanel() {
@@ -3223,7 +3233,44 @@ ${senderCompany}`;
             }
             updateEnforceabilityDisplay(1);
             updateEnforceabilityDisplay(2);
+            updateStep3Scores();
             updateStep4Scores();
+            // Update mark-all label
+            document.getElementById('markAllLabel').textContent = done === total ? 'Unmark all' : 'Mark all';
+        }
+
+        function toggleMarkAll() {
+            const checks = document.querySelectorAll('#preSendChecklist input[type="checkbox"]');
+            const allChecked = document.querySelectorAll('#preSendChecklist input[type="checkbox"]:checked').length === checks.length;
+            checks.forEach(c => c.checked = !allChecked);
+            updateChecklistProgress();
+        }
+
+        function updateStep3Scores() {
+            if (!generatedNDAText) return;
+            const panel = document.getElementById('step3Scores');
+            panel.style.display = '';
+            const srcNum = generatedNDAText2 ? 2 : 1;
+            const srcStrBar = document.getElementById('strengthBar' + srcNum);
+            const srcStrLabel = document.getElementById('strengthLabel' + srcNum);
+            document.getElementById('step3StrBar').style.width = srcStrBar.style.width;
+            document.getElementById('step3StrBar').style.background = srcStrBar.style.background;
+            document.getElementById('step3StrLabel').textContent = srcStrLabel.textContent;
+            document.getElementById('step3StrLabel').style.background = srcStrLabel.style.background;
+            document.getElementById('step3StrLabel').style.color = srcStrLabel.style.color;
+            const conf = 50 + checklistBonus + playbookBonus;
+            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
+            document.getElementById('step3ConfBar').style.width = conf + '%';
+            document.getElementById('step3ConfBar').style.background = confColor;
+            document.getElementById('step3ConfLabel').textContent = conf + '%';
+            document.getElementById('step3ConfLabel').style.background = confColor + '18';
+            document.getElementById('step3ConfLabel').style.color = confColor;
+            let parts = [];
+            if (checklistBonus > 0) parts.push('Checklist +5%');
+            if (playbookBonus > 0) parts.push('Playbook +15%');
+            document.getElementById('step3ConfNote').innerHTML = conf > 50
+                ? `${parts.join(', ')} applied — score: <strong>${conf}%</strong>. For <strong style="color:var(--green);">100%</strong> — order a Legal Review.`
+                : `Complete the checklist and apply the Playbook to boost your score.`;
         }
 
         function updateEnforceabilityDisplay(num) {
@@ -3318,6 +3365,7 @@ ${senderCompany}`;
             } else {
                 showTestimonials(false);
             }
+            if (step === 3) updateStep3Scores();
             if (step === 4) updateStep4Scores();
             if (step === 5) document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
             if (step === 6) { buildEmailTemplate(); updateDocsPanel(); }
@@ -3341,6 +3389,18 @@ ${senderCompany}`;
             // Hide/show signatory row (individuals sign for themselves)
             document.getElementById(`party${party}SignatoryDivider`).style.display = isIndividual ? 'none' : '';
             document.getElementById(`party${party}SignatoryRow`).style.display = isIndividual ? 'none' : '';
+            // For individuals, sync name to signatory field automatically
+            if (isIndividual) {
+                const nameEl = document.getElementById(`party${party}Name`);
+                document.getElementById(`party${party}Signatory`).value = nameEl.value;
+                nameEl.addEventListener('input', function syncName() {
+                    if (document.getElementById(`party${party}Kind`).checked) {
+                        document.getElementById(`party${party}Signatory`).value = nameEl.value;
+                    } else {
+                        nameEl.removeEventListener('input', syncName);
+                    }
+                });
+            }
         }
 
         function toggleSolicitFields() {
