@@ -101,7 +101,7 @@
             font-size: 0.82rem;
             font-weight: 500;
             transition: all 0.3s ease;
-            cursor: default;
+            cursor: pointer;
         }
         .step-badge.active {
             background: var(--accent);
@@ -134,9 +134,7 @@
         .step-arrow { color: var(--border); font-size: 1rem; }
         @media (max-width: 640px) { .step-label { display: none; } }
         @media (max-width: 640px) {
-            #persistentBlocks > div[style*="grid-template-columns"] {
-                grid-template-columns: 1fr !important;
-            }
+            .product-cards-grid { grid-template-columns: 1fr !important; }
         }
 
         /* ─── Cards ─── */
@@ -458,6 +456,62 @@
             border-color: var(--accent);
             color: var(--accent);
         }
+
+        /* ─── Product Cards ─── */
+        .product-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+        }
+        .product-card {
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-card--playbook { background: linear-gradient(135deg, #FAFAF8 0%, #FFF8F5 100%); border-color: var(--accent-ring); }
+        .product-card--audit { background: linear-gradient(135deg, #F6FBF8 0%, #F0FAF4 100%); border-color: #C8E6D0; }
+        .product-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+        .product-card-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 5px; line-height: 1.3; }
+        .product-card-desc { font-size: 0.74rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .product-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.78rem;
+            opacity: 0.5;
+            cursor: not-allowed;
+            width: 100%;
+            justify-content: center;
+        }
+        .product-meta { font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-top: 5px; }
+        @media (max-width: 640px) { .product-cards-grid { grid-template-columns: 1fr; } }
+
+        /* ─── Scales Visualization ─── */
+        .scales-viz {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 8px 0 4px 0;
+        }
+        .scales-svg { width: 120px; height: 60px; }
+
         .field-hint {
             font-size: 0.72rem;
             color: var(--text-muted);
@@ -1272,13 +1326,13 @@
                 <div class="nda-output-wrap">
                     <div class="nda-output-header">
                         <h3><span style="color:var(--green)">✓</span> Flash NDA Ready</h3>
-                        <div class="nda-output-actions">
-                            <button class="btn-secondary" onclick="copyText(generatedNDAText)">Copy</button>
-                            <button class="btn-secondary" onclick="downloadPDF('ndaContent1', 'NDA.pdf')">PDF</button>
-                        </div>
                     </div>
                     <div id="ndaContent1" class="generated-nda"></div>
-                    <div class="nda-output-header" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;">
+                    <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
+                        <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                        <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Audit</strong> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                    </div>
+                    <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
                         <div class="nda-output-actions">
                             <button class="btn-secondary" onclick="copyText(generatedNDAText)">Copy</button>
@@ -1287,10 +1341,10 @@
                     </div>
                 </div>
 
-                <!-- Strength Meter -->
+                <!-- Strictness Meter -->
                 <div id="strengthMeter1" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Restriction Level</span>
+                        <span class="strength-title">NDA Strictness Score</span>
                         <span id="strengthLabel1" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
@@ -1299,10 +1353,11 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span>Balanced</span>
+                        <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">Balanced<small style="font-size:0.6rem;color:var(--green);font-weight:600;">(Recommended)</small></span>
                         <span>Restrictive</span>
                         <span>Aggressive</span>
                     </div>
+                    <div id="scalesViz1" class="scales-viz"></div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
@@ -1315,12 +1370,38 @@
                         </div>
                         <div class="confidence-note" id="confNote1"></div>
                     </div>
-                </div>
 
-                <!-- AI Disclaimer -->
-                <div class="ai-disclaimer">
-                    <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
-                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                    <!-- Product Cards -->
+                    <div class="product-cards-grid">
+                        <div class="product-card product-card--playbook">
+                            <div>
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                                    <span style="font-size:1.3rem;">📘</span>
+                                    <span class="product-badge" style="color:var(--accent);background:var(--accent-soft);">Increase to 70%</span>
+                                </div>
+                                <h4 class="product-card-title">NDA Playbook in the AI Era</h4>
+                                <p class="product-card-desc">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples.</p>
+                            </div>
+                            <div>
+                                <span class="product-btn" style="background:var(--accent);">Get Playbook — $10 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <p class="product-meta">PDF · 40+ pages</p>
+                            </div>
+                        </div>
+                        <div class="product-card product-card--audit">
+                            <div>
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                                    <span style="font-size:1.3rem;">⚖️</span>
+                                    <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
+                                </div>
+                                <h4 class="product-card-title">Legal Audit by a Qualified Lawyer</h4>
+                                <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
+                            </div>
+                            <div>
+                                <span class="product-btn" style="background:var(--green);">Order Legal Audit — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display:flex;gap:12px;margin-top:16px;">
@@ -1580,13 +1661,13 @@
                 <div class="nda-output-wrap">
                     <div class="nda-output-header">
                         <h3><span style="color:var(--green)">✓</span> Enhanced NDA Ready</h3>
-                        <div class="nda-output-actions">
-                            <button class="btn-secondary" onclick="copyText(generatedNDAText2)">Copy</button>
-                            <button class="btn-secondary" onclick="downloadPDF('ndaContent2', 'NDA_Enhanced.pdf')">PDF</button>
-                        </div>
                     </div>
                     <div id="ndaContent2" class="generated-nda"></div>
-                    <div class="nda-output-header" style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px;">
+                    <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
+                        <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                        <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Audit</strong> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                    </div>
+                    <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
                         <div class="nda-output-actions">
                             <button class="btn-secondary" onclick="copyText(generatedNDAText2)">Copy</button>
@@ -1595,10 +1676,10 @@
                     </div>
                 </div>
 
-                <!-- Strength Meter -->
+                <!-- Strictness Meter -->
                 <div id="strengthMeter2" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Restriction Level</span>
+                        <span class="strength-title">NDA Strictness Score</span>
                         <span id="strengthLabel2" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
@@ -1607,10 +1688,11 @@
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span>Balanced</span>
+                        <span style="display:flex;flex-direction:column;align-items:center;line-height:1.1;">Balanced<small style="font-size:0.6rem;color:var(--green);font-weight:600;">(Recommended)</small></span>
                         <span>Restrictive</span>
                         <span>Aggressive</span>
                     </div>
+                    <div id="scalesViz2" class="scales-viz"></div>
                     <div id="strengthBreakdown2" class="strength-breakdown"></div>
 
                     <div class="confidence-section">
@@ -1623,12 +1705,38 @@
                         </div>
                         <div class="confidence-note" id="confNote2"></div>
                     </div>
-                </div>
 
-                <!-- AI Disclaimer -->
-                <div class="ai-disclaimer">
-                    <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
-                    <p><strong>AI-generated document.</strong> Large language models are probabilistic — outputs may contain inaccuracies, omissions, or clauses that are not enforceable in your jurisdiction. This NDA is a starting point, not a finished legal instrument. To get a binding and enforceable agreement, <a href="#" onclick="event.preventDefault();" class="disclaimer-cta" style="pointer-events:none;opacity:0.7;">order a Legal Audit</a> — a qualified lawyer will review your NDA within 24 hours during business days for <strong>$100</strong>.</p>
+                    <!-- Product Cards -->
+                    <div class="product-cards-grid">
+                        <div class="product-card product-card--playbook">
+                            <div>
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                                    <span style="font-size:1.3rem;">📘</span>
+                                    <span class="product-badge" style="color:var(--accent);background:var(--accent-soft);">Increase to 70%</span>
+                                </div>
+                                <h4 class="product-card-title">NDA Playbook in the AI Era</h4>
+                                <p class="product-card-desc">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples.</p>
+                            </div>
+                            <div>
+                                <span class="product-btn" style="background:var(--accent);">Get Playbook — $10 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <p class="product-meta">PDF · 40+ pages</p>
+                            </div>
+                        </div>
+                        <div class="product-card product-card--audit">
+                            <div>
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                                    <span style="font-size:1.3rem;">⚖️</span>
+                                    <span class="product-badge" style="color:var(--green);background:var(--green-soft);">Achieve 100%</span>
+                                </div>
+                                <h4 class="product-card-title">Legal Audit by a Qualified Lawyer</h4>
+                                <p class="product-card-desc">A lawyer reviews your NDA for enforceability, jurisdictional compliance, and missing protections. Delivered as a .docx ready for signing — within one business day.</p>
+                            </div>
+                            <div>
+                                <span class="product-btn" style="background:var(--green);">Order Legal Audit — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
+                                <p class="product-meta">Includes formatted .docx · 24h turnaround</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <button class="btn-primary" style="margin-top:16px;" onclick="goToStep3()">
@@ -1775,42 +1883,6 @@
             <div id="docsPanel" class="docs-panel" style="margin-bottom:16px;">
                 <div class="docs-panel-title">📄 Your Documents</div>
                 <div id="docsList" class="docs-list"></div>
-            </div>
-
-            <!-- Next Steps: Playbook + Legal Audit -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-
-                <!-- Playbook Card -->
-                <div class="card" style="background:linear-gradient(135deg, #FAFAF8 0%, #FFF8F5 100%);border-color:var(--accent-ring);display:flex;flex-direction:column;justify-content:space-between;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <span style="font-size:1.3rem;">📘</span>
-                            <span style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:5px;">Increase to 70%</span>
-                        </div>
-                        <h4 style="font-size:0.95rem;font-weight:600;margin-bottom:6px;line-height:1.3;">NDA Playbook in the AI Era</h4>
-                        <p style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;">The complete guide to NDA negotiation — when to push back, which clauses to insist on, red flags to watch for, and clause-by-clause explanations with real-world examples. Written by lawyers, designed for a broad audience seeking a better understanding of NDAs.</p>
-                    </div>
-                    <div>
-                        <span style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:var(--accent);color:white;font-weight:600;font-size:0.82rem;opacity:0.5;cursor:not-allowed;width:100%;justify-content:center;">Get Playbook — $10 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                        <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:6px;">PDF · 40+ pages</p>
-                    </div>
-                </div>
-
-                <!-- Legal Audit Card -->
-                <div class="card" style="background:linear-gradient(135deg, #F6FBF8 0%, #F0FAF4 100%);border-color:#C8E6D0;display:flex;flex-direction:column;justify-content:space-between;">
-                    <div>
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <span style="font-size:1.3rem;">⚖️</span>
-                            <span style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--green);background:var(--green-soft);padding:3px 8px;border-radius:5px;">Achieve 100%</span>
-                        </div>
-                        <h4 style="font-size:0.95rem;font-weight:600;margin-bottom:6px;line-height:1.3;">Legal Audit by a Qualified Lawyer</h4>
-                        <p style="font-size:0.78rem;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;">A lawyer reviews your generated NDA for enforceability, jurisdictional compliance, and missing legal protections. Delivered as a professionally formatted .docx ready for signing — within one business day.</p>
-                    </div>
-                    <div>
-                        <span style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:var(--green);color:white;font-weight:600;font-size:0.82rem;opacity:0.5;cursor:not-allowed;width:100%;justify-content:center;">Order Legal Audit — $100 <span style="font-size:0.68rem;opacity:0.8;font-weight:400;">(coming soon)</span></span>
-                        <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:6px;">Includes formatted .docx · 24h turnaround</p>
-                    </div>
-                </div>
             </div>
 
             <button class="btn-secondary" style="width:100%;" onclick="backToStep1()">
@@ -2626,6 +2698,42 @@ ${senderCompany}`;
                 `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
             ).join('');
 
+            // ── Scales Visualization ──
+            const scalesEl = document.getElementById('scalesViz' + num);
+            let tilt, scaleColor, scaleLabel;
+            if (score >= 80) { tilt = 22; scaleColor = '#C0392B'; scaleLabel = 'Heavily favours your side'; }
+            else if (score >= 60) { tilt = 12; scaleColor = '#D4670A'; scaleLabel = 'Tilted in your favour'; }
+            else if (score >= 40) { tilt = 0; scaleColor = '#27AE60'; scaleLabel = 'Fair and balanced'; }
+            else if (score >= 20) { tilt = -10; scaleColor = '#D4970A'; scaleLabel = 'Weak protections'; }
+            else { tilt = -20; scaleColor = '#C0392B'; scaleLabel = 'Your interests at risk'; }
+
+            scalesEl.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                    <svg class="scales-svg" viewBox="0 0 120 60">
+                        <!-- Pillar -->
+                        <line x1="60" y1="8" x2="60" y2="55" stroke="${scaleColor}" stroke-width="2.5" stroke-linecap="round"/>
+                        <!-- Base -->
+                        <rect x="42" y="52" width="36" height="5" rx="2.5" fill="${scaleColor}" opacity="0.3"/>
+                        <!-- Beam -->
+                        <line x1="15" y1="${30 + tilt}" x2="105" y2="${30 - tilt}" stroke="${scaleColor}" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Left pan -->
+                        <path d="M5,${36 + tilt} Q15,${44 + tilt} 25,${36 + tilt}" stroke="${scaleColor}" fill="${scaleColor}" fill-opacity="0.15" stroke-width="1.5"/>
+                        <line x1="15" y1="${30 + tilt}" x2="5" y2="${36 + tilt}" stroke="${scaleColor}" stroke-width="1"/>
+                        <line x1="15" y1="${30 + tilt}" x2="25" y2="${36 + tilt}" stroke="${scaleColor}" stroke-width="1"/>
+                        <!-- Right pan -->
+                        <path d="M95,${36 - tilt} Q105,${44 - tilt} 115,${36 - tilt}" stroke="${scaleColor}" fill="${scaleColor}" fill-opacity="0.15" stroke-width="1.5"/>
+                        <line x1="105" y1="${30 - tilt}" x2="95" y2="${36 - tilt}" stroke="${scaleColor}" stroke-width="1"/>
+                        <line x1="105" y1="${30 - tilt}" x2="115" y2="${36 - tilt}" stroke="${scaleColor}" stroke-width="1"/>
+                        <!-- Top ornament -->
+                        <circle cx="60" cy="8" r="3.5" fill="${scaleColor}"/>
+                        <!-- Labels -->
+                        <text x="15" y="${52 + tilt}" text-anchor="middle" font-size="6" fill="${scaleColor}" font-weight="500">You</text>
+                        <text x="105" y="${52 - tilt}" text-anchor="middle" font-size="6" fill="${scaleColor}" font-weight="500">Other</text>
+                    </svg>
+                    <span style="font-size:0.7rem;font-weight:500;color:${scaleColor};">${scaleLabel}</span>
+                </div>
+            `;
+
             // ── NDA Enforceability Score ──
             let conf = 50; // AI-generated baseline
             conf = Math.min(conf, 50); // hard cap without playbook or lawyer
@@ -2641,7 +2749,7 @@ ${senderCompany}`;
             confLabel.style.background = confColor + '18';
             confLabel.style.color = confColor;
 
-            confNote.innerHTML = `Legal enforceability of AI-generated NDAs remains at <strong>50%</strong>. While we apply best practices in our generative prompts, AI models have inherent limitations and may produce inaccuracies.<br><br>Applying the guidance from our <strong>"NDA Playbook in the AI Era"</strong> can increase the scale by up to <strong style="color:#D4670A;">70%</strong>, providing a general understanding of the enforceability gaps.<br><br>Achieving <strong style="color:var(--green);">100%</strong> confidence and enforceability requires human legal expertise.`;
+            confNote.innerHTML = `Legal enforceability of AI-generated NDAs remains at <strong>50%</strong>. While we apply best practices in our generative prompts, AI models have inherent limitations and may produce inaccuracies. Applying the guidance from our <strong>"NDA Playbook in the AI Era"</strong> can increase the scale by up to <strong style="color:#D4670A;">70%</strong>, providing a general understanding of the enforceability gaps. Achieving <strong style="color:var(--green);">100%</strong> confidence and enforceability requires human legal expertise.`;
         }
 
         function updateDocsPanel() {
