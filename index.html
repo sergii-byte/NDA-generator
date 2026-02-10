@@ -56,11 +56,8 @@
             --shadow-md: 0 2px 8px rgba(0,0,0,0.3);
             --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
         }
-        [data-theme="dark"] .ai-disclaimer { background: #2C2518; border-color: #3D3320; color: #C4A44A; }
-        [data-theme="dark"] .ai-disclaimer strong { color: #D4B44A; }
-        [data-theme="dark"] .cta-step--playbook { background: #2A2420; }
-        [data-theme="dark"] .cta-step--review { background: #202A24; }
-        [data-theme="dark"] .checklist-item--playbook { background: rgba(224,136,104,0.08); }
+        [data-theme="dark"] .cta-step--playbook { background: var(--card); }
+        [data-theme="dark"] .cta-step--review { background: var(--card); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -232,8 +229,7 @@
             white-space: nowrap;
         }
         .step-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            background: var(--border-light);
         }
         .step-badge.active {
             background: var(--accent);
@@ -245,7 +241,8 @@
             color: var(--green);
             cursor: pointer;
         }
-        .step-badge.done:hover { filter: brightness(0.95); }
+        .step-badge.active:hover { background: var(--accent-hover); }
+        .step-badge.done:hover { background: rgba(61, 154, 95, 0.15); }
         .step-badge.inactive {
             background: var(--bg-warm);
             color: var(--text-muted);
@@ -477,8 +474,8 @@
             color: var(--text-muted);
         }
         .checklist-item--playbook {
-            background: linear-gradient(135deg, var(--accent-soft), #FFF7ED);
-            border: 1px solid var(--accent-ring);
+            background: var(--bg-warm);
+            border: 1px solid var(--border-light);
             border-radius: 8px;
             margin-top: 4px;
         }
@@ -635,14 +632,14 @@
             gap: 10px;
             padding: 14px 16px;
             border-radius: var(--radius);
-            background: #FFF8F0;
-            border: 1px solid #F0DCC8;
-            color: #8B6914;
+            background: var(--bg-warm);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
             font-size: 0.78rem;
             line-height: 1.5;
             margin-top: 16px;
         }
-        .ai-disclaimer strong { color: #7A5A0A; }
+        .ai-disclaimer strong { color: var(--text); }
         .ai-disclaimer a.disclaimer-cta {
             color: var(--accent);
             font-weight: 600;
@@ -734,9 +731,9 @@
             border: 1px solid var(--border-light);
             transition: box-shadow 0.15s;
         }
-        .cta-step:hover { box-shadow: var(--shadow-md); }
-        .cta-step--playbook { background: #FFFAF7; border-color: var(--accent-ring); }
-        .cta-step--review { background: #F8FCF9; border-color: #C8E6D0; }
+        .cta-step:hover { border-color: var(--border); }
+        .cta-step--playbook { background: var(--card); }
+        .cta-step--review { background: var(--card); }
         .cta-step-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
         .cta-step-badge {
             font-size: 0.6rem;
@@ -886,7 +883,7 @@
             color: var(--text-secondary);
             transition: all 0.2s;
         }
-        .fill-tab:hover { background: var(--bg-warm); border-color: var(--accent); color: var(--accent); }
+        .fill-tab:hover { background: var(--bg-warm); border-color: var(--text-muted); color: var(--text); }
         .fill-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
         .fill-tab svg { width: 14px; height: 14px; }
 
@@ -926,7 +923,7 @@
             font-weight: 500;
         }
         .ac-tag.code { background: var(--bg-warm); color: var(--text-secondary); font-family: 'SF Mono', 'Fira Code', monospace; }
-        .ac-tag.jurisdiction { background: #EEF2FF; color: #4F46E5; }
+        .ac-tag.jurisdiction { background: var(--bg-warm); color: var(--text-secondary); }
         .ac-tag.status { background: var(--green-soft); color: var(--green); }
         .ac-tag.address-ok { background: var(--green-soft); color: var(--green); }
         .ac-tag.address-missing { background: var(--yellow-soft); color: #B8860B; }
@@ -1003,17 +1000,16 @@
             background: var(--accent);
             color: white;
         }
-        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 16px var(--accent-ring); transform: translateY(-1px); }
+        .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-hero {
-            padding: 18px 28px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            border-radius: 14px;
-            box-shadow: 0 2px 12px var(--accent-ring);
+            padding: 16px 28px;
+            font-size: 1.02rem;
+            font-weight: 600;
+            border-radius: 12px;
             letter-spacing: -0.01em;
         }
-        .btn-hero:hover { box-shadow: 0 6px 24px var(--accent-ring); transform: translateY(-2px); }
+        .btn-hero:hover { background: var(--accent-hover); }
 
         .btn-secondary {
             display: inline-flex;
@@ -1078,16 +1074,16 @@
 
         /* ─── Generated NDA Document ─── */
         .generated-nda {
-            background: #FFFEFA;
+            background: var(--card);
             border: 1px solid var(--border-light);
             border-radius: var(--radius);
             padding: 40px 48px;
             max-height: 600px;
             overflow-y: auto;
-            font-family: Georgia, 'Times New Roman', serif;
+            font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
             font-size: 0.92rem;
             line-height: 1.85;
-            color: #1A1A1A;
+            color: var(--text);
         }
         .generated-nda::-webkit-scrollbar { width: 6px; }
         .generated-nda::-webkit-scrollbar-track { background: transparent; }
@@ -1095,28 +1091,28 @@
         .generated-nda::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         .generated-nda h1 {
-            font-family: Georgia, serif;
+            font-family: 'Source Serif 4', Georgia, serif;
             font-size: 1.4rem;
-            font-weight: bold;
+            font-weight: 700;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             margin: 0 0 1.2em 0;
             padding-bottom: 0.8em;
-            border-bottom: 2px solid #1A1A1A;
+            border-bottom: 1px solid var(--border);
         }
         .generated-nda h2 {
-            font-family: Georgia, serif;
+            font-family: 'Source Serif 4', Georgia, serif;
             font-size: 1.05rem;
-            font-weight: bold;
+            font-weight: 700;
             margin: 1.8em 0 0.6em 0;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.03em;
         }
         .generated-nda h3 {
-            font-family: Georgia, serif;
+            font-family: 'Source Serif 4', Georgia, serif;
             font-size: 0.95rem;
-            font-weight: bold;
+            font-weight: 700;
             margin: 1.4em 0 0.5em 0;
         }
         .generated-nda p {
@@ -1155,7 +1151,7 @@
 
         /* ─── Summary Output ─── */
         .summary-content {
-            background: #FFFEFA;
+            background: var(--card);
             border: 1px solid var(--border-light);
             border-radius: var(--radius);
             padding: 28px 32px;
@@ -1225,8 +1221,8 @@
 
         /* ─── CTA Footer ─── */
         .cta-banner {
-            background: linear-gradient(135deg, var(--accent-soft), #FFF7ED);
-            border: 1px solid var(--accent-ring);
+            background: var(--card);
+            border: 1px solid var(--border-light);
             border-radius: var(--radius-lg);
             padding: 24px;
             margin-top: 24px;
@@ -1308,7 +1304,7 @@
         .testimonial-avatar {
             width: 36px; height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1a1a1a, #333);
+            background: var(--text);
             color: white;
             display: flex;
             align-items: center;
@@ -1867,23 +1863,23 @@
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
                             <div class="cta-step-left">
-                                <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+20% Score</span>
+                                <span class="cta-step-badge" style="color:var(--text-secondary);background:var(--bg-warm);">+20% Score</span>
                                 <div>
                                     <h4 class="cta-step-title">NDA Playbook in the AI Era</h4>
                                     <p class="cta-step-desc">Expert negotiation guide: which clauses to push, red flags, real-world examples. 40+ pages.</p>
                                 </div>
                             </div>
-                            <span class="cta-step-btn" style="background:var(--accent);">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
+                            <span class="cta-step-btn" style="background:var(--text);opacity:0.8;">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                         <div class="cta-step cta-step--review">
                             <div class="cta-step-left">
-                                <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100% Score</span>
+                                <span class="cta-step-badge" style="color:var(--text-secondary);background:var(--bg-warm);">100% Score</span>
                                 <div>
                                     <h4 class="cta-step-title">Legal Review by a Qualified Lawyer</h4>
                                     <p class="cta-step-desc">Enforceability check, jurisdictional compliance, ready-to-sign .docx. 24h turnaround.</p>
                                 </div>
                             </div>
-                            <span class="cta-step-btn" style="background:var(--green);">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
+                            <span class="cta-step-btn" style="background:var(--text);opacity:0.8;">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                     </div>
                 </div>
@@ -2199,23 +2195,23 @@
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
                             <div class="cta-step-left">
-                                <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+20% Score</span>
+                                <span class="cta-step-badge" style="color:var(--text-secondary);background:var(--bg-warm);">+20% Score</span>
                                 <div>
                                     <h4 class="cta-step-title">NDA Playbook in the AI Era</h4>
                                     <p class="cta-step-desc">Expert negotiation guide: which clauses to push, red flags, real-world examples. 40+ pages.</p>
                                 </div>
                             </div>
-                            <span class="cta-step-btn" style="background:var(--accent);">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
+                            <span class="cta-step-btn" style="background:var(--text);opacity:0.8;">$10 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                         <div class="cta-step cta-step--review">
                             <div class="cta-step-left">
-                                <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100% Score</span>
+                                <span class="cta-step-badge" style="color:var(--text-secondary);background:var(--bg-warm);">100% Score</span>
                                 <div>
                                     <h4 class="cta-step-title">Legal Review by a Qualified Lawyer</h4>
                                     <p class="cta-step-desc">Enforceability check, jurisdictional compliance, ready-to-sign .docx. 24h turnaround.</p>
                                 </div>
                             </div>
-                            <span class="cta-step-btn" style="background:var(--green);">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
+                            <span class="cta-step-btn" style="background:var(--text);opacity:0.8;">$100 <span style="font-size:0.6rem;opacity:0.7;">(soon)</span></span>
                         </div>
                     </div>
                 </div>
@@ -2256,7 +2252,7 @@
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Enhanced clauses reviewed</strong> — if you added non-solicitation, non-compete, or penalties, confirm they're proportionate and enforceable in the governing jurisdiction</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Both signature blocks are complete</strong> — signatory names, titles, and company details filled in</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Ready to send</strong> — NDA attached as PDF, cover email reviewed, counterparty contact details confirmed</span></label>
-                        <label class="checklist-item checklist-item--playbook"><input type="checkbox" id="playbookCheck" onchange="updateChecklistProgress()"><span><strong>I implemented tips from the <a href="#" onclick="event.preventDefault();event.stopPropagation();" class="playbook-cta">NDA Playbook in the AI Era</a></strong> — applying the Playbook's guidance adds <strong style="color:var(--green);">+15 points</strong> to your Legal Enforceability Score</span></label>
+                        <label class="checklist-item"><input type="checkbox" id="playbookCheck" onchange="updateChecklistProgress()"><span><strong>"<a href="#" onclick="event.preventDefault();event.stopPropagation();" class="playbook-cta">NDA Playbook in the AI Era</a>" best practices applied</strong> — understanding essentials gives <strong style="color:var(--green);">+15 points</strong> Legal Enforceability Score</span></label>
                     </div>
                     <div id="checklistProgress" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
                         <div style="flex:1;height:6px;border-radius:3px;background:var(--border-light);overflow:hidden;">
@@ -2305,20 +2301,20 @@
                 Back to Checklist
             </button>
 
-            <div class="info-banner" style="background:linear-gradient(135deg, #F6FBF8 0%, #F0FAF4 100%);border-color:#C8E6D0;">
+            <div class="info-banner">
                 <strong>Step 4 (Recommended):</strong> Get a real lawyer to review your NDA for enforceability and jurisdictional compliance — within 24 hours.
             </div>
 
-            <div class="card" style="border-color:#C8E6D0;background:linear-gradient(135deg, #FAFEFB 0%, #F5FBF7 100%);">
+            <div class="card">
                 <div style="text-align:center;padding:20px 0 10px;">
                     <span style="font-size:2.5rem;">⚖️</span>
                     <h3 style="font-size:1.15rem;font-weight:700;margin:12px 0 6px;">Legal Review by a Qualified Lawyer</h3>
-                    <span style="display:inline-block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--green);background:var(--green-soft);padding:4px 12px;border-radius:100px;">Achieve 100% Enforceability</span>
+                    <span style="display:inline-block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);background:var(--bg-warm);padding:4px 12px;border-radius:100px;">Achieve 100% Enforceability</span>
                 </div>
 
                 <div style="padding:0 8px 4px;">
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
-                        <div style="padding:14px;border-radius:10px;background:white;border:1px solid var(--border-light);">
+                        <div style="padding:14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
                             <div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">What's included</div>
                             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.6;">
                                 • Full enforceability review<br>
@@ -2327,7 +2323,7 @@
                                 • Ready-to-sign .docx format
                             </p>
                         </div>
-                        <div style="padding:14px;border-radius:10px;background:white;border:1px solid var(--border-light);">
+                        <div style="padding:14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
                             <div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">Delivery</div>
                             <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.6;">
                                 • Within 24 hours (business days)<br>
