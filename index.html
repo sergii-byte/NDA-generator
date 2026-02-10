@@ -315,6 +315,9 @@
             main { padding: 20px 16px; }
             .card { padding: 18px 16px; }
             .legal-disclaimer-bar { margin: 16px auto; padding: 12px 16px; }
+            #step4 .card > div:first-child { padding: 24px 20px 20px !important; }
+            #step4 .card > div:last-child { padding: 20px !important; }
+            #step4 .card [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
         }
         /* iPad / tablet */
         @media (min-width: 641px) and (max-width: 1024px) {
@@ -2343,105 +2346,70 @@
                 Back to Checklist
             </button>
 
-            <div class="info-banner">
-                <strong>Step 4 (Recommended):</strong> Get a real lawyer to review your NDA for enforceability and jurisdictional compliance — within 24 hours.
-            </div>
-
-            <div class="card">
-                <div style="text-align:center;padding:20px 0 10px;">
-                    <span style="font-size:2.5rem;">⚖️</span>
-                    <h3 style="font-size:1.15rem;font-weight:700;margin:12px 0 6px;">Legal Review by a Qualified Lawyer</h3>
-                    <span style="display:inline-block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary);background:var(--bg-warm);padding:4px 12px;border-radius:100px;">Reach 100/100 Confidence</span>
+            <div class="card" style="padding:0;overflow:hidden;">
+                <!-- Hero band -->
+                <div style="background:var(--text);color:var(--bg);padding:32px 28px 28px;text-align:center;">
+                    <span style="display:inline-block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);background:rgba(217,119,87,0.15);padding:4px 12px;border-radius:100px;margin-bottom:14px;">Recommended</span>
+                    <h3 style="font-size:1.3rem;font-weight:700;line-height:1.3;margin:0 0 8px;">From AI Draft to Legally Binding</h3>
+                    <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;max-width:420px;margin:0 auto;">A qualified lawyer reviews your NDA, fixes gaps, and returns a document ready to sign — closing your Confidence Score to <strong style="color:var(--green);">100/100</strong>.</p>
                 </div>
 
-                <div style="padding:0 8px 4px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
-                        <div style="padding:14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
-                            <div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">What's included</div>
-                            <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.6;">
-                                • Full enforceability review<br>
-                                • Jurisdictional compliance check<br>
-                                • Missing protections analysis<br>
-                                • Ready-to-sign .docx format
-                            </p>
+                <div style="padding:24px 28px 28px;">
+                    <!-- Value columns -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+                        <div style="padding:16px;border-radius:var(--radius);background:var(--bg-warm);border:1px solid var(--border-light);">
+                            <div style="font-size:0.65rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">What you get</div>
+                            <ul style="font-size:0.8rem;color:var(--text-secondary);line-height:1.8;list-style:none;padding:0;margin:0;">
+                                <li>✓ Full enforceability review</li>
+                                <li>✓ Jurisdictional compliance check</li>
+                                <li>✓ Missing protections analysis</li>
+                                <li>✓ Ready-to-sign .docx format</li>
+                            </ul>
                         </div>
-                        <div style="padding:14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
-                            <div style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">Delivery</div>
-                            <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.6;">
-                                • Within 24 hours (business days)<br>
-                                • Professionally formatted .docx<br>
-                                • Lawyer's comments & notes<br>
-                                • Unlimited follow-up questions
-                            </p>
+                        <div style="padding:16px;border-radius:var(--radius);background:var(--bg-warm);border:1px solid var(--border-light);">
+                            <div style="font-size:0.65rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">How it works</div>
+                            <ul style="font-size:0.8rem;color:var(--text-secondary);line-height:1.8;list-style:none;padding:0;margin:0;">
+                                <li>1. Submit your AI-generated NDA</li>
+                                <li>2. Lawyer reviews within 24h</li>
+                                <li>3. Receive annotated .docx + notes</li>
+                                <li>4. Unlimited follow-up questions</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div style="text-align:center;margin-bottom:16px;">
-                        <span style="font-size:2rem;font-weight:700;color:var(--text);">$100</span>
-                        <span style="font-size:0.82rem;color:var(--text-muted);margin-left:4px;">one-time</span>
+                    <!-- Trust signals -->
+                    <div style="display:flex;gap:16px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;">
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            Licensed attorney
+                        </span>
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            24h turnaround
+                        </span>
+                        <span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            100/100 Confidence
+                        </span>
                     </div>
 
-                    <button class="btn-primary" style="background:var(--green);opacity:0.55;cursor:not-allowed;font-size:1rem;padding:16px;" disabled>
-                        Order Legal Review — Coming Soon
-                    </button>
-                    <p style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:8px;">We're finalizing the process. Leave your email to be notified when it's available.</p>
-                </div>
-            </div>
-
-            <!-- NDA Confidence Score on Lawyer Review -->
-            <div id="step4Scores" class="strength-meter" style="display:none;">
-                <div class="strength-header">
-                    <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
-                    <span id="step4ConfLabel" class="strength-label">—</span>
-                </div>
-                <div class="strength-bar-bg" style="position:relative;">
-                    <div id="step4ConfRemain" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;background:rgba(120,140,93,0.15);"></div>
-                    <div id="step4ConfBar" class="strength-bar-fill" style="width:0%;position:relative;z-index:1;"></div>
-                </div>
-                <div class="confidence-note" id="step4ConfNote">Order a Legal Review to reach <strong style="color:var(--green);">100</strong> — you're almost there.</div>
-
-                <div class="cta-steps">
-                    <div class="cta-step cta-step--playbook">
-                        <div class="cta-step-left">
-                            <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+15 points</span>
-                            <div>
-                                <h4 class="cta-step-title">Master the NDA Playbook in the AI Era</h4>
-                                <p class="cta-step-desc">Essentials of building an enforceable NDA: key clauses to push, red flags, and real-world use cases. 40 pages.</p>
-                            </div>
+                    <!-- Price + CTA -->
+                    <div style="text-align:center;">
+                        <div style="margin-bottom:16px;">
+                            <span style="font-size:2.2rem;font-weight:700;color:var(--text);">$100</span>
+                            <span style="font-size:0.78rem;color:var(--text-muted);margin-left:4px;">one-time</span>
                         </div>
-                        <span class="cta-step-btn" style="background:var(--accent);">$10</span>
-                    </div>
-                    <div class="cta-step cta-step--review">
-                        <div class="cta-step-left">
-                            <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100/100</span>
-                            <div>
-                                <h4 class="cta-step-title">Get a Lawyer's Sign-Off</h4>
-                                <p class="cta-step-desc">A qualified lawyer reviews your NDA for enforceability, fixes gaps, and returns a ready-to-sign document. 24h.</p>
-                            </div>
+                        <button class="btn-primary" style="background:var(--green);font-size:1rem;padding:16px;width:100%;cursor:not-allowed;opacity:0.85;" disabled>
+                            Order Legal Review
+                        </button>
+                        <p style="text-align:center;font-size:0.68rem;color:var(--text-muted);margin-top:10px;">We're finalizing the lawyer matching process. Leave your email to be the first to know.</p>
+                        <div style="display:flex;gap:8px;margin-top:10px;max-width:360px;margin-left:auto;margin-right:auto;">
+                            <input type="email" id="waitlistEmail" placeholder="your@email.com" style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:0.82rem;background:var(--bg);color:var(--text);outline:none;">
+                            <button class="btn-secondary" onclick="joinWaitlist()" style="padding:10px 18px;font-size:0.78rem;white-space:nowrap;">Notify Me</button>
                         </div>
-                        <span class="cta-step-btn" style="background:var(--text);">$100</span>
+                        <p id="waitlistConfirm" class="hidden" style="font-size:0.72rem;color:var(--green);margin-top:8px;font-weight:500;">You're on the list — we'll email you when it's live.</p>
                     </div>
                 </div>
-            </div>
-
-            <!-- NDA Strictness Score on Lawyer Review -->
-            <div id="step4StrictnessBlock" class="strength-meter" style="display:none;">
-                <div class="strength-header">
-                    <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
-                    <span id="step4StrLabel" class="strength-label">—</span>
-                </div>
-                <div class="strength-bar-bg">
-                    <div id="step4StrBar" class="strength-bar-fill" style="width:0%;"></div>
-                </div>
-                <div class="strength-scale">
-                    <span>Weak</span>
-                    <span>Moderate</span>
-                    <span class="scale-recommended">Balanced</span>
-                    <span class="scale-recommended">Restrictive</span>
-                    <span>Aggressive</span>
-                </div>
-                <div id="step4StrBreakdown" class="strength-breakdown"></div>
-                <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
             </div>
 
             <div style="display:flex;gap:12px;margin-top:4px;">
@@ -3657,36 +3625,36 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
                 `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
             ).join('');
 
-            // Update every Confidence display (Step 1, 2, 3, 4)
-            ['confBar1','confBar2','step3ConfBar','step4ConfBar'].forEach(id => {
+            // Update every Confidence display (Steps 1, 2, 3)
+            ['confBar1','confBar2','step3ConfBar'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.style.width = conf + '%'; el.style.background = confColor; }
             });
-            ['confLabel1','confLabel2','step3ConfLabel','step4ConfLabel'].forEach(id => {
+            ['confLabel1','confLabel2','step3ConfLabel'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.textContent = conf + '/100'; el.style.background = confColor + '18'; el.style.color = confColor; }
             });
-            ['confNote1','confNote2','step3ConfNote','step4ConfNote'].forEach(id => {
+            ['confNote1','confNote2','step3ConfNote'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = confNoteText;
             });
 
-            // Update every Strictness display (Step 1, 2, 3, 4)
-            ['strengthBar1','strengthBar2','step3StrBar','step4StrBar'].forEach(id => {
+            // Update every Strictness display (Steps 1, 2, 3)
+            ['strengthBar1','strengthBar2','step3StrBar'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.style.width = score + '%'; el.style.background = color; }
             });
-            ['strengthLabel1','strengthLabel2','step3StrLabel','step4StrLabel'].forEach(id => {
+            ['strengthLabel1','strengthLabel2','step3StrLabel'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.textContent = level + ' · ' + score + '/100'; el.style.background = color + '18'; el.style.color = color; }
             });
-            ['strengthBreakdown1','strengthBreakdown2','step3StrBreakdown','step4StrBreakdown'].forEach(id => {
+            ['strengthBreakdown1','strengthBreakdown2','step3StrBreakdown'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = breakdownHTML;
             });
 
-            // Show Step 3 & 4 panels
-            ['step3Scores','step3StrictnessBlock','step4Scores','step4StrictnessBlock'].forEach(id => {
+            // Show Step 3 panels
+            ['step3Scores','step3StrictnessBlock'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = '';
             });
@@ -3695,7 +3663,18 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
         // Keep old names as aliases for backward compat
         function updateEnforceabilityDisplay() { refreshAllScores(); }
         function updateStep3Scores() { refreshAllScores(); }
-        function updateStep4Scores() { refreshAllScores(); }
+        function updateStep4Scores() { /* scores removed from Step 4 */ }
+
+        function joinWaitlist() {
+            const input = document.getElementById('waitlistEmail');
+            const email = input.value.trim();
+            if (!email || !email.includes('@')) { input.focus(); return; }
+            localStorage.setItem('waitlistEmail', email);
+            document.getElementById('waitlistConfirm').classList.remove('hidden');
+            input.disabled = true;
+            input.parentElement.querySelector('button').disabled = true;
+            input.parentElement.querySelector('button').textContent = 'Saved';
+        }
 
         function copyEmailText() {
             const subject = document.getElementById('emailSubject').value;
