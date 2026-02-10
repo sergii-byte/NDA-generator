@@ -577,8 +577,19 @@
             width: 40%;
             height: 100%;
             background: var(--green);
-            opacity: 0.13;
+            opacity: 0.18;
             border-radius: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .strength-bar-marker {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--green);
+            opacity: 0.55;
+            z-index: 3;
             pointer-events: none;
         }
         .strength-bar-fill {
@@ -594,39 +605,6 @@
             font-size: 0.68rem;
             color: var(--text-muted);
             position: relative;
-            padding-bottom: 16px;
-        }
-        .strength-scale .scale-recommended {
-            color: var(--green);
-            font-weight: 600;
-        }
-        .strength-scale-bracket {
-            position: absolute;
-            left: 40%;
-            width: 40%;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            pointer-events: none;
-        }
-        .strength-scale-bracket-line {
-            width: 100%;
-            height: 4px;
-            border-left: 1.5px solid var(--green);
-            border-right: 1.5px solid var(--green);
-            border-top: 1.5px solid var(--green);
-            border-radius: 3px 3px 0 0;
-            opacity: 0.35;
-        }
-        .strength-scale-bracket-label {
-            font-size: 0.54rem;
-            font-weight: 600;
-            color: var(--green);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 2px;
-            opacity: 0.7;
         }
         .strength-breakdown {
             margin-top: 12px;
@@ -1185,6 +1163,9 @@
         .btn-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-warm); }
         .btn-nav--muted { color: var(--text-muted); font-weight: 500; border-width: 1px; }
         .btn-nav--muted:hover { color: var(--accent); border-color: var(--accent); }
+        @media (max-width: 640px) {
+            .btn-nav { padding: 10px 12px; font-size: 0.74rem; }
+        }
 
         .btn-back {
             display: inline-flex;
@@ -1976,7 +1957,7 @@
                     <div id="ndaContent1" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
                         <span style="flex-shrink:0;font-size:1rem;margin-top:1px;opacity:0.6;">ℹ️</span>
-                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a lawyer will check your NDA within 24 hours (business days).</p>
+                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <span style="cursor:pointer;" onclick="navigateStep(4)">order a Legal Review</span> — a lawyer will check your NDA within 24 hours (business days).</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
@@ -1998,6 +1979,7 @@
                         <div id="confBar1" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="confidence-note" id="confNote1"></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
 
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
@@ -2030,28 +2012,24 @@
                         <span id="strengthLabel1" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
-                        <div class="strength-bar-zone"></div>
+                        <div class="strength-bar-zone"></div><div class="strength-bar-marker" style="left:40%"></div><div class="strength-bar-marker" style="left:80%"></div>
                         <div id="strengthBar1" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span class="scale-recommended">Balanced</span>
-                        <span class="scale-recommended">Restrictive</span>
+                        <span>Balanced</span>
+                        <span>Restrictive</span>
                         <span>Aggressive</span>
-                        <div class="strength-scale-bracket"><div class="strength-scale-bracket-line"></div><span class="strength-scale-bracket-label">Recommended</span></div>
                     </div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
-                    <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;">Add Advanced Clauses →</a></div>
                 </div>
 
                 <div style="display:flex;gap:10px;margin-top:16px;">
-                    <button class="btn-nav" style="flex:1;" onclick="navigateStep(2)">
-                        Advanced Clauses →
-                    </button>
-                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(3)">
-                        Skip to Checklist
-                    </button>
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="white-space:nowrap;">↻ Create Another NDA</button>
+                    <button class="btn-nav" style="flex:1;" onclick="navigateStep(2)">Advanced Clauses →</button>
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(3)" style="white-space:nowrap;">Skip to Checklist »</button>
                 </div>
             </div>
         </div>
@@ -2310,7 +2288,7 @@
                     <div id="ndaContent2" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
                         <span style="flex-shrink:0;font-size:1rem;margin-top:1px;opacity:0.6;">ℹ️</span>
-                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a lawyer will check your NDA within 24 hours (business days).</p>
+                        <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <span style="cursor:pointer;" onclick="navigateStep(4)">order a Legal Review</span> — a lawyer will check your NDA within 24 hours (business days).</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
                         <span></span>
@@ -2333,6 +2311,7 @@
                         <div id="confBar2" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="confidence-note" id="confNote2"></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
 
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
@@ -2365,24 +2344,25 @@
                         <span id="strengthLabel2" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
-                        <div class="strength-bar-zone"></div>
+                        <div class="strength-bar-zone"></div><div class="strength-bar-marker" style="left:40%"></div><div class="strength-bar-marker" style="left:80%"></div>
                         <div id="strengthBar2" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="strength-scale">
                         <span>Weak</span>
                         <span>Moderate</span>
-                        <span class="scale-recommended">Balanced</span>
-                        <span class="scale-recommended">Restrictive</span>
+                        <span>Balanced</span>
+                        <span>Restrictive</span>
                         <span>Aggressive</span>
-                        <div class="strength-scale-bracket"><div class="strength-scale-bracket-line"></div><span class="strength-scale-bracket-label">Recommended</span></div>
                     </div>
                     <div id="strengthBreakdown2" class="strength-breakdown"></div>
-                    <div class="confidence-note" style="margin-top:10px;">Your Advanced Clauses are reflected in this score. <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Edit clauses</a></div>
+                    <div class="confidence-note" style="margin-top:10px;">Your Advanced Clauses are reflected in this score. <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;">Edit clauses</a></div>
                 </div>
 
-                <button class="btn-nav" style="margin-top:16px;width:100%;" onclick="navigateStep(3)">
-                    NDA Checklist →
-                </button>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="white-space:nowrap;">↻ Create Another NDA</button>
+                    <button class="btn-nav" style="flex:1;" onclick="navigateStep(3)">NDA Checklist →</button>
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(4)" style="white-space:nowrap;">Skip to Review »</button>
+                </div>
             </div>
         </div>
 
@@ -2437,6 +2417,7 @@
                     <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
                 <div class="confidence-note" id="step3ConfNote"></div>
+                <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
 
                 <div class="cta-steps">
                     <div class="cta-step cta-step--playbook">
@@ -2469,28 +2450,24 @@
                     <span id="step3StrLabel" class="strength-label">—</span>
                 </div>
                 <div class="strength-bar-bg">
-                    <div class="strength-bar-zone"></div>
+                    <div class="strength-bar-zone"></div><div class="strength-bar-marker" style="left:40%"></div><div class="strength-bar-marker" style="left:80%"></div>
                     <div id="step3StrBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
                 <div class="strength-scale">
                     <span>Weak</span>
                     <span>Moderate</span>
-                    <span class="scale-recommended">Balanced</span>
-                    <span class="scale-recommended">Restrictive</span>
+                    <span>Balanced</span>
+                    <span>Restrictive</span>
                     <span>Aggressive</span>
-                    <div class="strength-scale-bracket"><div class="strength-scale-bracket-line"></div><span class="strength-scale-bracket-label">Recommended</span></div>
                 </div>
                 <div id="step3StrBreakdown" class="strength-breakdown"></div>
-                <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
+                <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;">Add Advanced Clauses →</a></div>
             </div>
 
             <div style="display:flex;gap:10px;">
-                <button class="btn-nav" style="flex:1;" onclick="navigateStep(4)">
-                    Lawyer Review →
-                </button>
-                <button class="btn-nav btn-nav--muted" onclick="navigateStep(5)">
-                    Skip to Summary
-                </button>
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="white-space:nowrap;">↻ Create Another NDA</button>
+                <button class="btn-nav" style="flex:1;" onclick="navigateStep(4)">Lawyer Review →</button>
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(5)" style="white-space:nowrap;">Skip to Summary »</button>
             </div>
         </div>
 
@@ -2555,7 +2532,7 @@
                     <!-- NDA Confidence Score slider -->
                     <div style="margin-bottom:6px;">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                            <span class="strength-title" style="margin:0;">NDA Confidence Score</span>
+                            <span class="strength-title" style="margin:0;">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
                             <span id="slideScoreLabel" class="strength-label" style="font-size:0.72rem;">50/100</span>
                         </div>
                         <div class="slide-cta" id="slideCta">
@@ -2571,12 +2548,9 @@
             </div>
 
             <div style="display:flex;gap:10px;margin-top:8px;">
-                <button class="btn-nav" style="flex:1;" onclick="navigateStep(5)">
-                    Final Summary →
-                </button>
-                <button class="btn-nav btn-nav--muted" onclick="navigateStep(6)">
-                    Skip to Send
-                </button>
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="white-space:nowrap;">↻ Create Another NDA</button>
+                <button class="btn-nav" style="flex:1;" onclick="navigateStep(5)">Final Summary →</button>
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(6)" style="white-space:nowrap;">Skip to Send »</button>
             </div>
         </div>
 
@@ -2632,9 +2606,10 @@
                     </div>
                 </div>
 
-                <button class="btn-nav" style="margin-top:16px;width:100%;" onclick="navigateStep(6)">
-                    Send NDA →
-                </button>
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="white-space:nowrap;">↻ Create Another NDA</button>
+                    <button class="btn-nav" style="flex:1;" onclick="navigateStep(6)">Send NDA →</button>
+                </div>
             </div>
         </div>
 
@@ -2768,6 +2743,7 @@
         let generatedSummaryText = '';
         let checklistBonus = 0;
         let playbookBonus = 0;
+        let advancedClausesActive = false;
         let searchTimeout = null;
 
         // ═══════ Dark Mode ═══════
@@ -3627,66 +3603,68 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             score += 28;
             tags.push({name:'Standard protections', on:true});
 
-            // ── Advanced clause scoring (always read from form, live) ──
-            const residualEl = document.getElementById('residualKnowledge');
-            if (residualEl) {
-                if (residualEl.value === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
-                else { tags.push({name:'Residual permitted', on:false}); }
-            }
+            // ── Advanced clause scoring (only when user has visited Step 2) ──
+            if (advancedClausesActive) {
+                const residualEl = document.getElementById('residualKnowledge');
+                if (residualEl) {
+                    if (residualEl.value === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
+                    else { tags.push({name:'Residual permitted', on:false}); }
+                }
 
-            const returnEl = document.getElementById('returnDays');
-            if (returnEl) {
-                const returnD = parseInt(returnEl.value);
-                if (returnD <= 10) { score += 5; } else if (returnD <= 14) { score += 3; } else { score += 1; }
-            }
+                const returnEl = document.getElementById('returnDays');
+                if (returnEl) {
+                    const returnD = parseInt(returnEl.value);
+                    if (returnD <= 10) { score += 5; } else if (returnD <= 14) { score += 3; } else { score += 1; }
+                }
 
-            const certEl = document.getElementById('writtenCert');
-            if (certEl) {
-                if (certEl.value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
-                else { tags.push({name:'No destruction cert', on:false}); }
-            }
+                const certEl = document.getElementById('writtenCert');
+                if (certEl) {
+                    if (certEl.value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
+                    else { tags.push({name:'No destruction cert', on:false}); }
+                }
 
-            const advisorEl = document.getElementById('restrictAdvisors');
-            if (advisorEl) {
-                if (advisorEl.value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
-                else { tags.push({name:'Advisors permitted', on:false}); }
-            }
+                const advisorEl = document.getElementById('restrictAdvisors');
+                if (advisorEl) {
+                    if (advisorEl.value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
+                    else { tags.push({name:'Advisors permitted', on:false}); }
+                }
 
-            const llmEl = document.getElementById('prohibitLLM');
-            if (llmEl) {
-                if (llmEl.value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
-                else { tags.push({name:'No AI clause', on:false}); }
-            }
+                const llmEl = document.getElementById('prohibitLLM');
+                if (llmEl) {
+                    if (llmEl.value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
+                    else { tags.push({name:'No AI clause', on:false}); }
+                }
 
-            const compelledEl = document.getElementById('notifyCompelled');
-            if (compelledEl) {
-                if (compelledEl.value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
-            }
+                const compelledEl = document.getElementById('notifyCompelled');
+                if (compelledEl) {
+                    if (compelledEl.value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+                }
 
-            const solicitEl = document.getElementById('prohibitSoliciting');
-            if (solicitEl) {
-                if (solicitEl.value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
-                else { tags.push({name:'No non-solicit', on:false}); }
-            }
+                const solicitEl = document.getElementById('prohibitSoliciting');
+                if (solicitEl) {
+                    if (solicitEl.value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
+                    else { tags.push({name:'No non-solicit', on:false}); }
+                }
 
-            const competeEl = document.getElementById('nonCompete');
-            if (competeEl) {
-                if (competeEl.value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
-                else { tags.push({name:'No non-compete', on:false}); }
-            }
+                const competeEl = document.getElementById('nonCompete');
+                if (competeEl) {
+                    if (competeEl.value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
+                    else { tags.push({name:'No non-compete', on:false}); }
+                }
 
-            const remedyEl = document.getElementById('breachRemedy');
-            if (remedyEl) {
-                const remedy = remedyEl.value;
-                if (remedy === 'Liquidated' || remedy === 'Penalty') { score += 10; tags.push({name: remedy === 'Liquidated' ? 'Liquidated damages' : 'Contractual penalty', on:true}); }
-                else { tags.push({name:'Actual damages only', on:false}); }
-            }
+                const remedyEl = document.getElementById('breachRemedy');
+                if (remedyEl) {
+                    const remedy = remedyEl.value;
+                    if (remedy === 'Liquidated' || remedy === 'Penalty') { score += 10; tags.push({name: remedy === 'Liquidated' ? 'Liquidated damages' : 'Contractual penalty', on:true}); }
+                    else { tags.push({name:'Actual damages only', on:false}); }
+                }
 
-            const disputeEl = document.getElementById('disputeMethod');
-            if (disputeEl) {
-                const dispute = disputeEl.value;
-                if (dispute.includes('Arbitration')) { score += 6; tags.push({name:'Arbitration', on:true}); }
-                if (dispute.includes('Mediation')) { score += 2; tags.push({name:'Mediation step', on:true}); }
+                const disputeEl = document.getElementById('disputeMethod');
+                if (disputeEl) {
+                    const dispute = disputeEl.value;
+                    if (dispute.includes('Arbitration')) { score += 6; tags.push({name:'Arbitration', on:true}); }
+                    if (dispute.includes('Mediation')) { score += 2; tags.push({name:'Mediation step', on:true}); }
+                }
             }
 
             // Clamp to 100
@@ -3790,8 +3768,8 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             if (checklistBonus > 0) parts.push('Checklist +5');
             if (playbookBonus > 0) parts.push('Playbook +15');
             const confNoteText = conf > 50
-                ? `${parts.join(', ')} applied — score: <strong>${conf}/100</strong>. Order a <strong style="color:var(--green);">Legal Review</strong> to reach 100.`
-                : `AI-generated NDAs start at <strong>50 points</strong>. Complete the checklist (+5) and apply the <strong>NDA Playbook</strong> (+15) to boost your confidence. A <strong style="color:var(--green);">Legal Review</strong> brings you to 100.`;
+                ? `${parts.join(', ')} applied — score: <strong>${conf}/100</strong>. Order a Legal Review to reach <strong>100</strong>.`
+                : `AI-generated NDAs start at <strong>50</strong> points. Complete the checklist (<strong>+5</strong>) and apply the NDA Playbook (<strong>+15</strong>) to boost your confidence. A Legal Review brings you to <strong>100</strong>.`;
 
             // Strictness breakdown HTML
             const breakdownHTML = tags.map(t =>
@@ -4024,6 +4002,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             } else {
                 showTestimonials(false);
             }
+            if (step === 2) { advancedClausesActive = true; refreshAllScores(); }
             if (step === 3) updateStep3Scores();
             if (step === 4) {
                 // Reset slider and position at current Confidence Score
