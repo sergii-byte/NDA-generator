@@ -1834,36 +1834,17 @@
                     </div>
                 </div>
 
-                <!-- Strictness Meter -->
-                <div id="strengthMeter1" class="strength-meter">
+                <!-- NDA Confidence Score (boost via Playbook & Legal Review) -->
+                <div id="confidenceMeter1" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
-                        <span id="strengthLabel1" class="strength-label">—</span>
+                        <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
+                        <span id="confLabel1" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
-                        <div id="strengthBar1" class="strength-bar-fill" style="width:0%;"></div>
+                        <div id="confBar1" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
-                    <div class="strength-scale">
-                        <span>Weak</span>
-                        <span>Moderate</span>
-                        <span class="scale-recommended">Balanced</span>
-                        <span class="scale-recommended">Restrictive</span>
-                        <span>Aggressive</span>
-                    </div>
-                    <div id="strengthBreakdown1" class="strength-breakdown"></div>
+                    <div class="confidence-note" id="confNote1"></div>
 
-                    <div class="confidence-section">
-                        <div class="strength-header">
-                            <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
-                            <span id="confLabel1" class="strength-label">—</span>
-                        </div>
-                        <div class="strength-bar-bg">
-                            <div id="confBar1" class="strength-bar-fill" style="width:0%;"></div>
-                        </div>
-                        <div class="confidence-note" id="confNote1"></div>
-                    </div>
-
-                    <!-- CTA: Next steps -->
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
                             <div class="cta-step-left">
@@ -1886,6 +1867,26 @@
                             <span class="cta-step-btn" style="background:var(--text);">$100</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- NDA Strictness Score (boost via Advanced Clauses) -->
+                <div id="strengthMeter1" class="strength-meter">
+                    <div class="strength-header">
+                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
+                        <span id="strengthLabel1" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg">
+                        <div id="strengthBar1" class="strength-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <div class="strength-scale">
+                        <span>Weak</span>
+                        <span>Moderate</span>
+                        <span class="scale-recommended">Balanced</span>
+                        <span class="scale-recommended">Restrictive</span>
+                        <span>Aggressive</span>
+                    </div>
+                    <div id="strengthBreakdown1" class="strength-breakdown"></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
                 </div>
 
                 <div style="display:flex;gap:12px;margin-top:16px;">
@@ -2166,36 +2167,17 @@
                     </div>
                 </div>
 
-                <!-- Strictness Meter -->
-                <div id="strengthMeter2" class="strength-meter">
+                <!-- NDA Confidence Score (boost via Playbook & Legal Review) -->
+                <div id="confidenceMeter2" class="strength-meter">
                     <div class="strength-header">
-                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
-                        <span id="strengthLabel2" class="strength-label">—</span>
+                        <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
+                        <span id="confLabel2" class="strength-label">—</span>
                     </div>
                     <div class="strength-bar-bg">
-                        <div id="strengthBar2" class="strength-bar-fill" style="width:0%;"></div>
+                        <div id="confBar2" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
-                    <div class="strength-scale">
-                        <span>Weak</span>
-                        <span>Moderate</span>
-                        <span class="scale-recommended">Balanced</span>
-                        <span class="scale-recommended">Restrictive</span>
-                        <span>Aggressive</span>
-                    </div>
-                    <div id="strengthBreakdown2" class="strength-breakdown"></div>
+                    <div class="confidence-note" id="confNote2"></div>
 
-                    <div class="confidence-section">
-                        <div class="strength-header">
-                            <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
-                            <span id="confLabel2" class="strength-label">—</span>
-                        </div>
-                        <div class="strength-bar-bg">
-                            <div id="confBar2" class="strength-bar-fill" style="width:0%;"></div>
-                        </div>
-                        <div class="confidence-note" id="confNote2"></div>
-                    </div>
-
-                    <!-- CTA: Next steps -->
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
                             <div class="cta-step-left">
@@ -2218,6 +2200,26 @@
                             <span class="cta-step-btn" style="background:var(--text);">$100</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- NDA Strictness Score (boost via Advanced Clauses) -->
+                <div id="strengthMeter2" class="strength-meter">
+                    <div class="strength-header">
+                        <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
+                        <span id="strengthLabel2" class="strength-label">—</span>
+                    </div>
+                    <div class="strength-bar-bg">
+                        <div id="strengthBar2" class="strength-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <div class="strength-scale">
+                        <span>Weak</span>
+                        <span>Moderate</span>
+                        <span class="scale-recommended">Balanced</span>
+                        <span class="scale-recommended">Restrictive</span>
+                        <span>Aggressive</span>
+                    </div>
+                    <div id="strengthBreakdown2" class="strength-breakdown"></div>
+                    <div class="confidence-note" style="margin-top:10px;">Your Advanced Clauses are reflected in this score. <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Edit clauses</a></div>
                 </div>
 
                 <button class="btn-primary" style="margin-top:16px;" onclick="navigateStep(3)">
@@ -2246,6 +2248,7 @@
                 </div>
                 <div class="form-fields">
                     <div class="checklist" id="preSendChecklist">
+                        <label class="checklist-item"><input type="checkbox" id="playbookCheck" onchange="updateChecklistProgress()"><span><strong>"<a href="#" onclick="event.preventDefault();event.stopPropagation();" class="playbook-cta">NDA Playbook in the AI Era</a>" completed</strong> — understanding and applying the basics adds <strong style="color:var(--green);">+15 points</strong> to NDA Confidence Score</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Party details verified</strong> — legal names, registration numbers, and addresses match official records</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Signatory authority</strong> — each signatory is authorised to bind their company (director, CEO, or holder of a power of attorney)</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Purpose matches the deal</strong> — the stated purpose accurately describes what you're sharing information for</span></label>
@@ -2256,7 +2259,6 @@
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Enhanced clauses reviewed</strong> — if you added non-solicitation, non-compete, or penalties, confirm they're proportionate and enforceable in the governing jurisdiction</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Both signature blocks are complete</strong> — signatory names, titles, and company details filled in</span></label>
                         <label class="checklist-item"><input type="checkbox" onchange="updateChecklistProgress()"><span><strong>Ready to send</strong> — NDA attached as PDF, cover email reviewed, counterparty contact details confirmed</span></label>
-                        <label class="checklist-item"><input type="checkbox" id="playbookCheck" onchange="updateChecklistProgress()"><span><strong>"<a href="#" onclick="event.preventDefault();event.stopPropagation();" class="playbook-cta">NDA Playbook in the AI Era</a>" completed</strong> — understanding and applying the basics adds <strong style="color:var(--green);">+15 points</strong> to NDA Confidence Score</span></label>
                     </div>
                     <div id="checklistProgress" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--bg-warm);border:1px solid var(--border-light);">
                         <div style="flex:1;height:6px;border-radius:3px;background:var(--border-light);overflow:hidden;">
@@ -2267,8 +2269,20 @@
                 </div>
             </div>
 
-            <!-- Scores on checklist page -->
+            <!-- NDA Confidence Score -->
             <div id="step3Scores" class="strength-meter" style="display:none;">
+                <div class="strength-header">
+                    <span class="strength-title">NDA Confidence Score</span>
+                    <span id="step3ConfLabel" class="strength-label">—</span>
+                </div>
+                <div class="strength-bar-bg">
+                    <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
+                </div>
+                <div class="confidence-note" id="step3ConfNote"></div>
+            </div>
+
+            <!-- NDA Strictness Score -->
+            <div id="step3StrictnessBlock" class="strength-meter" style="display:none;">
                 <div class="strength-header">
                     <span class="strength-title">NDA Strictness Score</span>
                     <span id="step3StrLabel" class="strength-label">—</span>
@@ -2276,16 +2290,7 @@
                 <div class="strength-bar-bg">
                     <div id="step3StrBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
-                <div class="confidence-section">
-                    <div class="strength-header">
-                        <span class="strength-title">NDA Confidence Score</span>
-                        <span id="step3ConfLabel" class="strength-label">—</span>
-                    </div>
-                    <div class="strength-bar-bg">
-                        <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
-                    </div>
-                    <div class="confidence-note" id="step3ConfNote"></div>
-                </div>
+                <div class="confidence-note" style="margin-top:8px;">Adjust strictness with <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Advanced Clauses</a>.</div>
             </div>
 
             <div style="display:flex;gap:12px;">
@@ -2350,8 +2355,21 @@
                 </div>
             </div>
 
-            <!-- Score Bars on Lawyer Review -->
+            <!-- NDA Confidence Score on Lawyer Review -->
             <div id="step4Scores" class="strength-meter" style="display:none;">
+                <div class="strength-header">
+                    <span class="strength-title">NDA Confidence Score</span>
+                    <span id="step4ConfLabel" class="strength-label">—</span>
+                </div>
+                <div class="strength-bar-bg" style="position:relative;">
+                    <div id="step4ConfRemain" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;background:rgba(120,140,93,0.15);"></div>
+                    <div id="step4ConfBar" class="strength-bar-fill" style="width:0%;position:relative;z-index:1;"></div>
+                </div>
+                <div class="confidence-note" id="step4ConfNote">Order a Legal Review to reach <strong style="color:var(--green);">100</strong> — you're almost there.</div>
+            </div>
+
+            <!-- NDA Strictness Score on Lawyer Review -->
+            <div id="step4StrictnessBlock" class="strength-meter" style="display:none;">
                 <div class="strength-header">
                     <span class="strength-title">NDA Strictness Score</span>
                     <span id="step4StrLabel" class="strength-label">—</span>
@@ -2359,17 +2377,7 @@
                 <div class="strength-bar-bg">
                     <div id="step4StrBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
-                <div class="confidence-section">
-                    <div class="strength-header">
-                        <span class="strength-title">NDA Confidence Score</span>
-                        <span id="step4ConfLabel" class="strength-label">—</span>
-                    </div>
-                    <div class="strength-bar-bg" style="position:relative;">
-                        <div id="step4ConfRemain" style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;background:rgba(120,140,93,0.15);"></div>
-                        <div id="step4ConfBar" class="strength-bar-fill" style="width:0%;position:relative;z-index:1;"></div>
-                    </div>
-                    <div class="confidence-note" id="step4ConfNote">Order a Legal Review to reach <strong style="color:var(--green);">100</strong> — you're almost there.</div>
-                </div>
+                <div class="confidence-note" style="margin-top:8px;">Adjust strictness with <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Advanced Clauses</a>.</div>
             </div>
 
             <div style="display:flex;gap:12px;margin-top:4px;">
@@ -3579,8 +3587,8 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
 
         function updateStep3Scores() {
             if (!generatedNDAText) return;
-            const panel = document.getElementById('step3Scores');
-            panel.style.display = '';
+            document.getElementById('step3Scores').style.display = '';
+            document.getElementById('step3StrictnessBlock').style.display = '';
             const srcNum = generatedNDAText2 ? 2 : 1;
             const srcStrBar = document.getElementById('strengthBar' + srcNum);
             const srcStrLabel = document.getElementById('strengthLabel' + srcNum);
@@ -3626,8 +3634,8 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
 
         function updateStep4Scores() {
             if (!generatedNDAText) return;
-            const panel = document.getElementById('step4Scores');
-            panel.style.display = '';
+            document.getElementById('step4Scores').style.display = '';
+            document.getElementById('step4StrictnessBlock').style.display = '';
             // Copy strictness from whichever NDA exists
             const srcNum = generatedNDAText2 ? 2 : 1;
             const srcStrBar = document.getElementById('strengthBar' + srcNum);
