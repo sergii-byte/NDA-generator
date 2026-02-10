@@ -752,8 +752,9 @@
             border-radius: 5px;
             white-space: nowrap;
             flex-shrink: 0;
-            min-width: 62px;
+            width: 72px;
             text-align: center;
+            box-sizing: border-box;
         }
         .cta-step-title { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
         .cta-step-desc { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; margin-top: 2px; }
@@ -780,8 +781,8 @@
             width: 100%;
             height: 52px;
             border-radius: 26px;
-            background: var(--bg-warm);
-            border: 1px solid var(--border);
+            background: rgba(217,119,87,0.15);
+            border: 1px solid rgba(217,119,87,0.25);
             overflow: hidden;
             cursor: default;
             user-select: none;
@@ -794,7 +795,7 @@
             left: 0;
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, rgba(120,140,93,0.12), rgba(120,140,93,0.25));
+            background: linear-gradient(90deg, rgba(120,140,93,0.25), rgba(120,140,93,0.4));
             border-radius: 26px;
             transition: width 0.05s linear;
             pointer-events: none;
@@ -1086,13 +1087,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
-            padding: 14px 24px;
+            padding: 10px 20px;
             border: none;
             border-radius: var(--radius);
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -1102,10 +1103,10 @@
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-hero {
-            padding: 16px 28px;
-            font-size: 1.02rem;
+            padding: 12px 24px;
+            font-size: 0.88rem;
             font-weight: 600;
-            border-radius: 12px;
+            border-radius: var(--radius);
             letter-spacing: -0.01em;
         }
         .btn-hero:hover { background: var(--accent-hover); }
@@ -1134,19 +1135,19 @@
             justify-content: center;
             gap: 4px;
             padding: 10px 20px;
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius);
             background: var(--card);
             font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.82rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text);
             cursor: pointer;
             transition: border-color 0.2s, background 0.2s, color 0.2s;
         }
         .btn-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-warm); }
-        .btn-nav--muted { color: var(--text-muted); font-weight: 400; }
-        .btn-nav--muted:hover { color: var(--accent); }
+        .btn-nav--muted { color: var(--text-muted); font-weight: 500; border-width: 1px; }
+        .btn-nav--muted:hover { color: var(--accent); border-color: var(--accent); }
 
         .btn-back {
             display: inline-flex;
@@ -1859,7 +1860,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>NDA Type</label>
-                            <select id="ndaType">
+                            <select id="ndaType" onchange="refreshAllScores()">
                                 <option value="Mutual">Mutual (both parties)</option>
                                 <option value="Unilateral">Unilateral (one-way)</option>
                             </select>
@@ -1874,7 +1875,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Confidentiality Period</label>
-                            <select id="confPeriod">
+                            <select id="confPeriod" onchange="refreshAllScores()">
                                 <option value="1">1 year</option>
                                 <option value="2" selected>2 years</option>
                                 <option value="3">3 years</option>
@@ -2002,7 +2003,7 @@
                         <span>Aggressive</span>
                     </div>
                     <div id="strengthBreakdown1" class="strength-breakdown"></div>
-                    <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
                 </div>
 
                 <div style="display:flex;gap:10px;margin-top:16px;">
@@ -2034,7 +2035,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Residual Knowledge</label>
-                            <select id="residualKnowledge">
+                            <select id="residualKnowledge" onchange="refreshAllScores()">
                                 <option value="Permitted">Permitted (standard)</option>
                                 <option value="Restricted">Restricted (strict)</option>
                             </select>
@@ -2042,7 +2043,7 @@
                         </div>
                         <div class="form-group">
                             <label>Return Materials Within</label>
-                            <select id="returnDays">
+                            <select id="returnDays" onchange="refreshAllScores()">
                                 <option value="10">10 days</option>
                                 <option value="14" selected>14 days</option>
                                 <option value="30">30 days</option>
@@ -2053,7 +2054,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Written Certification of Destruction</label>
-                            <select id="writtenCert">
+                            <select id="writtenCert" onchange="refreshAllScores()">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
@@ -2061,7 +2062,7 @@
                         </div>
                         <div class="form-group">
                             <label>Restrict Professional Advisors</label>
-                            <select id="restrictAdvisors">
+                            <select id="restrictAdvisors" onchange="refreshAllScores()">
                                 <option value="No">No — permitted (default from NDA)</option>
                                 <option value="Yes">Yes — require prior written consent</option>
                             </select>
@@ -2071,7 +2072,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Prohibit Public LLM / AI Uploads</label>
-                            <select id="prohibitLLM">
+                            <select id="prohibitLLM" onchange="refreshAllScores()">
                                 <option value="Yes">Yes — prohibit</option>
                                 <option value="No">No</option>
                             </select>
@@ -2079,7 +2080,7 @@
                         </div>
                         <div class="form-group">
                             <label>Notify Before Legal Disclosure</label>
-                            <select id="notifyCompelled">
+                            <select id="notifyCompelled" onchange="refreshAllScores()">
                                 <option value="Yes">Yes (unless prohibited by court order)</option>
                                 <option value="No">No</option>
                             </select>
@@ -2093,7 +2094,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Solicitation</label>
-                            <select id="prohibitSoliciting" onchange="toggleSolicitFields()">
+                            <select id="prohibitSoliciting" onchange="toggleSolicitFields();refreshAllScores()">
                                 <option value="No">No</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -2131,7 +2132,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Compete</label>
-                            <select id="nonCompete" onchange="toggleCompeteFields()">
+                            <select id="nonCompete" onchange="toggleCompeteFields();refreshAllScores()">
                                 <option value="No">No (recommended for NDA)</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -2162,7 +2163,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Remedy Type</label>
-                            <select id="breachRemedy" onchange="toggleBreachFields()">
+                            <select id="breachRemedy" onchange="toggleBreachFields();refreshAllScores()">
                                 <option value="Damages">Actual Damages Only (default)</option>
                                 <option value="Liquidated">Liquidated Damages (common law)</option>
                                 <option value="Penalty">Contractual Penalty (civil law only)</option>
@@ -2195,7 +2196,7 @@
                     <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">• <strong>Courts</strong> — simple, public, best for domestic deals<br>• <strong>Arbitration</strong> — private, enforceable in 170+ countries. Best for cross-border<br>• <strong>Mediation then Arbitration</strong> — negotiation step first, saves cost. Best for long-term relationships<br>• Choose institution (ICC, LCIA, SIAC) matching your deal geography</p></details>
                     <div class="form-group">
                         <label>Dispute Resolution Method</label>
-                        <select id="disputeMethod" onchange="toggleArbFields()">
+                        <select id="disputeMethod" onchange="toggleArbFields();refreshAllScores()">
                             <option value="Courts">Courts (default)</option>
                             <option value="Arbitration">Arbitration</option>
                             <option value="Mediation then Arbitration">Mediation then Arbitration</option>
@@ -2437,7 +2438,7 @@
                     <span>Aggressive</span>
                 </div>
                 <div id="step3StrBreakdown" class="strength-breakdown"></div>
-                <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
+                <div class="confidence-note" style="margin-top:10px;">Want a stricter NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
             </div>
 
             <div style="display:flex;gap:10px;">
@@ -2511,8 +2512,8 @@
                     <!-- NDA Confidence Score slider -->
                     <div style="margin-bottom:6px;">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);">NDA Confidence Score</span>
-                            <span id="slideScoreLabel" style="font-size:0.72rem;font-weight:700;color:var(--green);">50/100</span>
+                            <span class="strength-title" style="margin:0;">NDA Confidence Score</span>
+                            <span id="slideScoreLabel" class="strength-label" style="font-size:0.72rem;">50/100</span>
                         </div>
                         <div class="slide-cta" id="slideCta">
                             <div class="slide-cta-fill" id="slideCtaFill"></div>
@@ -2645,7 +2646,7 @@
         </div>
 
         <!-- ═══════ Persistent Blocks (visible after first NDA) ═══════ -->
-        <div id="persistentBlocks" class="hidden" style="margin-top:24px;">
+        <div id="persistentBlocks" class="hidden" style="margin-top:16px;">
 
             <!-- Documents Panel -->
             <div id="docsPanel" class="docs-panel" style="margin-bottom:16px;">
@@ -3550,7 +3551,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             document.getElementById('emailBody').value = body;
         }
 
-        function calculateNDAStrength(enhanced) {
+        function calculateNDAStrength() {
             let score = 0;
             const tags = [];
 
@@ -3583,47 +3584,64 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             score += 28;
             tags.push({name:'Standard protections', on:true});
 
-            // ── Enhanced NDA scoring ──
-            if (enhanced) {
-                // Residual Knowledge
-                const residual = document.getElementById('residualKnowledge').value;
-                if (residual === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
+            // ── Advanced clause scoring (always read from form, live) ──
+            const residualEl = document.getElementById('residualKnowledge');
+            if (residualEl) {
+                if (residualEl.value === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
                 else { tags.push({name:'Residual permitted', on:false}); }
+            }
 
-                // Return period
-                const returnD = parseInt(document.getElementById('returnDays').value);
+            const returnEl = document.getElementById('returnDays');
+            if (returnEl) {
+                const returnD = parseInt(returnEl.value);
                 if (returnD <= 10) { score += 5; } else if (returnD <= 14) { score += 3; } else { score += 1; }
+            }
 
-                // Written certification
-                if (document.getElementById('writtenCert').value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
+            const certEl = document.getElementById('writtenCert');
+            if (certEl) {
+                if (certEl.value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
                 else { tags.push({name:'No destruction cert', on:false}); }
+            }
 
-                // Restrict advisors
-                if (document.getElementById('restrictAdvisors').value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
+            const advisorEl = document.getElementById('restrictAdvisors');
+            if (advisorEl) {
+                if (advisorEl.value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
                 else { tags.push({name:'Advisors permitted', on:false}); }
+            }
 
-                // LLM prohibition
-                if (document.getElementById('prohibitLLM').value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
+            const llmEl = document.getElementById('prohibitLLM');
+            if (llmEl) {
+                if (llmEl.value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
                 else { tags.push({name:'No AI clause', on:false}); }
+            }
 
-                // Compelled disclosure notice
-                if (document.getElementById('notifyCompelled').value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+            const compelledEl = document.getElementById('notifyCompelled');
+            if (compelledEl) {
+                if (compelledEl.value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+            }
 
-                // Non-solicitation
-                if (document.getElementById('prohibitSoliciting').value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
+            const solicitEl = document.getElementById('prohibitSoliciting');
+            if (solicitEl) {
+                if (solicitEl.value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
                 else { tags.push({name:'No non-solicit', on:false}); }
+            }
 
-                // Non-compete
-                if (document.getElementById('nonCompete').value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
+            const competeEl = document.getElementById('nonCompete');
+            if (competeEl) {
+                if (competeEl.value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
                 else { tags.push({name:'No non-compete', on:false}); }
+            }
 
-                // Breach remedy
-                const remedy = document.getElementById('breachRemedy').value;
+            const remedyEl = document.getElementById('breachRemedy');
+            if (remedyEl) {
+                const remedy = remedyEl.value;
                 if (remedy === 'Liquidated' || remedy === 'Penalty') { score += 10; tags.push({name: remedy === 'Liquidated' ? 'Liquidated damages' : 'Contractual penalty', on:true}); }
                 else { tags.push({name:'Actual damages only', on:false}); }
+            }
 
-                // Dispute resolution
-                const dispute = document.getElementById('disputeMethod').value;
+            const disputeEl = document.getElementById('disputeMethod');
+            if (disputeEl) {
+                const dispute = disputeEl.value;
                 if (dispute.includes('Arbitration')) { score += 6; tags.push({name:'Arbitration', on:true}); }
                 if (dispute.includes('Mediation')) { score += 2; tags.push({name:'Mediation step', on:true}); }
             }
@@ -3642,9 +3660,9 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             return { score, level, color, tags };
         }
 
-        function renderStrengthMeter(num, enhanced) {
+        function renderStrengthMeter(num) {
             // Strictness only — Confidence is handled by refreshAllScores()
-            const { score, level, color, tags } = calculateNDAStrength(enhanced);
+            const { score, level, color, tags } = calculateNDAStrength();
             const bar = document.getElementById('strengthBar' + num);
             const label = document.getElementById('strengthLabel' + num);
             const breakdown = document.getElementById('strengthBreakdown' + num);
@@ -3719,9 +3737,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
         // ═══════ Unified score refresh — single source of truth ═══════
         function refreshAllScores() {
             if (!generatedNDAText) return;
-            const enhanced = !!generatedNDAText2;
-            const srcNum = enhanced ? 2 : 1;
-            const { score, level, color, tags } = calculateNDAStrength(enhanced);
+            const { score, level, color, tags } = calculateNDAStrength();
 
             // ── Confidence Score (same on every page) ──
             const conf = 50 + checklistBonus + playbookBonus;
@@ -4677,7 +4693,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState1');
 
                 generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
-                renderStrengthMeter(1, false);
+                renderStrengthMeter(1);
                 document.getElementById('persistentBlocks').classList.remove('hidden');
                 updateDocsPanel();
                 updateBadge(1);
@@ -4707,7 +4723,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState2');
 
                 generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
-                renderStrengthMeter(2, true);
+                renderStrengthMeter(2);
                 updateDocsPanel();
                 updateBadge(2);
                 // Show Compare button if both NDAs exist
