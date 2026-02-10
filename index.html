@@ -734,9 +734,12 @@
             padding: 14px 16px;
             border-radius: var(--radius);
             border: 1px solid var(--border-light);
-            transition: box-shadow 0.15s;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
         }
-        .cta-step:hover { border-color: var(--border); }
+        .cta-step:hover { border-color: var(--accent); background: var(--bg-warm); }
         .cta-step--playbook { background: var(--card); }
         .cta-step--review { background: var(--card); }
         .cta-step-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -765,8 +768,6 @@
             font-weight: 600;
             white-space: nowrap;
             flex-shrink: 0;
-            cursor: not-allowed;
-            opacity: 0.85;
         }
         @media (max-width: 640px) {
             .cta-step { flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -1125,6 +1126,27 @@
             transition: all 0.2s;
         }
         .btn-secondary:hover { background: var(--bg-warm); border-color: var(--accent); color: var(--accent); }
+
+        /* ─── Navigation buttons (Next Step / Skip) ─── */
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, color 0.2s;
+        }
+        .btn-nav:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-warm); }
+        .btn-nav--muted { color: var(--text-muted); font-weight: 400; }
+        .btn-nav--muted:hover { color: var(--accent); }
 
         .btn-back {
             display: inline-flex;
@@ -1915,7 +1937,7 @@
                     </div>
                     <div id="ndaContent1" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
-                        <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                        <span style="flex-shrink:0;font-size:1rem;margin-top:1px;opacity:0.6;">ℹ️</span>
                         <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a lawyer will check your NDA within 24 hours (business days).</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
@@ -1983,11 +2005,11 @@
                     <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
                 </div>
 
-                <div style="display:flex;gap:12px;margin-top:16px;">
-                    <button class="btn-primary" style="flex:1;" onclick="navigateStep(2)">
+                <div style="display:flex;gap:10px;margin-top:16px;">
+                    <button class="btn-nav" style="flex:1;" onclick="navigateStep(2)">
                         Advanced Clauses →
                     </button>
-                    <button class="btn-secondary" onclick="navigateStep(3)" style="padding:14px 20px;">
+                    <button class="btn-nav btn-nav--muted" onclick="navigateStep(3)">
                         Skip to Checklist
                     </button>
                 </div>
@@ -2247,7 +2269,7 @@
                     </div>
                     <div id="ndaContent2" class="generated-nda"></div>
                     <div class="ai-disclaimer" style="margin:16px 0 12px 0;border-radius:10px;">
-                        <span style="flex-shrink:0;font-size:1.1rem;margin-top:1px;">⚠️</span>
+                        <span style="flex-shrink:0;font-size:1rem;margin-top:1px;opacity:0.6;">ℹ️</span>
                         <p><strong>AI-generated document.</strong> This NDA is a starting point, not a finished legal instrument. AI outputs may contain inaccuracies, omissions, or clauses unenforceable in your jurisdiction. To be sure, <strong style="text-decoration:underline;cursor:not-allowed;opacity:0.7;">order a Legal Review</strong> — a lawyer will check your NDA within 24 hours (business days).</p>
                     </div>
                     <div class="nda-output-header" style="border-top:1px solid var(--border);padding-top:12px;">
@@ -2316,7 +2338,7 @@
                     <div class="confidence-note" style="margin-top:10px;">Your Advanced Clauses are reflected in this score. <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Edit clauses</a></div>
                 </div>
 
-                <button class="btn-primary" style="margin-top:16px;" onclick="navigateStep(3)">
+                <button class="btn-nav" style="margin-top:16px;width:100%;" onclick="navigateStep(3)">
                     NDA Checklist →
                 </button>
             </div>
@@ -2418,11 +2440,11 @@
                 <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
             </div>
 
-            <div style="display:flex;gap:12px;">
-                <button class="btn-primary" style="flex:1;" onclick="navigateStep(4)">
+            <div style="display:flex;gap:10px;">
+                <button class="btn-nav" style="flex:1;" onclick="navigateStep(4)">
                     Lawyer Review →
                 </button>
-                <button class="btn-secondary" onclick="navigateStep(5)" style="padding:14px 20px;">
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(5)">
                     Skip to Summary
                 </button>
             </div>
@@ -2451,7 +2473,7 @@
                             <ul style="font-size:0.8rem;color:var(--text-secondary);line-height:1.8;list-style:none;padding:0;margin:0;">
                                 <li>✓ Full enforceability and gap review</li>
                                 <li>✓ Jurisdictional compliance check</li>
-                                <li>✓ Ready-to-sign .docx format</li>
+                                <li>✓ Ready-to-sign format</li>
                             </ul>
                         </div>
                         <div style="padding:16px;border-radius:var(--radius);background:var(--bg-warm);border:1px solid var(--border-light);">
@@ -2486,27 +2508,31 @@
                         <span style="font-size:0.78rem;color:var(--text-muted);margin-left:4px;">one-time</span>
                     </div>
 
-                    <!-- Slide-to-order CTA -->
-                    <div class="slide-cta" id="slideCta">
-                        <div class="slide-cta-fill" id="slideCtaFill"></div>
-                        <span class="slide-cta-label" id="slideCtaLabel">Slide to order Legal Review →</span>
-                        <div class="slide-cta-thumb" id="slideCtaThumb">
-                            <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7"/><path d="M4 12h16"/></svg>
+                    <!-- NDA Confidence Score slider -->
+                    <div style="margin-bottom:6px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);">NDA Confidence Score</span>
+                            <span id="slideScoreLabel" style="font-size:0.72rem;font-weight:700;color:var(--green);">50/100</span>
                         </div>
+                        <div class="slide-cta" id="slideCta">
+                            <div class="slide-cta-fill" id="slideCtaFill"></div>
+                            <span class="slide-cta-label" id="slideCtaLabel">Slide to 100 to order →</span>
+                            <div class="slide-cta-thumb" id="slideCtaThumb">
+                                <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7"/><path d="M4 12h16"/></svg>
+                            </div>
+                        </div>
+                        <p id="slideHint" style="text-align:center;font-size:0.62rem;color:var(--text-muted);margin-top:6px;">Drag the handle to 100 to confirm your order</p>
                     </div>
-                    <p style="text-align:center;font-size:0.62rem;color:var(--text-muted);margin-top:8px;">Drag the handle all the way right to confirm</p>
                 </div>
             </div>
 
-            <!-- Navigation — quiet inline links -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 2px;">
-                <a href="#" onclick="event.preventDefault();navigateStep(5);" style="font-size:0.78rem;font-weight:500;color:var(--text-secondary);text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:color 0.15s;">
-                    Final Summary
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-                </a>
-                <a href="#" onclick="event.preventDefault();navigateStep(6);" style="font-size:0.78rem;font-weight:500;color:var(--text-muted);text-decoration:none;transition:color 0.15s;">
+            <div style="display:flex;gap:10px;margin-top:8px;">
+                <button class="btn-nav" style="flex:1;" onclick="navigateStep(5)">
+                    Final Summary →
+                </button>
+                <button class="btn-nav btn-nav--muted" onclick="navigateStep(6)">
                     Skip to Send
-                </a>
+                </button>
             </div>
         </div>
 
@@ -2562,7 +2588,7 @@
                     </div>
                 </div>
 
-                <button class="btn-primary" style="margin-top:16px;" onclick="navigateStep(6)">
+                <button class="btn-nav" style="margin-top:16px;width:100%;" onclick="navigateStep(6)">
                     Send NDA →
                 </button>
             </div>
@@ -3753,13 +3779,35 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
         function updateStep3Scores() { refreshAllScores(); }
         function updateStep4Scores() { /* scores removed from Step 4 */ }
 
-        // ═══════ Slide-to-Order CTA ═══════
+        // ═══════ Slide-to-Order CTA (NDA Confidence Score slider) ═══════
+        var slideCtaState = { baseConf: 50, minPct: 0.5 };
+        function initSlideCtaPosition() {
+            // Set slider start position based on current Confidence Score
+            var conf = 50 + checklistBonus + playbookBonus;
+            slideCtaState.baseConf = conf;
+            slideCtaState.minPct = conf / 100;
+            var track = document.getElementById('slideCta');
+            var thumb = document.getElementById('slideCtaThumb');
+            var fill = document.getElementById('slideCtaFill');
+            var label = document.getElementById('slideCtaLabel');
+            var scoreLabel = document.getElementById('slideScoreLabel');
+            var hint = document.getElementById('slideHint');
+            if (!track || track.classList.contains('completed')) return;
+            var THUMB_SIZE = 44, PAD = 4;
+            var ml = track.offsetWidth - THUMB_SIZE - PAD;
+            var startLeft = PAD + (ml - PAD) * slideCtaState.minPct;
+            thumb.style.left = startLeft + 'px';
+            fill.style.width = (slideCtaState.minPct * 100) + '%';
+            if (label) { label.style.opacity = '1'; label.textContent = 'Slide to 100 to order →'; }
+            if (scoreLabel) { scoreLabel.textContent = conf + '/100'; }
+            if (hint) hint.textContent = conf >= 100 ? '' : 'Drag the handle to 100 to confirm your order';
+        }
         (function initSlideCta() {
-            let dragging = false;
-            let startX = 0;
-            let thumbStartLeft = 4;
-            const THUMB_SIZE = 44;
-            const PAD = 4;
+            var dragging = false;
+            var startX = 0;
+            var thumbStartLeft = 4;
+            var THUMB_SIZE = 44;
+            var PAD = 4;
 
             function getTrack() { return document.getElementById('slideCta'); }
             function getThumb() { return document.getElementById('slideCtaThumb'); }
@@ -3767,36 +3815,41 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             function getLabel() { return document.getElementById('slideCtaLabel'); }
 
             function maxLeft() {
-                const track = getTrack();
+                var track = getTrack();
                 return track ? track.offsetWidth - THUMB_SIZE - PAD : 0;
             }
 
             function pctFromLeft(left) {
-                const ml = maxLeft();
+                var ml = maxLeft();
                 return ml > 0 ? Math.min(1, Math.max(0, (left - PAD) / (ml - PAD))) : 0;
             }
 
             function setPosition(left) {
-                const thumb = getThumb();
-                const fill = getFill();
-                const label = getLabel();
+                var minLeft = PAD + (maxLeft() - PAD) * slideCtaState.minPct;
+                var thumb = getThumb();
+                var fill = getFill();
+                var label = getLabel();
+                var scoreLabel = document.getElementById('slideScoreLabel');
                 if (!thumb) return;
-                const clamped = Math.max(PAD, Math.min(left, maxLeft()));
+                var clamped = Math.max(minLeft, Math.min(left, maxLeft()));
                 thumb.style.left = clamped + 'px';
-                const pct = pctFromLeft(clamped);
+                var pct = pctFromLeft(clamped);
                 if (fill) fill.style.width = (pct * 100) + '%';
-                if (label) label.style.opacity = Math.max(0, 1 - pct * 2.5);
+                if (label) label.style.opacity = Math.max(0, 1 - pct * 2);
+                // Update score display
+                var displayScore = Math.round(pct * 100);
+                if (scoreLabel) scoreLabel.textContent = displayScore + '/100';
             }
 
             function onStart(e) {
-                const track = getTrack();
+                var track = getTrack();
                 if (!track || track.classList.contains('completed')) return;
                 dragging = true;
-                const thumb = getThumb();
-                const fill = getFill();
+                var thumb = getThumb();
+                var fill = getFill();
                 thumb.classList.remove('returning');
                 fill.classList.remove('returning');
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                var clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 startX = clientX;
                 thumbStartLeft = parseInt(thumb.style.left) || PAD;
                 e.preventDefault();
@@ -3804,40 +3857,47 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
 
             function onMove(e) {
                 if (!dragging) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const dx = clientX - startX;
+                var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                var dx = clientX - startX;
                 setPosition(thumbStartLeft + dx);
             }
 
             function onEnd() {
                 if (!dragging) return;
                 dragging = false;
-                const pct = pctFromLeft(parseInt(getThumb().style.left) || PAD);
+                var pct = pctFromLeft(parseInt(getThumb().style.left) || PAD);
                 if (pct >= 0.95) {
                     // Completed!
-                    const track = getTrack();
-                    const thumb = getThumb();
-                    const fill = getFill();
-                    const label = getLabel();
+                    var track = getTrack();
+                    var thumb = getThumb();
+                    var fill = getFill();
+                    var label = getLabel();
+                    var scoreLabel = document.getElementById('slideScoreLabel');
+                    var hint = document.getElementById('slideHint');
                     track.classList.add('completed');
                     thumb.style.left = maxLeft() + 'px';
                     fill.style.width = '100%';
                     label.textContent = '✓ Order confirmed';
                     label.style.opacity = '1';
+                    if (scoreLabel) { scoreLabel.textContent = '100/100'; scoreLabel.style.color = 'var(--green)'; }
+                    if (hint) hint.textContent = '';
                     thumb.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-                    // Redirect to payment / placeholder action
                     setTimeout(function() {
                         alert('Legal Review order placed! We will redirect you to payment shortly.');
                     }, 500);
                 } else {
-                    // Snap back
-                    const thumb = getThumb();
-                    const fill = getFill();
-                    const label = getLabel();
+                    // Snap back to Confidence Score position
+                    var thumb = getThumb();
+                    var fill = getFill();
+                    var label = getLabel();
+                    var scoreLabel = document.getElementById('slideScoreLabel');
                     thumb.classList.add('returning');
                     fill.classList.add('returning');
-                    setPosition(PAD);
+                    var minLeft = PAD + (maxLeft() - PAD) * slideCtaState.minPct;
+                    thumb.style.left = minLeft + 'px';
+                    fill.style.width = (slideCtaState.minPct * 100) + '%';
                     if (label) label.style.opacity = '1';
+                    if (scoreLabel) scoreLabel.textContent = slideCtaState.baseConf + '/100';
                     setTimeout(function() {
                         thumb.classList.remove('returning');
                         fill.classList.remove('returning');
@@ -3907,16 +3967,12 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             }
             if (step === 3) updateStep3Scores();
             if (step === 4) {
-                // Reset slide CTA if not already completed
-                const sc = document.getElementById('slideCta');
-                if (sc && !sc.classList.contains('completed')) {
-                    const th = document.getElementById('slideCtaThumb');
-                    const fl = document.getElementById('slideCtaFill');
-                    const lb = document.getElementById('slideCtaLabel');
-                    if (th) th.style.left = '4px';
-                    if (fl) fl.style.width = '0%';
-                    if (lb) { lb.style.opacity = '1'; lb.textContent = 'Slide to order Legal Review →'; }
-                }
+                // Reset slider and position at current Confidence Score
+                var sc = document.getElementById('slideCta');
+                if (sc) sc.classList.remove('completed');
+                var sth = document.getElementById('slideCtaThumb');
+                if (sth) sth.innerHTML = '<svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7"/><path d="M4 12h16"/></svg>';
+                setTimeout(initSlideCtaPosition, 50);
             }
             if (step === 5) document.getElementById('summarySource').textContent = generatedNDAText2 ? 'Enhanced NDA' : 'Flash NDA';
             if (step === 6) { buildEmailTemplate(); updateDocsPanel(); }
