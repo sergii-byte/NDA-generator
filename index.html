@@ -2272,25 +2272,56 @@
             <!-- NDA Confidence Score -->
             <div id="step3Scores" class="strength-meter" style="display:none;">
                 <div class="strength-header">
-                    <span class="strength-title">NDA Confidence Score</span>
+                    <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
                     <span id="step3ConfLabel" class="strength-label">—</span>
                 </div>
                 <div class="strength-bar-bg">
                     <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
                 <div class="confidence-note" id="step3ConfNote"></div>
+
+                <div class="cta-steps">
+                    <div class="cta-step cta-step--playbook">
+                        <div class="cta-step-left">
+                            <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+15 points</span>
+                            <div>
+                                <h4 class="cta-step-title">Master the NDA Playbook in the AI Era</h4>
+                                <p class="cta-step-desc">Essentials of building an enforceable NDA: key clauses to push, red flags, and real-world use cases. 40 pages.</p>
+                            </div>
+                        </div>
+                        <span class="cta-step-btn" style="background:var(--accent);">$10</span>
+                    </div>
+                    <div class="cta-step cta-step--review">
+                        <div class="cta-step-left">
+                            <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100/100</span>
+                            <div>
+                                <h4 class="cta-step-title">Get a Lawyer's Sign-Off</h4>
+                                <p class="cta-step-desc">A qualified lawyer reviews your NDA for enforceability, fixes gaps, and returns a ready-to-sign document. 24h.</p>
+                            </div>
+                        </div>
+                        <span class="cta-step-btn" style="background:var(--text);">$100</span>
+                    </div>
+                </div>
             </div>
 
             <!-- NDA Strictness Score -->
             <div id="step3StrictnessBlock" class="strength-meter" style="display:none;">
                 <div class="strength-header">
-                    <span class="strength-title">NDA Strictness Score</span>
+                    <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
                     <span id="step3StrLabel" class="strength-label">—</span>
                 </div>
                 <div class="strength-bar-bg">
                     <div id="step3StrBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
-                <div class="confidence-note" style="margin-top:8px;">Adjust strictness with <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Advanced Clauses</a>.</div>
+                <div class="strength-scale">
+                    <span>Weak</span>
+                    <span>Moderate</span>
+                    <span class="scale-recommended">Balanced</span>
+                    <span class="scale-recommended">Restrictive</span>
+                    <span>Aggressive</span>
+                </div>
+                <div id="step3StrBreakdown" class="strength-breakdown"></div>
+                <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
             </div>
 
             <div style="display:flex;gap:12px;">
@@ -2358,7 +2389,7 @@
             <!-- NDA Confidence Score on Lawyer Review -->
             <div id="step4Scores" class="strength-meter" style="display:none;">
                 <div class="strength-header">
-                    <span class="strength-title">NDA Confidence Score</span>
+                    <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
                     <span id="step4ConfLabel" class="strength-label">—</span>
                 </div>
                 <div class="strength-bar-bg" style="position:relative;">
@@ -2366,18 +2397,49 @@
                     <div id="step4ConfBar" class="strength-bar-fill" style="width:0%;position:relative;z-index:1;"></div>
                 </div>
                 <div class="confidence-note" id="step4ConfNote">Order a Legal Review to reach <strong style="color:var(--green);">100</strong> — you're almost there.</div>
+
+                <div class="cta-steps">
+                    <div class="cta-step cta-step--playbook">
+                        <div class="cta-step-left">
+                            <span class="cta-step-badge" style="color:var(--accent);background:var(--accent-soft);">+15 points</span>
+                            <div>
+                                <h4 class="cta-step-title">Master the NDA Playbook in the AI Era</h4>
+                                <p class="cta-step-desc">Essentials of building an enforceable NDA: key clauses to push, red flags, and real-world use cases. 40 pages.</p>
+                            </div>
+                        </div>
+                        <span class="cta-step-btn" style="background:var(--accent);">$10</span>
+                    </div>
+                    <div class="cta-step cta-step--review">
+                        <div class="cta-step-left">
+                            <span class="cta-step-badge" style="color:var(--green);background:var(--green-soft);">100/100</span>
+                            <div>
+                                <h4 class="cta-step-title">Get a Lawyer's Sign-Off</h4>
+                                <p class="cta-step-desc">A qualified lawyer reviews your NDA for enforceability, fixes gaps, and returns a ready-to-sign document. 24h.</p>
+                            </div>
+                        </div>
+                        <span class="cta-step-btn" style="background:var(--text);">$100</span>
+                    </div>
+                </div>
             </div>
 
             <!-- NDA Strictness Score on Lawyer Review -->
             <div id="step4StrictnessBlock" class="strength-meter" style="display:none;">
                 <div class="strength-header">
-                    <span class="strength-title">NDA Strictness Score</span>
+                    <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
                     <span id="step4StrLabel" class="strength-label">—</span>
                 </div>
                 <div class="strength-bar-bg">
                     <div id="step4StrBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
-                <div class="confidence-note" style="margin-top:8px;">Adjust strictness with <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Advanced Clauses</a>.</div>
+                <div class="strength-scale">
+                    <span>Weak</span>
+                    <span>Moderate</span>
+                    <span class="scale-recommended">Balanced</span>
+                    <span class="scale-recommended">Restrictive</span>
+                    <span>Aggressive</span>
+                </div>
+                <div id="step4StrBreakdown" class="strength-breakdown"></div>
+                <div class="confidence-note" style="margin-top:10px;">Want a stronger NDA? <a href="#" onclick="event.preventDefault();navigateStep(2);" style="color:var(--accent);font-weight:600;text-decoration:underline;">Add Advanced Clauses →</a></div>
             </div>
 
             <div style="display:flex;gap:12px;margin-top:4px;">
@@ -3497,6 +3559,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
         }
 
         function renderStrengthMeter(num, enhanced) {
+            // Strictness only — Confidence is handled by refreshAllScores()
             const { score, level, color, tags } = calculateNDAStrength(enhanced);
             const bar = document.getElementById('strengthBar' + num);
             const label = document.getElementById('strengthLabel' + num);
@@ -3513,21 +3576,8 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
                 `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
             ).join('');
 
-            // ── NDA Confidence Score ──
-            const conf = 50 + checklistBonus + playbookBonus;
-
-            const confBar = document.getElementById('confBar' + num);
-            const confLabel = document.getElementById('confLabel' + num);
-            const confNote = document.getElementById('confNote' + num);
-
-            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
-            confBar.style.width = conf + '%';
-            confBar.style.background = confColor;
-            confLabel.textContent = conf + '/100';
-            confLabel.style.background = confColor + '18';
-            confLabel.style.color = confColor;
-
-            confNote.innerHTML = `AI-generated NDAs have inherent limitations — models may produce inaccuracies or unenforceable clauses. Your baseline is <strong>50 points</strong>. Self-verifying key terms of your NDA against our Checklist adds <strong>+5</strong>. Mastering our <strong>NDA Playbook</strong> adds <strong>+15</strong> to your confidence. A <strong style="color:var(--green);">Legal Review</strong> by a qualified lawyer brings you to <strong style="color:var(--green);">100</strong>.`;
+            // Update all scores (Confidence + Strictness) across every step
+            refreshAllScores();
         }
 
         function updateDocsPanel() {
@@ -3570,10 +3620,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
                 document.getElementById('checklistBar').style.background = 'var(--accent)';
                 document.getElementById('checklistCount').style.color = 'var(--text-muted)';
             }
-            updateEnforceabilityDisplay(1);
-            updateEnforceabilityDisplay(2);
-            updateStep3Scores();
-            updateStep4Scores();
+            refreshAllScores();
             // Update mark-all label
             document.getElementById('markAllLabel').textContent = done === total ? 'Unmark all' : 'Mark all';
         }
@@ -3585,76 +3632,68 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             updateChecklistProgress();
         }
 
-        function updateStep3Scores() {
+        // ═══════ Unified score refresh — single source of truth ═══════
+        function refreshAllScores() {
             if (!generatedNDAText) return;
-            document.getElementById('step3Scores').style.display = '';
-            document.getElementById('step3StrictnessBlock').style.display = '';
-            const srcNum = generatedNDAText2 ? 2 : 1;
-            const srcStrBar = document.getElementById('strengthBar' + srcNum);
-            const srcStrLabel = document.getElementById('strengthLabel' + srcNum);
-            document.getElementById('step3StrBar').style.width = srcStrBar.style.width;
-            document.getElementById('step3StrBar').style.background = srcStrBar.style.background;
-            document.getElementById('step3StrLabel').textContent = srcStrLabel.textContent;
-            document.getElementById('step3StrLabel').style.background = srcStrLabel.style.background;
-            document.getElementById('step3StrLabel').style.color = srcStrLabel.style.color;
-            const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
-            document.getElementById('step3ConfBar').style.width = conf + '%';
-            document.getElementById('step3ConfBar').style.background = confColor;
-            document.getElementById('step3ConfLabel').textContent = conf + '/100';
-            document.getElementById('step3ConfLabel').style.background = confColor + '18';
-            document.getElementById('step3ConfLabel').style.color = confColor;
-            let parts = [];
-            if (checklistBonus > 0) parts.push('Checklist +5');
-            if (playbookBonus > 0) parts.push('Playbook +15');
-            document.getElementById('step3ConfNote').innerHTML = conf > 50
-                ? `${parts.join(', ')} applied — score: <strong>${conf}/100</strong>. Order a <strong style="color:var(--green);">Legal Review</strong> to reach 100.`
-                : `Complete the checklist and apply the Playbook to boost your score.`;
-        }
+            const enhanced = !!generatedNDAText2;
+            const srcNum = enhanced ? 2 : 1;
+            const { score, level, color, tags } = calculateNDAStrength(enhanced);
 
-        function updateEnforceabilityDisplay(num) {
-            const confBar = document.getElementById('confBar' + num);
-            const confLabel = document.getElementById('confLabel' + num);
-            const confNote = document.getElementById('confNote' + num);
-            if (!confBar || confBar.style.width === '0%') return;
+            // ── Confidence Score (same on every page) ──
             const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
-            confBar.style.width = conf + '%';
-            confBar.style.background = confColor;
-            confLabel.textContent = conf + '/100';
-            confLabel.style.background = confColor + '18';
-            confLabel.style.color = confColor;
+            const greenVar = getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+            const confColor = conf > 50 ? greenVar : '#D4970A';
             let parts = [];
             if (checklistBonus > 0) parts.push('Checklist +5');
             if (playbookBonus > 0) parts.push('Playbook +15');
-            confNote.innerHTML = conf > 50
+            const confNoteText = conf > 50
                 ? `${parts.join(', ')} applied — score: <strong>${conf}/100</strong>. Order a <strong style="color:var(--green);">Legal Review</strong> to reach 100.`
                 : `AI-generated NDAs start at <strong>50 points</strong>. Complete the checklist (+5) and apply the <strong>NDA Playbook</strong> (+15) to boost your confidence. A <strong style="color:var(--green);">Legal Review</strong> brings you to 100.`;
+
+            // Strictness breakdown HTML
+            const breakdownHTML = tags.map(t =>
+                `<span class="strength-tag ${t.on ? 'active' : 'inactive'}">${t.on ? '✓' : '—'} ${t.name}</span>`
+            ).join('');
+
+            // Update every Confidence display (Step 1, 2, 3, 4)
+            ['confBar1','confBar2','step3ConfBar','step4ConfBar'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.style.width = conf + '%'; el.style.background = confColor; }
+            });
+            ['confLabel1','confLabel2','step3ConfLabel','step4ConfLabel'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = conf + '/100'; el.style.background = confColor + '18'; el.style.color = confColor; }
+            });
+            ['confNote1','confNote2','step3ConfNote','step4ConfNote'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = confNoteText;
+            });
+
+            // Update every Strictness display (Step 1, 2, 3, 4)
+            ['strengthBar1','strengthBar2','step3StrBar','step4StrBar'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.style.width = score + '%'; el.style.background = color; }
+            });
+            ['strengthLabel1','strengthLabel2','step3StrLabel','step4StrLabel'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.textContent = level + ' · ' + score + '/100'; el.style.background = color + '18'; el.style.color = color; }
+            });
+            ['strengthBreakdown1','strengthBreakdown2','step3StrBreakdown','step4StrBreakdown'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = breakdownHTML;
+            });
+
+            // Show Step 3 & 4 panels
+            ['step3Scores','step3StrictnessBlock','step4Scores','step4StrictnessBlock'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
         }
 
-        function updateStep4Scores() {
-            if (!generatedNDAText) return;
-            document.getElementById('step4Scores').style.display = '';
-            document.getElementById('step4StrictnessBlock').style.display = '';
-            // Copy strictness from whichever NDA exists
-            const srcNum = generatedNDAText2 ? 2 : 1;
-            const srcStrBar = document.getElementById('strengthBar' + srcNum);
-            const srcStrLabel = document.getElementById('strengthLabel' + srcNum);
-            document.getElementById('step4StrBar').style.width = srcStrBar.style.width;
-            document.getElementById('step4StrBar').style.background = srcStrBar.style.background;
-            document.getElementById('step4StrLabel').textContent = srcStrLabel.textContent;
-            document.getElementById('step4StrLabel').style.background = srcStrLabel.style.background;
-            document.getElementById('step4StrLabel').style.color = srcStrLabel.style.color;
-            // Confidence Score with pale green remainder
-            const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
-            document.getElementById('step4ConfBar').style.width = conf + '%';
-            document.getElementById('step4ConfBar').style.background = confColor;
-            document.getElementById('step4ConfLabel').textContent = conf + ' → 100';
-            document.getElementById('step4ConfLabel').style.background = confColor + '18';
-            document.getElementById('step4ConfLabel').style.color = confColor;
-            document.getElementById('step4ConfNote').innerHTML = `Your current score: <strong>${conf}/100</strong>. Order a Legal Review to reach <strong style="color:var(--green);">100</strong> — you're one step away.`;
-        }
+        // Keep old names as aliases for backward compat
+        function updateEnforceabilityDisplay() { refreshAllScores(); }
+        function updateStep3Scores() { refreshAllScores(); }
+        function updateStep4Scores() { refreshAllScores(); }
 
         function copyEmailText() {
             const subject = document.getElementById('emailSubject').value;
