@@ -9,48 +9,52 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #F9F6F1;
-            --bg-warm: #F4F0E8;
+            --bg: #faf9f5;
+            --bg-warm: #f2f0e8;
             --card: #FFFFFF;
-            --card-hover: #FDFCFA;
-            --border: #E5E0D5;
-            --border-light: #EDE9E0;
-            --text: #2B2926;
+            --card-hover: #fdfcfa;
+            --border: #e8e6dc;
+            --border-light: #eeece4;
+            --text: #141413;
             --text-secondary: #6B6560;
-            --text-muted: #9A9490;
-            --accent: #D97757;
-            --accent-hover: #C5684A;
+            --text-muted: #b0aea5;
+            --accent: #d97757;
+            --accent-hover: #c5684a;
             --accent-soft: rgba(217, 119, 87, 0.08);
             --accent-ring: rgba(217, 119, 87, 0.2);
-            --green: #3D9A5F;
-            --green-soft: rgba(61, 154, 95, 0.1);
-            --yellow-soft: rgba(217, 176, 87, 0.15);
+            --green: #788c5d;
+            --green-soft: rgba(120, 140, 93, 0.12);
+            --blue: #6a9bcc;
+            --blue-soft: rgba(106, 155, 204, 0.12);
+            --yellow-soft: rgba(217, 176, 87, 0.12);
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
             --shadow-lg: 0 4px 16px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --radius-lg: 16px;
+            --radius: 10px;
+            --radius-lg: 14px;
         }
         /* Dark mode */
         [data-theme="dark"] {
-            --bg: #1A1A1A;
-            --bg-warm: #222222;
-            --card: #2A2A2A;
-            --card-hover: #333333;
-            --border: #3A3A3A;
-            --border-light: #333333;
-            --text: #E8E4DF;
-            --text-secondary: #B0AAA4;
-            --text-muted: #7A7470;
-            --accent: #E08868;
-            --accent-hover: #D47858;
-            --accent-soft: rgba(224, 136, 104, 0.12);
-            --accent-ring: rgba(224, 136, 104, 0.25);
-            --green: #5AB87A;
-            --green-soft: rgba(90, 184, 122, 0.12);
+            --bg: #141413;
+            --bg-warm: #1e1e1c;
+            --card: #232321;
+            --card-hover: #2a2a28;
+            --border: #363633;
+            --border-light: #2e2e2b;
+            --text: #faf9f5;
+            --text-secondary: #b0aea5;
+            --text-muted: #706e66;
+            --accent: #d97757;
+            --accent-hover: #e08868;
+            --accent-soft: rgba(217, 119, 87, 0.12);
+            --accent-ring: rgba(217, 119, 87, 0.25);
+            --green: #96a87a;
+            --green-soft: rgba(150, 168, 122, 0.12);
+            --blue: #7dadd4;
+            --blue-soft: rgba(125, 173, 212, 0.12);
             --yellow-soft: rgba(217, 176, 87, 0.12);
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
             --shadow-md: 0 2px 8px rgba(0,0,0,0.3);
@@ -62,15 +66,15 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Poppins', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
-        /* Claude-like typography: serif for generated NDA content */
+        /* Anthropic typography: Lora for generated NDA content */
         .generated-nda {
-            font-family: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+            font-family: 'Lora', Georgia, 'Times New Roman', serif;
             font-size: 0.92rem;
             line-height: 1.7;
         }
@@ -371,7 +375,7 @@
             gap: 10px;
         }
         .card-title .badge {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.65rem;
             font-weight: 600;
             text-transform: uppercase;
@@ -833,7 +837,7 @@
             padding: 10px 14px;
             border: 1px solid var(--border);
             border-radius: 10px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.9rem;
             color: var(--text);
             background: var(--card);
@@ -927,7 +931,7 @@
         .ac-tag.status { background: var(--green-soft); color: var(--green); }
         .ac-tag.address-ok { background: var(--green-soft); color: var(--green); }
         .ac-tag.address-missing { background: var(--yellow-soft); color: #B8860B; }
-        .ac-tag.source { background: #FFF7ED; color: #C2410C; font-size: 0.65rem; }
+        .ac-tag.source { background: var(--accent-soft); color: var(--accent); font-size: 0.65rem; }
         .ac-address { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
         .ac-loading {
             padding: 16px;
@@ -992,7 +996,7 @@
             padding: 14px 24px;
             border: none;
             border-radius: var(--radius);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
@@ -1019,7 +1023,7 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             background: var(--card);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.82rem;
             font-weight: 500;
             color: var(--text-secondary);
@@ -1037,7 +1041,7 @@
             cursor: pointer;
             background: none;
             border: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             transition: color 0.2s;
             margin-bottom: 16px;
         }
@@ -1060,7 +1064,7 @@
             margin-bottom: 16px;
         }
         .nda-output-header h3 {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-weight: 600;
             font-size: 1rem;
             display: flex;
@@ -1080,7 +1084,7 @@
             padding: 40px 48px;
             max-height: 600px;
             overflow-y: auto;
-            font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+            font-family: 'Lora', Georgia, 'Times New Roman', serif;
             font-size: 0.92rem;
             line-height: 1.85;
             color: var(--text);
@@ -1091,28 +1095,28 @@
         .generated-nda::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         .generated-nda h1 {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             margin: 0 0 1.2em 0;
             padding-bottom: 0.8em;
             border-bottom: 1px solid var(--border);
         }
         .generated-nda h2 {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 1.05rem;
-            font-weight: 700;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
             margin: 1.8em 0 0.6em 0;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.02em;
         }
         .generated-nda h3 {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 0.95rem;
-            font-weight: 700;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 0.92rem;
+            font-weight: 600;
             margin: 1.4em 0 0.5em 0;
         }
         .generated-nda p {
@@ -1162,7 +1166,7 @@
             color: var(--text);
         }
         .summary-content h1, .summary-content h2, .summary-content h3 {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-weight: 600;
             margin: 1.2em 0 0.5em 0;
         }
@@ -1229,7 +1233,7 @@
             text-align: center;
         }
         .cta-banner h4 {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             font-size: 1.05rem;
             font-weight: 600;
             margin-bottom: 8px;
@@ -2119,7 +2123,7 @@
                             </div>
                         </div>
                         <div id="arbClausePreview" style="padding: 14px 16px; background: var(--bg-warm); border: 1px solid var(--border-light); border-radius: 10px; font-size: 0.8rem; line-height: 1.65; color: var(--text-secondary); font-family: Georgia, 'Times New Roman', serif; display: none;">
-                            <div style="font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
+                            <div style="font-family: 'Poppins', Arial, sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Model Clause Preview</div>
                             <div id="arbClauseText"></div>
                         </div>
                     </div>
@@ -3508,7 +3512,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             const confLabel = document.getElementById('confLabel' + num);
             const confNote = document.getElementById('confNote' + num);
 
-            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
+            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
             confLabel.textContent = conf + '%';
@@ -3522,18 +3526,18 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             const list = document.getElementById('docsList');
             let html = '';
             if (generatedNDAText) {
-                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:#EDE9FE;color:#7C3AED;">⚡</span> NDA Draft</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText)">Copy</button><button onclick="downloadPDF('ndaContent1','NDA.pdf')">PDF</button><button onclick="downloadDOCX('ndaContent1','NDA_Draft')">DOCX</button></div></div>`;
+                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:var(--accent-soft);color:var(--accent);">⚡</span> NDA Draft</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText)">Copy</button><button onclick="downloadPDF('ndaContent1','NDA.pdf')">PDF</button><button onclick="downloadDOCX('ndaContent1','NDA_Draft')">DOCX</button></div></div>`;
             }
             if (generatedNDAText2) {
-                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:#FEF3C7;color:#D97706;">🔒</span> Advanced NDA</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText2)">Copy</button><button onclick="downloadPDF('ndaContent2','NDA_Customized.pdf')">PDF</button><button onclick="downloadDOCX('ndaContent2','NDA_Enhanced')">DOCX</button></div></div>`;
+                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:var(--bg-warm);color:var(--text-secondary);">🔒</span> Advanced NDA</span><div class="doc-item-actions"><button onclick="copyText(generatedNDAText2)">Copy</button><button onclick="downloadPDF('ndaContent2','NDA_Customized.pdf')">PDF</button><button onclick="downloadDOCX('ndaContent2','NDA_Enhanced')">DOCX</button></div></div>`;
             }
             if (generatedSummaryText) {
-                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:#DBEAFE;color:#2563EB;">📄</span> Plain-English Summary</span><div class="doc-item-actions"><button onclick="copyText(generatedSummaryText)">Copy</button><button onclick="downloadPDF('summaryContent','NDA_Summary.pdf')">PDF</button><button onclick="downloadDOCX('summaryContent','NDA_Summary')">DOCX</button></div></div>`;
+                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:var(--bg-warm);color:var(--text-secondary);">📄</span> Plain-English Summary</span><div class="doc-item-actions"><button onclick="copyText(generatedSummaryText)">Copy</button><button onclick="downloadPDF('summaryContent','NDA_Summary.pdf')">PDF</button><button onclick="downloadDOCX('summaryContent','NDA_Summary')">DOCX</button></div></div>`;
             }
             const subj = document.getElementById('emailSubject');
             const body = document.getElementById('emailBody');
             if (subj && subj.value) {
-                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:#D1FAE5;color:#059669;">✉️</span> Cover Email</span><div class="doc-item-actions"><button onclick="copyEmailText()">Copy</button></div></div>`;
+                html += `<div class="doc-item"><span class="doc-item-name"><span class="doc-icon" style="background:var(--green-soft);color:var(--green);">✉️</span> Cover Email</span><div class="doc-item-actions"><button onclick="copyEmailText()">Copy</button></div></div>`;
             }
             list.innerHTML = html || '<div style="font-size:0.82rem;color:var(--text-muted);padding:4px 0;">No documents generated yet.</div>';
         }
@@ -3586,7 +3590,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             document.getElementById('step3StrLabel').style.background = srcStrLabel.style.background;
             document.getElementById('step3StrLabel').style.color = srcStrLabel.style.color;
             const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
+            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
             document.getElementById('step3ConfBar').style.width = conf + '%';
             document.getElementById('step3ConfBar').style.background = confColor;
             document.getElementById('step3ConfLabel').textContent = conf + '%';
@@ -3606,7 +3610,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             const confNote = document.getElementById('confNote' + num);
             if (!confBar || confBar.style.width === '0%') return;
             const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = conf > 50 ? '#3D9A5F' : '#D4970A';
+            const confColor = conf > 50 ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim() : '#D4970A';
             confBar.style.width = conf + '%';
             confBar.style.background = confColor;
             confLabel.textContent = conf + '%';
@@ -3635,7 +3639,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             document.getElementById('step4StrLabel').style.color = srcStrLabel.style.color;
             // Enforceability with pale green remainder
             const conf = 50 + checklistBonus + playbookBonus;
-            const confColor = '#3D9A5F';
+            const confColor = getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
             document.getElementById('step4ConfBar').style.width = conf + '%';
             document.getElementById('step4ConfBar').style.background = confColor;
             document.getElementById('step4ConfLabel').textContent = conf + '% → 100%';
