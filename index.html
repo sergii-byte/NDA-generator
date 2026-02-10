@@ -694,7 +694,7 @@
             justify-content: space-between;
             padding: 8px 12px;
             border-radius: 8px;
-            background: var(--bg-warm);
+            background: transparent;
             font-size: 0.82rem;
         }
         .doc-item-name {
@@ -810,7 +810,7 @@
             left: 0;
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, rgba(120,140,93,0.25), rgba(120,140,93,0.4));
+            background: linear-gradient(90deg, rgba(120,140,93,0.45), rgba(120,140,93,0.7));
             border-radius: 26px;
             transition: width 0.05s linear;
             pointer-events: none;
@@ -830,7 +830,7 @@
             font-family: 'Poppins', Arial, sans-serif;
             font-size: 0.78rem;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--text);
             letter-spacing: 0.02em;
             pointer-events: none;
             transition: opacity 0.2s;
@@ -1979,7 +1979,7 @@
                         <div id="confBar1" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="confidence-note" id="confNote1"></div>
-                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA?</div>
 
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
@@ -2166,11 +2166,11 @@
                     <div class="form-row" id="competeRow2" style="display:none;">
                         <div class="form-group">
                             <label>Geographic Scope</label>
-                            <input type="text" id="competeGeo" placeholder="e.g. European Union, worldwide">
+                            <input type="text" id="competeGeo" autocomplete="off" placeholder="e.g. European Union, worldwide">
                         </div>
                         <div class="form-group">
                             <label>Industry / Activity Scope</label>
-                            <input type="text" id="competeScope" placeholder="e.g. fintech payment processing">
+                            <input type="text" id="competeScope" autocomplete="off" placeholder="e.g. fintech payment processing">
                         </div>
                     </div>
 
@@ -2199,8 +2199,8 @@
                                     <option value="CZK">CZK</option>
                                     <option value="custom">Other</option>
                                 </select>
-                                <input type="text" id="breachCurrencyCustom" class="hidden" style="flex:0 0 70px;" placeholder="e.g. SGD">
-                                <input type="text" id="breachAmount" style="flex:1;" placeholder="e.g. 50,000">
+                                <input type="text" id="breachCurrencyCustom" class="hidden" autocomplete="off" style="flex:0 0 70px;" placeholder="e.g. SGD">
+                                <input type="text" id="breachAmount" autocomplete="off" style="flex:1;" placeholder="e.g. 50,000">
                             </div>
                         </div>
                     </div>
@@ -2234,7 +2234,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Seat of Arbitration</label>
-                                <input type="text" id="arbLocation" placeholder="Auto-filled or enter manually">
+                                <input type="text" id="arbLocation" autocomplete="off" placeholder="Auto-filled or enter manually">
                             </div>
                         </div>
                         <div class="form-row">
@@ -2302,7 +2302,7 @@
                 </div>
 
                 <!-- NDA Confidence Score (boost via Playbook & Legal Review) -->
-                <div id="confidenceMeter2" class="strength-meter">
+                <div id="confidenceMeter2" class="strength-meter" style="display:none;">
                     <div class="strength-header">
                         <span class="strength-title">NDA Confidence Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how confident you can be in your NDA. AI drafts start at 50 — the Checklist adds +5, the Playbook adds +15, and a Legal Review brings you to 100.</span></span></span>
                         <span id="confLabel2" class="strength-label">—</span>
@@ -2311,7 +2311,7 @@
                         <div id="confBar2" class="strength-bar-fill" style="width:0%;"></div>
                     </div>
                     <div class="confidence-note" id="confNote2"></div>
-                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
+                    <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA?</div>
 
                     <div class="cta-steps">
                         <div class="cta-step cta-step--playbook">
@@ -2338,7 +2338,7 @@
                 </div>
 
                 <!-- NDA Strictness Score (boost via Advanced Clauses) -->
-                <div id="strengthMeter2" class="strength-meter">
+                <div id="strengthMeter2" class="strength-meter" style="display:none;">
                     <div class="strength-header">
                         <span class="strength-title">NDA Strictness Score <span class="score-tip">ⓘ<span class="score-tip-text">Measures how restrictive your NDA is. Balanced to Restrictive is the recommended range — aggressive terms may be unenforceable or discourage signing.</span></span></span>
                         <span id="strengthLabel2" class="strength-label">—</span>
@@ -2417,7 +2417,7 @@
                     <div id="step3ConfBar" class="strength-bar-fill" style="width:0%;"></div>
                 </div>
                 <div class="confidence-note" id="step3ConfNote"></div>
-                <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA? <a href="#" onclick="event.preventDefault();navigateStep(4);" style="color:var(--accent);font-weight:600;">Get a Legal Review →</a></div>
+                <div class="confidence-note" style="margin-top:10px;">Want to increase your confidence in NDA?</div>
 
                 <div class="cta-steps">
                     <div class="cta-step cta-step--playbook">
@@ -2537,12 +2537,12 @@
                         </div>
                         <div class="slide-cta" id="slideCta">
                             <div class="slide-cta-fill" id="slideCtaFill"></div>
-                            <span class="slide-cta-label" id="slideCtaLabel">Slide to 100 to order →</span>
+                            <span class="slide-cta-label" id="slideCtaLabel">Slide to 100 to order Legal Review →</span>
                             <div class="slide-cta-thumb" id="slideCtaThumb">
                                 <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7"/><path d="M4 12h16"/></svg>
                             </div>
                         </div>
-                        <p id="slideHint" style="text-align:center;font-size:0.62rem;color:var(--text-muted);margin-top:6px;">Drag the handle to 100 to confirm your order</p>
+                        <p id="slideHint" style="text-align:center;font-size:0.62rem;color:var(--text-secondary);margin-top:6px;">Drag the handle to 100 to order Legal Review</p>
                     </div>
                 </div>
             </div>
@@ -2642,7 +2642,7 @@
                     </div>
                     <div class="form-group">
                         <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Subject</label>
-                        <input type="text" id="emailSubject" style="margin-top:4px;" />
+                        <input type="text" id="emailSubject" autocomplete="off" style="margin-top:4px;" />
                     </div>
                     <div class="form-group">
                         <label style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">Email Body</label>
@@ -2672,9 +2672,6 @@
                 <div id="docsList" class="docs-list"></div>
             </div>
 
-            <button class="btn-secondary" style="width:100%;" onclick="navigateStep(1)">
-                ← Create Another NDA
-            </button>
         </div>
     </main>
 
@@ -2765,7 +2762,7 @@
         function autoSaveDraft() {
             const fields = ['partyAName','partyACompanyNumber','partyAEmail','partyAAddress','partyASignatory','partyATitle',
                 'partyBName','partyBCompanyNumber','partyBEmail','partyBAddress','partyBSignatory','partyBTitle',
-                'ndaType','effectiveDate','confPeriod','purposeSelect','customPurpose','confInfoCustom','partyBRole','partyBRoleCustom'];
+                'ndaType','effectiveDate','confPeriod','purposeSelect','partyBRole'];
             const data = {};
             fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
             data.partyAKind = document.getElementById('partyAKind').checked;
@@ -2789,6 +2786,11 @@
                 if (data.confInfoChecked) {
                     document.querySelectorAll('.confInfo').forEach((el, i) => { if (data.confInfoChecked[i] !== undefined) el.checked = data.confInfoChecked[i]; });
                 }
+                // Always clear custom text fields — they must start empty each session
+                ['confInfoCustom','partyBRoleCustom','purposeCustom'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
             } catch(e) {}
         }
         document.addEventListener('DOMContentLoaded', () => {
@@ -3082,7 +3084,7 @@
 
                     // Always show manual register links at bottom
                     const linksHtml = REGISTER_LINKS.map(r =>
-                        `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;font-size:0.8rem;white-space:nowrap;">${r.name}</a>`
+                        `<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:0.8rem;white-space:nowrap;">${r.name}</a>`
                     ).join(' · ');
                     dropdown.innerHTML += `<div style="padding:8px 12px;border-top:1px solid var(--border);font-size:0.78rem;color:var(--text-muted);">Search manually: ${linksHtml}</div>`;
 
@@ -3835,7 +3837,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             var startLeft = PAD + (ml - PAD) * slideCtaState.minPct;
             thumb.style.left = startLeft + 'px';
             fill.style.width = (slideCtaState.minPct * 100) + '%';
-            if (label) { label.style.opacity = '1'; label.textContent = 'Slide to 100 to order →'; }
+            if (label) { label.style.opacity = '1'; label.textContent = 'Slide to 100 to order Legal Review →'; }
             if (scoreLabel) { scoreLabel.textContent = conf + '/100'; }
             if (hint) hint.textContent = conf >= 100 ? '' : 'Drag the handle to 100 to confirm your order';
         }
@@ -4745,6 +4747,11 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState2');
 
                 generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
+                // Show score meters only after enhanced NDA is generated
+                ['confidenceMeter2','strengthMeter2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = '';
+                });
                 renderStrengthMeter(2);
                 updateDocsPanel();
                 updateBadge(2);
