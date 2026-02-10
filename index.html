@@ -1860,7 +1860,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>NDA Type</label>
-                            <select id="ndaType">
+                            <select id="ndaType" onchange="refreshAllScores()">
                                 <option value="Mutual">Mutual (both parties)</option>
                                 <option value="Unilateral">Unilateral (one-way)</option>
                             </select>
@@ -1875,7 +1875,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Confidentiality Period</label>
-                            <select id="confPeriod">
+                            <select id="confPeriod" onchange="refreshAllScores()">
                                 <option value="1">1 year</option>
                                 <option value="2" selected>2 years</option>
                                 <option value="3">3 years</option>
@@ -2035,7 +2035,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Residual Knowledge</label>
-                            <select id="residualKnowledge">
+                            <select id="residualKnowledge" onchange="refreshAllScores()">
                                 <option value="Permitted">Permitted (standard)</option>
                                 <option value="Restricted">Restricted (strict)</option>
                             </select>
@@ -2043,7 +2043,7 @@
                         </div>
                         <div class="form-group">
                             <label>Return Materials Within</label>
-                            <select id="returnDays">
+                            <select id="returnDays" onchange="refreshAllScores()">
                                 <option value="10">10 days</option>
                                 <option value="14" selected>14 days</option>
                                 <option value="30">30 days</option>
@@ -2054,7 +2054,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Written Certification of Destruction</label>
-                            <select id="writtenCert">
+                            <select id="writtenCert" onchange="refreshAllScores()">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
@@ -2062,7 +2062,7 @@
                         </div>
                         <div class="form-group">
                             <label>Restrict Professional Advisors</label>
-                            <select id="restrictAdvisors">
+                            <select id="restrictAdvisors" onchange="refreshAllScores()">
                                 <option value="No">No — permitted (default from NDA)</option>
                                 <option value="Yes">Yes — require prior written consent</option>
                             </select>
@@ -2072,7 +2072,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Prohibit Public LLM / AI Uploads</label>
-                            <select id="prohibitLLM">
+                            <select id="prohibitLLM" onchange="refreshAllScores()">
                                 <option value="Yes">Yes — prohibit</option>
                                 <option value="No">No</option>
                             </select>
@@ -2080,7 +2080,7 @@
                         </div>
                         <div class="form-group">
                             <label>Notify Before Legal Disclosure</label>
-                            <select id="notifyCompelled">
+                            <select id="notifyCompelled" onchange="refreshAllScores()">
                                 <option value="Yes">Yes (unless prohibited by court order)</option>
                                 <option value="No">No</option>
                             </select>
@@ -2094,7 +2094,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Solicitation</label>
-                            <select id="prohibitSoliciting" onchange="toggleSolicitFields()">
+                            <select id="prohibitSoliciting" onchange="toggleSolicitFields();refreshAllScores()">
                                 <option value="No">No</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -2132,7 +2132,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Non-Compete</label>
-                            <select id="nonCompete" onchange="toggleCompeteFields()">
+                            <select id="nonCompete" onchange="toggleCompeteFields();refreshAllScores()">
                                 <option value="No">No (recommended for NDA)</option>
                                 <option value="Yes">Yes</option>
                             </select>
@@ -2163,7 +2163,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Remedy Type</label>
-                            <select id="breachRemedy" onchange="toggleBreachFields()">
+                            <select id="breachRemedy" onchange="toggleBreachFields();refreshAllScores()">
                                 <option value="Damages">Actual Damages Only (default)</option>
                                 <option value="Liquidated">Liquidated Damages (common law)</option>
                                 <option value="Penalty">Contractual Penalty (civil law only)</option>
@@ -2196,7 +2196,7 @@
                     <details class="hint-wrap" style="margin-top:-2px;"><summary>ⓘ</summary><p class="field-hint">• <strong>Courts</strong> — simple, public, best for domestic deals<br>• <strong>Arbitration</strong> — private, enforceable in 170+ countries. Best for cross-border<br>• <strong>Mediation then Arbitration</strong> — negotiation step first, saves cost. Best for long-term relationships<br>• Choose institution (ICC, LCIA, SIAC) matching your deal geography</p></details>
                     <div class="form-group">
                         <label>Dispute Resolution Method</label>
-                        <select id="disputeMethod" onchange="toggleArbFields()">
+                        <select id="disputeMethod" onchange="toggleArbFields();refreshAllScores()">
                             <option value="Courts">Courts (default)</option>
                             <option value="Arbitration">Arbitration</option>
                             <option value="Mediation then Arbitration">Mediation then Arbitration</option>
@@ -3551,7 +3551,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             document.getElementById('emailBody').value = body;
         }
 
-        function calculateNDAStrength(enhanced) {
+        function calculateNDAStrength() {
             let score = 0;
             const tags = [];
 
@@ -3584,47 +3584,64 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             score += 28;
             tags.push({name:'Standard protections', on:true});
 
-            // ── Enhanced NDA scoring ──
-            if (enhanced) {
-                // Residual Knowledge
-                const residual = document.getElementById('residualKnowledge').value;
-                if (residual === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
+            // ── Advanced clause scoring (always read from form, live) ──
+            const residualEl = document.getElementById('residualKnowledge');
+            if (residualEl) {
+                if (residualEl.value === 'Restricted') { score += 8; tags.push({name:'Residual restricted', on:true}); }
                 else { tags.push({name:'Residual permitted', on:false}); }
+            }
 
-                // Return period
-                const returnD = parseInt(document.getElementById('returnDays').value);
+            const returnEl = document.getElementById('returnDays');
+            if (returnEl) {
+                const returnD = parseInt(returnEl.value);
                 if (returnD <= 10) { score += 5; } else if (returnD <= 14) { score += 3; } else { score += 1; }
+            }
 
-                // Written certification
-                if (document.getElementById('writtenCert').value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
+            const certEl = document.getElementById('writtenCert');
+            if (certEl) {
+                if (certEl.value === 'Yes') { score += 6; tags.push({name:'Destruction cert', on:true}); }
                 else { tags.push({name:'No destruction cert', on:false}); }
+            }
 
-                // Restrict advisors
-                if (document.getElementById('restrictAdvisors').value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
+            const advisorEl = document.getElementById('restrictAdvisors');
+            if (advisorEl) {
+                if (advisorEl.value === 'Yes') { score += 6; tags.push({name:'Advisors restricted', on:true}); }
                 else { tags.push({name:'Advisors permitted', on:false}); }
+            }
 
-                // LLM prohibition
-                if (document.getElementById('prohibitLLM').value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
+            const llmEl = document.getElementById('prohibitLLM');
+            if (llmEl) {
+                if (llmEl.value === 'Yes') { score += 5; tags.push({name:'AI/LLM prohibition', on:true}); }
                 else { tags.push({name:'No AI clause', on:false}); }
+            }
 
-                // Compelled disclosure notice
-                if (document.getElementById('notifyCompelled').value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+            const compelledEl = document.getElementById('notifyCompelled');
+            if (compelledEl) {
+                if (compelledEl.value === 'Yes') { score += 4; tags.push({name:'Disclosure notice', on:true}); }
+            }
 
-                // Non-solicitation
-                if (document.getElementById('prohibitSoliciting').value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
+            const solicitEl = document.getElementById('prohibitSoliciting');
+            if (solicitEl) {
+                if (solicitEl.value === 'Yes') { score += 8; tags.push({name:'Non-solicitation', on:true}); }
                 else { tags.push({name:'No non-solicit', on:false}); }
+            }
 
-                // Non-compete
-                if (document.getElementById('nonCompete').value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
+            const competeEl = document.getElementById('nonCompete');
+            if (competeEl) {
+                if (competeEl.value === 'Yes') { score += 8; tags.push({name:'Non-compete', on:true}); }
                 else { tags.push({name:'No non-compete', on:false}); }
+            }
 
-                // Breach remedy
-                const remedy = document.getElementById('breachRemedy').value;
+            const remedyEl = document.getElementById('breachRemedy');
+            if (remedyEl) {
+                const remedy = remedyEl.value;
                 if (remedy === 'Liquidated' || remedy === 'Penalty') { score += 10; tags.push({name: remedy === 'Liquidated' ? 'Liquidated damages' : 'Contractual penalty', on:true}); }
                 else { tags.push({name:'Actual damages only', on:false}); }
+            }
 
-                // Dispute resolution
-                const dispute = document.getElementById('disputeMethod').value;
+            const disputeEl = document.getElementById('disputeMethod');
+            if (disputeEl) {
+                const dispute = disputeEl.value;
                 if (dispute.includes('Arbitration')) { score += 6; tags.push({name:'Arbitration', on:true}); }
                 if (dispute.includes('Mediation')) { score += 2; tags.push({name:'Mediation step', on:true}); }
             }
@@ -3643,9 +3660,9 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             return { score, level, color, tags };
         }
 
-        function renderStrengthMeter(num, enhanced) {
+        function renderStrengthMeter(num) {
             // Strictness only — Confidence is handled by refreshAllScores()
-            const { score, level, color, tags } = calculateNDAStrength(enhanced);
+            const { score, level, color, tags } = calculateNDAStrength();
             const bar = document.getElementById('strengthBar' + num);
             const label = document.getElementById('strengthLabel' + num);
             const breakdown = document.getElementById('strengthBreakdown' + num);
@@ -3720,9 +3737,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
         // ═══════ Unified score refresh — single source of truth ═══════
         function refreshAllScores() {
             if (!generatedNDAText) return;
-            const enhanced = !!generatedNDAText2;
-            const srcNum = enhanced ? 2 : 1;
-            const { score, level, color, tags } = calculateNDAStrength(enhanced);
+            const { score, level, color, tags } = calculateNDAStrength();
 
             // ── Confidence Score (same on every page) ──
             const conf = 50 + checklistBonus + playbookBonus;
@@ -4678,7 +4693,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState1');
 
                 generatedNDAText = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
-                renderStrengthMeter(1, false);
+                renderStrengthMeter(1);
                 document.getElementById('persistentBlocks').classList.remove('hidden');
                 updateDocsPanel();
                 updateBadge(1);
@@ -4708,7 +4723,7 @@ FORMATTING:
                 const loadingEl = document.getElementById('loadingState2');
 
                 generatedNDAText2 = await streamGenerate(prompt, contentEl, resultEl, loadingEl);
-                renderStrengthMeter(2, true);
+                renderStrengthMeter(2);
                 updateDocsPanel();
                 updateBadge(2);
                 // Show Compare button if both NDAs exist
