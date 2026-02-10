@@ -264,7 +264,7 @@
             left: 50%;
             transform: translateX(-50%) translateY(-4px);
             background: var(--text);
-            color: white;
+            color: var(--bg);
             font-size: 0.68rem;
             font-weight: 400;
             padding: 10px 14px;
@@ -543,7 +543,7 @@
             left: 50%;
             transform: translateX(-50%) translateY(4px);
             background: var(--text);
-            color: white;
+            color: var(--bg);
             font-size: 0.68rem;
             font-weight: 400;
             padding: 8px 12px;
@@ -810,7 +810,7 @@
             left: 0;
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, rgba(120,140,93,0.45), rgba(120,140,93,0.7));
+            background: var(--green);
             border-radius: 26px;
             transition: width 0.05s linear;
             pointer-events: none;
@@ -1337,6 +1337,9 @@
             margin: 24px auto;
             padding: 16px 24px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .legal-disclaimer-bar p {
             font-size: 0.72rem;
@@ -2542,7 +2545,7 @@
                                 <svg viewBox="0 0 24 24"><path d="M13 5l7 7-7 7"/><path d="M4 12h16"/></svg>
                             </div>
                         </div>
-                        <p id="slideHint" style="text-align:center;font-size:0.62rem;color:var(--text-secondary);margin-top:6px;">Drag the handle to 100 to order Legal Review</p>
+                        <p id="slideHint" style="text-align:center;font-size:0.62rem;color:var(--accent);font-weight:600;margin-top:6px;">Drag the handle to 100 to order Legal Review</p>
                     </div>
                 </div>
             </div>
@@ -2661,6 +2664,8 @@
                     </div>
                 </div>
             </div>
+
+            <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="width:100%;margin-top:12px;white-space:nowrap;">↻ Create Another NDA</button>
         </div>
 
         <!-- ═══════ Persistent Blocks (visible after first NDA) ═══════ -->
@@ -3839,7 +3844,7 @@ ${senderName}${senderTitle ? '\n' + senderTitle : ''}${senderCompany ? '\n' + se
             fill.style.width = (slideCtaState.minPct * 100) + '%';
             if (label) { label.style.opacity = '1'; label.textContent = 'Slide to 100 to order Legal Review →'; }
             if (scoreLabel) { scoreLabel.textContent = conf + '/100'; }
-            if (hint) hint.textContent = conf >= 100 ? '' : 'Drag the handle to 100 to confirm your order';
+            if (hint) hint.textContent = '';
         }
         (function initSlideCta() {
             var dragging = false;
