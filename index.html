@@ -62,6 +62,10 @@
         }
         [data-theme="dark"] .cta-step--playbook { background: var(--card); }
         [data-theme="dark"] .cta-step--review { background: var(--card); }
+        [data-theme="dark"] .slide-cta { background: #3d1f1f; border-color: #5a2d2d; }
+        [data-theme="dark"] .slide-cta-label { color: #f87171; }
+        [data-theme="dark"] .slide-cta-thumb { background: #232321; border-color: var(--green); }
+        [data-theme="dark"] .slide-cta-thumb svg { stroke: var(--green); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -234,6 +238,8 @@
         }
         .step-badge:hover {
             background: var(--border-light);
+            outline: 2px solid #f59e0b;
+            outline-offset: 1px;
         }
         .step-badge.active {
             background: var(--accent);
@@ -245,13 +251,14 @@
             color: var(--green);
             cursor: pointer;
         }
-        .step-badge.active:hover { background: var(--accent-hover); }
-        .step-badge.done:hover { background: rgba(61, 154, 95, 0.15); }
+        .step-badge.active:hover { background: var(--accent-hover); outline: 2px solid #f59e0b; outline-offset: 1px; }
+        .step-badge.done:hover { background: rgba(61, 154, 95, 0.15); outline: 2px solid #f59e0b; outline-offset: 1px; }
         .step-badge.inactive {
             background: var(--bg-warm);
             color: var(--text-muted);
             border: 1px solid var(--border-light);
         }
+        .step-badge.inactive:hover { outline: 2px solid #f59e0b; outline-offset: 1px; }
         .step-icon { width: 18px; height: 18px; flex-shrink: 0; stroke-width: 2; }
         .step-badge.active .step-icon { stroke: white; }
         .step-badge.done .step-icon { stroke: var(--green); }
@@ -794,8 +801,8 @@
             width: 100%;
             height: 52px;
             border-radius: 26px;
-            background: var(--green);
-            border: 1px solid var(--green);
+            background: #fde8e1;
+            border: 1px solid #f5c6b8;
             overflow: hidden;
             cursor: default;
             user-select: none;
@@ -824,11 +831,13 @@
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
+            padding-right: 16px;
+            box-sizing: border-box;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            color: #d97757;
+            color: #b91c1c;
             letter-spacing: 0.02em;
             pointer-events: none;
             transition: opacity 0.2s;
@@ -840,14 +849,15 @@
             width: 44px;
             height: 44px;
             border-radius: 22px;
-            background: var(--green);
+            background: #ffffff;
+            border: 2.5px solid var(--green);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: grab;
-            transition: left 0.05s linear, box-shadow 0.2s;
+            transition: left 0.05s linear, box-shadow 0.2s, border-color 0.2s;
             z-index: 2;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18), 0 0 0 3px rgba(120,140,93,0.2);
         }
         .slide-cta-thumb:active { cursor: grabbing; }
         .slide-cta-thumb.returning {
@@ -856,7 +866,7 @@
         .slide-cta-thumb svg {
             width: 18px;
             height: 18px;
-            stroke: white;
+            stroke: var(--green);
             fill: none;
             stroke-width: 2.5;
             stroke-linecap: round;
@@ -870,10 +880,16 @@
         .slide-cta.completed .slide-cta-label {
             color: var(--green);
             font-weight: 700;
+            justify-content: center;
+            padding-right: 0;
         }
         .slide-cta.completed .slide-cta-thumb {
             background: var(--green);
+            border-color: var(--green);
             box-shadow: 0 0 0 4px rgba(120,140,93,0.2);
+        }
+        .slide-cta.completed .slide-cta-thumb svg {
+            stroke: white;
         }
         @media (prefers-reduced-motion: reduce) {
             .slide-cta-fill, .slide-cta-thumb { transition: none !important; }
@@ -1332,7 +1348,7 @@
         }
         .legal-disclaimer-bar {
             max-width: 600px;
-            margin: 24px auto;
+            margin: 0 auto;
             padding: 16px 24px;
             text-align: center;
             display: flex;
@@ -1345,6 +1361,16 @@
             color: var(--text-muted);
         }
         .legal-disclaimer-bar strong { color: var(--text-secondary); font-weight: 600; }
+        .step-disclaimer-spacer {
+            flex-grow: 1;
+            min-height: 24px;
+        }
+        .step-disclaimer-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
         .footer-inner {
             max-width: 1100px;
             margin: 0 auto;
@@ -1476,6 +1502,7 @@
         .testimonial-role a:hover { text-decoration: underline; }
 
         .hidden { display: none !important; }
+        .space-y { display: flex; flex-direction: column; min-height: calc(100vh - 200px); }
         .space-y > * + * { margin-top: 16px; }
 
         /* ─── NDA Comparison Modal ─── */
@@ -2033,6 +2060,8 @@
                     <button class="btn-nav btn-nav--muted" onclick="navigateStep(3)" style="white-space:nowrap;">Skip to Checklist »</button>
                 </div>
             </div>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ STEP 2: Enhanced ═══════ -->
@@ -2365,6 +2394,8 @@
                     <button class="btn-nav btn-nav--muted" onclick="navigateStep(4)" style="white-space:nowrap;">Skip to Review »</button>
                 </div>
             </div>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ STEP 3: NDA Checklist ═══════ -->
@@ -2470,6 +2501,8 @@
                 <button class="btn-nav" style="flex:1;" onclick="navigateStep(4)">Lawyer Review →</button>
                 <button class="btn-nav btn-nav--muted" onclick="navigateStep(5)" style="white-space:nowrap;">Skip to Summary »</button>
             </div>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ STEP 4: Lawyer Review ═══════ -->
@@ -2553,6 +2586,8 @@
                 <button class="btn-nav" style="flex:1;" onclick="navigateStep(5)">Final Summary →</button>
                 <button class="btn-nav btn-nav--muted" onclick="navigateStep(6)" style="white-space:nowrap;">Skip to Send »</button>
             </div>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ STEP 5: Final Summary ═══════ -->
@@ -2612,6 +2647,8 @@
                     <button class="btn-nav" style="flex:1;" onclick="navigateStep(6)">Send NDA →</button>
                 </div>
             </div>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ STEP 6: Send NDA ═══════ -->
@@ -2664,6 +2701,8 @@
             </div>
 
             <button class="btn-nav btn-nav--muted" onclick="navigateStep(1)" style="width:100%;margin-top:12px;white-space:nowrap;">↻ Create Another NDA</button>
+            <div class="step-disclaimer-spacer"></div>
+            <div class="step-disclaimer-wrap"><div class="legal-disclaimer-bar"><p><strong>Legal disclaimer.</strong> This tool generates NDA drafts using AI and does not constitute legal advice. No attorney-client relationship is created. Consult a qualified lawyer before using.</p></div></div>
         </div>
 
         <!-- ═══════ Persistent Blocks (visible after first NDA) ═══════ -->
