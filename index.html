@@ -4629,10 +4629,14 @@ FORMATTING:
             const ct = res.headers.get('content-type') || '';
 
             if (ct.includes('application/json')) {
-                // JSON error from our function
+                // JSON error from streaming function — fall back to non-streaming
                 let data;
                 try { data = await res.json(); } catch(e) { data = {}; }
-                throw new Error(data.error || 'Generation failed');
+                console.warn('Streaming endpoint returned API error:', data.error, '— falling back');
+                const result = await fallbackGenerate(prompt, contentEl);
+                if (contentEl) contentEl.innerHTML = formatNDA(result);
+                if (loadingEl) loadingEl.classList.add('hidden');
+                return result;
             }
 
             if (!ct.includes('text/event-stream')) {
