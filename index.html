@@ -3121,6 +3121,8 @@
             document.getElementById(`party${party}Name`).value = company.name || '';
             document.getElementById(`party${party}CompanyNumber`).value = company.companyNumber || '';
             document.getElementById(`party${party}Address`).value = company.address || '';
+            // Store registry jurisdiction code for governing law fallback
+            document.getElementById(`party${party}Address`).dataset.registryJurisdiction = company.jurisdiction || '';
             if (company.companyType) {
                 const typeMap = {
                     'ltd': 'LTD', 'private-limited-guarant-nsc': 'LTD', 'plc': 'Corporation', 'llp': 'Partnership',
@@ -3223,13 +3225,15 @@
                 return document.getElementById('governingLawCustom').value.trim();
             }
             if (sel.value === 'partyA' || !sel.value) {
-                // Default: detect from Party A address
+                // Default: detect from Party A address, fallback to registry jurisdiction
                 const addrA = document.getElementById('partyAAddress').value;
-                const jurA = detectJurisdictionFromAddress(addrA);
+                const jurA = detectJurisdictionFromAddress(addrA)
+                    || mapRegistryJurisdictionToLaw(document.getElementById('partyAAddress').dataset.registryJurisdiction);
                 if (jurA) return jurA;
                 // Fallback: try Party B
                 const addrB = document.getElementById('partyBAddress').value;
-                const jurB = detectJurisdictionFromAddress(addrB);
+                const jurB = detectJurisdictionFromAddress(addrB)
+                    || mapRegistryJurisdictionToLaw(document.getElementById('partyBAddress').dataset.registryJurisdiction);
                 return jurB || '';
             }
             return sel.value;
@@ -3470,7 +3474,100 @@
                     if (addr.includes(kw)) return law;
                 }
             }
+            // Fallback: generic 'united kingdom' → default to England and Wales
+            // (checked after loop so Scotland/NI-specific keywords take priority)
+            if (addr.includes('united kingdom')) return 'England and Wales';
             return null;
+        }
+
+        function mapRegistryJurisdictionToLaw(code) {
+            if (!code) return null;
+            const c = code.toUpperCase().replace(/_/g, '-');
+            const map = {
+                'GB': 'England and Wales',
+                'GB-ENG': 'England and Wales',
+                'GB-WLS': 'England and Wales',
+                'GB-SCT': 'Scotland',
+                'GB-NIR': 'Northern Ireland',
+                'CZ': 'Czech Republic',
+                'EE': 'Republic of Estonia',
+                'LT': 'Republic of Lithuania',
+                'LV': 'Republic of Latvia',
+                'PL': 'Republic of Poland',
+                'DE': 'Germany',
+                'FR': 'France',
+                'NL': 'The Netherlands',
+                'BE': 'Kingdom of Belgium',
+                'IE': 'Republic of Ireland',
+                'ES': 'Kingdom of Spain',
+                'PT': 'Republic of Portugal',
+                'IT': 'Republic of Italy',
+                'AT': 'Republic of Austria',
+                'CH': 'Switzerland',
+                'SE': 'Kingdom of Sweden',
+                'DK': 'Kingdom of Denmark',
+                'FI': 'Republic of Finland',
+                'NO': 'Kingdom of Norway',
+                'HU': 'Hungary',
+                'SK': 'Slovak Republic',
+                'SI': 'Republic of Slovenia',
+                'HR': 'Republic of Croatia',
+                'RO': 'Romania',
+                'BG': 'Republic of Bulgaria',
+                'GR': 'Republic of Greece',
+                'CY': 'Republic of Cyprus',
+                'MT': 'Republic of Malta',
+                'LU': 'Grand Duchy of Luxembourg',
+                'SG': 'Singapore',
+                'HK': 'Hong Kong',
+                'AE': 'UAE Federal Law',
+                'AE-DU': 'Emirate of Dubai',
+                'AE-AZ': 'Emirate of Abu Dhabi',
+                'US-DE': 'Delaware, USA',
+                'US-NY': 'State of New York, USA',
+                'US-CA': 'State of California, USA',
+                'US-TX': 'State of Texas, USA',
+                'US-FL': 'State of Florida, USA',
+                'US-IL': 'State of Illinois, USA',
+                'US-WA': 'State of Washington, USA',
+                'US-MA': 'State of Massachusetts, USA',
+                'US-CO': 'State of Colorado, USA',
+                'US-GA': 'State of Georgia, USA',
+                'US-WY': 'State of Wyoming, USA',
+                'US-NV': 'State of Nevada, USA',
+                'JP': 'Japan',
+                'KR': 'Republic of Korea',
+                'CN': "People's Republic of China",
+                'IN': 'Republic of India',
+                'AU': 'Australia',
+                'NZ': 'New Zealand',
+                'IL': 'State of Israel',
+                'SA': 'Kingdom of Saudi Arabia',
+                'QA': 'State of Qatar',
+                'BH': 'Kingdom of Bahrain',
+                'KW': 'State of Kuwait',
+                'TR': 'Republic of Turkey',
+                'UA': 'Ukraine',
+                'RS': 'Republic of Serbia',
+                'ZA': 'Republic of South Africa',
+                'NG': 'Federal Republic of Nigeria',
+                'KE': 'Republic of Kenya',
+                'BR': 'Federative Republic of Brazil',
+                'MX': 'United Mexican States',
+                'AR': 'Argentine Republic',
+                'CL': 'Republic of Chile',
+                'CO': 'Republic of Colombia',
+                'VG': 'British Virgin Islands',
+                'KY': 'Cayman Islands',
+                'BM': 'Bermuda',
+                'JE': 'Jersey',
+                'GG': 'Guernsey',
+                'IM': 'Isle of Man',
+                'GI': 'Gibraltar',
+                'LI': 'Principality of Liechtenstein',
+                'MC': 'Principality of Monaco',
+            };
+            return map[c] || null;
         }
 
         function toggleCustomGoverningLaw() {
@@ -3484,11 +3581,13 @@
             const current = sel.value;
             sel.innerHTML = '';
 
-            // Detect jurisdictions from party addresses
+            // Detect jurisdictions from party addresses, fallback to registry jurisdiction code
             const addrA = document.getElementById('partyAAddress').value;
             const addrB = document.getElementById('partyBAddress').value;
-            const jurA = detectJurisdictionFromAddress(addrA);
-            const jurB = detectJurisdictionFromAddress(addrB);
+            const regJurA = document.getElementById('partyAAddress').dataset.registryJurisdiction || '';
+            const regJurB = document.getElementById('partyBAddress').dataset.registryJurisdiction || '';
+            const jurA = detectJurisdictionFromAddress(addrA) || mapRegistryJurisdictionToLaw(regJurA);
+            const jurB = detectJurisdictionFromAddress(addrB) || mapRegistryJurisdictionToLaw(regJurB);
 
             // Party A option (default)
             const optA = document.createElement('option');
