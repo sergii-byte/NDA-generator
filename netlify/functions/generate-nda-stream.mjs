@@ -57,10 +57,15 @@ export default async (req, context) => {
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text();
       console.error("Anthropic API error:", apiResponse.status, errorText);
+      let errorMessage = `Claude API error (${apiResponse.status}).`;
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error && errorData.error.message) {
+          errorMessage = errorData.error.message;
+        }
+      } catch (_) {}
       return new Response(
-        JSON.stringify({
-          error: `Claude API error (${apiResponse.status}). Please try again.`,
-        }),
+        JSON.stringify({ error: errorMessage }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
